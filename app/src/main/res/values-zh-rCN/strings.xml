@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">同学帮</string>
+    <string name="title_home">首页</string>
+    <string name="title_notice">通知</string>
+    <string name="title_me">我的</string>
+    <string name="button_login">登录</string>
+    <string name="button_register">注册</string>
+    <string name="button_certificate">认证</string>
+    <string name="button_publish">发布</string>
+    <string name="button_detail">详情</string>
+    <string name="button_conversation">会话</string>
+    <string name="button_announcement">公告</string>
+    <string name="button_zone">空间</string>
+    <string name="button_account">账户</string>
+    <string name="button_wallet">钱包</string>
+    <string name="button_history">历史</string>
+    <string name="button_settings">设置</string>
+    <string name="button_about">关于</string>
+    <string name="title_login">用户登录</string>
+    <string name="title_register">用户注册</string>
+    <string name="title_certificate">学籍认证</string>
+    <string name="title_publish">活动发布</string>
+    <string name="title_detail">活动详情</string>
+    <string name="title_conversation">活动会话</string>
+    <string name="title_announcement">系统公告</string>
+    <string name="title_zone">个人空间</string>
+    <string name="title_account">账户信息</string>
+    <string name="title_wallet">我的钱包</string>
+    <string name="title_history">历史活动</string>
+    <string name="title_settings">软件设置</string>
+    <string name="title_about">关于我们</string>
+    <string name="title_errand">活动详情</string>
+</resources>

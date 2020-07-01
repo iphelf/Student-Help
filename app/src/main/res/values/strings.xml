@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">Student Help</string>
+    <string name="title_home">Home</string>
+    <string name="title_notice">Notice</string>
+    <string name="title_me">Me</string>
+    <string name="button_login">Login</string>
+    <string name="button_register">Register</string>
+    <string name="button_certificate">Certificate</string>
+    <string name="button_publish">Publish</string>
+    <string name="button_detail">Detail</string>
+    <string name="button_conversation">Conversation</string>
+    <string name="button_announcement">Announcement</string>
+    <string name="button_zone">Zone</string>
+    <string name="button_account">Account</string>
+    <string name="button_wallet">Wallet</string>
+    <string name="button_history">History</string>
+    <string name="button_settings">Settings</string>
+    <string name="button_about">About</string>
+    <string name="title_login">Login</string>
+    <string name="title_register">Register</string>
+    <string name="title_certificate">Certificate</string>
+    <string name="title_publish">Publish</string>
+    <string name="title_detail">Detail</string>
+    <string name="title_conversation">Conversation</string>
+    <string name="title_announcement">Announcement</string>
+    <string name="title_zone">Zone</string>
+    <string name="title_account">Account</string>
+    <string name="title_wallet">Wallet</string>
+    <string name="title_history">History</string>
+    <string name="title_settings">Settings</string>
+    <string name="title_about">About</string>
+    <string name="title_errand">Errand</string>
+</resources>
