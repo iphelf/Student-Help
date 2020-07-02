@@ -35,4 +35,13 @@
     <string name="hint_realName">Real name</string>
     <string name="hint_studentId">Student ID</string>
     <string name="checkBox_certificate">Certificate</string>
+    <string name="hint_search">Search</string>
+    <string name="state_waiting">Waiting</string>
+    <string name="state_ongoing">Ongoing</string>
+    <string name="state_complete">Complete</string>
+    <string name="state_deleted">Deleted</string>
+    <string name="state_all">All</string>
+    <string name="type_all">All</string>
+    <string name="type_deal">Deal</string>
+    <string name="type_group">Group</string>
 </resources>
