@@ -31,4 +31,9 @@
     <string name="title_settings">软件设置</string>
     <string name="title_about">关于我们</string>
     <string name="title_errand">活动详情</string>
+    <string name="hint_username">请输入用户名</string>
+    <string name="hint_password">请输入密码</string>
+    <string name="hint_studentId">请输入学号</string>
+    <string name="hint_realName">请输入真实姓名</string>
+    <string name="checkBox_certificate">认证</string>
 </resources>

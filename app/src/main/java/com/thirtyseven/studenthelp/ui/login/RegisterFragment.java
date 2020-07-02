@@ -9,6 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.Switch;
+import android.widget.ToggleButton;
 
 import com.thirtyseven.studenthelp.R;
 
@@ -64,12 +67,12 @@ public class RegisterFragment extends Fragment {
                              Bundle savedInstanceState) {
         requireActivity().setTitle(R.string.title_register);
         // Inflate the layout for this fragment
-        View root= inflater.inflate(R.layout.fragment_register, container, false);
-        Button buttonCertificate=root.findViewById(R.id.button_certificate);
-        buttonCertificate.setOnClickListener(
+        View root = inflater.inflate(R.layout.fragment_register, container, false);
+        CheckBox checkBoxCertificate = root.findViewById(R.id.checkBox_certificate);
+        checkBoxCertificate.setOnClickListener(
                 Navigation.createNavigateOnClickListener(R.id.action_registerFragment_to_certificateFragment)
         );
-        Button buttonRegister=root.findViewById(R.id.button_register);
+        Button buttonRegister = root.findViewById(R.id.button_register);
         buttonRegister.setOnClickListener(
                 Navigation.createNavigateOnClickListener(R.id.action_registerFragment_to_loginFragment)
         );
