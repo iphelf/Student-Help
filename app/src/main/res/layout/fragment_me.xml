@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayout_name"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.main.MeFragment">
@@ -15,60 +16,124 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.100000024" />
 
-    <Button
-        android:id="@+id/button_account"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/linearLayout_zone"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/button_account"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_zone" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.20">
 
-    <Button
-        android:id="@+id/button_zone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/button_zone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView6" />
+        <Button
+            android:id="@+id/button_zone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorWhite"
+            android:text="@string/button_zone" />
 
-    <Button
-        android:id="@+id/button_wallet"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/button_wallet"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_account" />
+    </LinearLayout>
 
-    <Button
-        android:id="@+id/button_history"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/linearLayout_account"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/button_history"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_wallet" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.30">
 
-    <Button
-        android:id="@+id/button_settings"
-        android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/button_account"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorWhite"
+            android:text="@string/button_account" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout_wallent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/button_settings"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_history" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.40">
 
-    <Button
-        android:id="@+id/button_about"
-        android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/button_wallet"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorWhite"
+            android:text="@string/button_wallet" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout_history"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/button_about"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_settings" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <Button
+            android:id="@+id/button_history"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorWhite"
+            android:text="@string/button_history" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout_settings"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="9dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.6">
+
+        <Button
+            android:id="@+id/button_settings"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorWhite"
+            android:text="@string/button_settings" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout_about"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.7">
+
+        <Button
+            android:id="@+id/button_about"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorWhite"
+            android:text="@string/button_about" />
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
