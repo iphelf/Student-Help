@@ -50,5 +50,9 @@
     <string name="tabItem_conversation">Conversation</string>
     <string name="tabItem_progress">Progress</string>
     <string name="tabItem_announcement">Announcement</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="editText_title">Title</string>
+    <string name="radioButton_deal">Deal</string>
+    <string name="radioButton_group">Group</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

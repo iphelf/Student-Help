@@ -56,7 +56,7 @@
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
 
         <Spinner
-            android:id="@+id/spinner_tags"
+            android:id="@+id/spinner_tag"
             android:layout_width="122dp"
             android:layout_height="40dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -72,7 +72,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/spinner_state"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/spinner_tags"
+            app:layout_constraintStart_toEndOf="@+id/spinner_tag"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Spinner

@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class HomeFragment extends Fragment {
 
@@ -49,7 +48,7 @@ public class HomeFragment extends Fragment {
         String[] tags = {
                 "全部", "代领快递", "寻物启事", "二手交易", "组队征集", "学习辅导", "问卷调查", "其他"
         };
-        Spinner spinnerTag = root.findViewById(R.id.spinner_tags);
+        Spinner spinnerTag = root.findViewById(R.id.spinner_tag);
         ArrayAdapter<String> arrayAdapterTag = new ArrayAdapter<>(
                 requireContext(),
                 R.layout.support_simple_spinner_dropdown_item,
