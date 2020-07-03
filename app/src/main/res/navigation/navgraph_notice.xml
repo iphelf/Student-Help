@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navgraph_notice"
+    app:startDestination="@id/noticeConversationFragment">
+
+    <fragment
+        android:id="@+id/noticeConversationFragment"
+        android:name="com.thirtyseven.studenthelp.ui.notice.NoticeConversationFragment"
+        android:label="fragment_notice_conversation"
+        tools:layout="@layout/fragment_notice_conversation" />
+    <fragment
+        android:id="@+id/noticeProgressFragment"
+        android:name="com.thirtyseven.studenthelp.ui.notice.NoticeProgressFragment"
+        android:label="fragment_notice_progress"
+        tools:layout="@layout/fragment_notice_progress" />
+    <fragment
+        android:id="@+id/noticeAnnouncementFragment"
+        android:name="com.thirtyseven.studenthelp.ui.notice.NoticeAnnouncementFragment"
+        android:label="fragment_notice_announcement"
+        tools:layout="@layout/fragment_notice_announcement" />
+</navigation>

@@ -1,24 +1,25 @@
 package com.thirtyseven.studenthelp.ui.main;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.NavigationUI;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.tabs.TabItem;
+import com.google.android.material.tabs.TabLayout;
 import com.thirtyseven.studenthelp.R;
-import com.thirtyseven.studenthelp.data.Errand;
-import com.thirtyseven.studenthelp.ui.common.ConversationActivity;
-import com.thirtyseven.studenthelp.ui.common.ErrandActivity;
-import com.thirtyseven.studenthelp.ui.notice.AnnouncementActivity;
+import com.thirtyseven.studenthelp.ui.MainActivity;
+
 
 public class NoticeFragment extends Fragment {
 
@@ -30,30 +31,42 @@ public class NoticeFragment extends Fragment {
                 ViewModelProviders.of(this).get(NoticeViewModel.class);
         requireActivity().setTitle(R.string.title_notice);
         View root = inflater.inflate(R.layout.fragment_notice, container, false);
-        Button buttonDetail=root.findViewById(R.id.button_detail);
-        buttonDetail.setOnClickListener(new View.OnClickListener() {
+        TabLayout tabLayout = root.findViewById(R.id.tabLayout);
+        final NavController navController = Navigation.findNavController(root.findViewById(R.id.navHostFragment_notice));
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
-            public void onClick(View view) {
-                Intent intent=new Intent(getActivity(), ErrandActivity.class);
-                startActivity(intent);
+            public void onTabSelected(TabLayout.Tab tab) {
+                NavOptions navOptions = new NavOptions.Builder()
+                        .setPopUpTo(R.id.noticeConversationFragment,false)
+                        .build();
+                switch (tab.getPosition()) {
+                    case 0:
+                        navController.navigate(R.id.noticeConversationFragment, null, navOptions);
+                        break;
+                    case 1:
+                        navController.navigate(R.id.noticeProgressFragment, null, navOptions);
+                        break;
+                    case 2:
+                        navController.navigate(R.id.noticeAnnouncementFragment, null, navOptions);
+                        break;
+                }
             }
-        });
-        Button buttonConversation=root.findViewById(R.id.button_conversation);
-        buttonConversation.setOnClickListener(new View.OnClickListener() {
+
             @Override
-            public void onClick(View view) {
-                Intent intent=new Intent(getActivity(), ConversationActivity.class);
-                startActivity(intent);
+            public void onTabUnselected(TabLayout.Tab tab) {
+
             }
-        });
-        Button buttonAnnouncement=root.findViewById(R.id.button_announcement);
-        buttonAnnouncement.setOnClickListener(new View.OnClickListener() {
+
             @Override
-            public void onClick(View view) {
-                Intent intent=new Intent(getActivity(), AnnouncementActivity.class);
-                startActivity(intent);
+            public void onTabReselected(TabLayout.Tab tab) {
+
             }
+
         });
+
+
         return root;
     }
 }
+

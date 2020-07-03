@@ -48,4 +48,7 @@
     <string name="type_all">全部</string>
     <string name="type_deal">悬赏</string>
     <string name="type_group">组队</string>
+    <string name="tabItem_conversation">会话</string>
+    <string name="tabItem_progress">动态</string>
+    <string name="tabItem_announcement">公告</string>
 </resources>

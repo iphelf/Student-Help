@@ -11,5 +11,10 @@
     <style name="ButtonStyle">
         <item name="android:textColor">#080</item>
     </style>
+    <style name="TabStyle">
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="tabTextColor">@android:color/black</item>
+        <item name="tabSelectedTextColor">@android:color/white</item>
+    </style>
 
 </resources>

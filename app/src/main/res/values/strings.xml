@@ -47,5 +47,8 @@
     <string name="type_group">Group</string>
     <string name="button_withdrawal">Withdrawal</string>
     <string name="title_myCoin">My Coin</string>
-
+    <string name="tabItem_conversation">Conversation</string>
+    <string name="tabItem_progress">Progress</string>
+    <string name="tabItem_announcement">Announcement</string>
+    <!-- TODO: Remove or change this placeholder text -->
 </resources>
