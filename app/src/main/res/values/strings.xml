@@ -56,5 +56,10 @@
     <string name="radioButton_group">Group</string>
     <string name="text_version">Version</string>
     <string name="button_evaluate">Evaluate</string>
+    <string name="button_delete">Delete</string>
+    <string name="button_apply">Apply</string>
+    <string name="button_dismiss">dismiss</string>
+    <string name="button_resign">Resign</string>
+    <string name="button_submit">Submit</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>
