@@ -28,7 +28,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <EditText
-            android:id="@+id/editText_realName"
+            android:id="@+id/editText_username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -36,7 +36,7 @@
             android:inputType="textPersonName" />
 
         <EditText
-            android:id="@+id/editText_studentId"
+            android:id="@+id/editText_password"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"

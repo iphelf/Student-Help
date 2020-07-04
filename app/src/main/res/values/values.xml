@@ -2,5 +2,7 @@
 <resources>
     <string name="version_number" translatable="false">1.0</string>
     <string name="about_copyRight" translatable="false">©2020同学帮制作小组 版权所有</string>
+    <string name="host" translatable="false">37.iphelf.top</string>
+    <string name="urlHost" translatable="false">http://37.iphelf.top:8080</string>
     <string name="to_AllPeople" translatable="false">致所有用户：</string>
 </resources>

@@ -63,6 +63,7 @@
     <string name="text_version">版本号:</string>
     <string name="button_evaluate">评价我们</string>
     <string name="text_changeSkin">更换背景颜色</string>
+    <string name="toast_loginError">用户名或密码错误！</string>
     <string name="text_username">用户名</string>
     <string name="text_college">学院</string>
 </resources>
