@@ -25,7 +25,7 @@
 | activity_login.xml               |   ✔️   |
 | activity_main.xml                |   ✔️   |
 | activity_publish.xml             |   ✔️   |
-| activity_settings.xml            |        |
+| activity_settings.xml            |   ✔️   |
 | activity_wallet.xml              |   ✔️   |
 | activity_zone.xml                |        |
 | fragment_certificate.xml         |   ✔️   |
