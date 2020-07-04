@@ -57,19 +57,6 @@ public class HomeFragment extends Fragment {
         spinnerTag.setAdapter(arrayAdapterTag);
 
 
-        String[] types = {
-                getString(R.string.type_all),
-                getString(R.string.type_deal),
-                getString(R.string.type_group)
-        };
-        Spinner spinnerType = root.findViewById(R.id.spinner_type);
-        ArrayAdapter<String> arrayAdapterType = new ArrayAdapter<>(
-                requireContext(),
-                R.layout.support_simple_spinner_dropdown_item,
-                types
-        );
-        spinnerType.setAdapter(arrayAdapterType);
-
         String[] states = {
                 getString(R.string.state_all),
                 getString(R.string.state_waiting),
@@ -86,7 +73,7 @@ public class HomeFragment extends Fragment {
         spinnerState.setAdapter(arrayAdapterState);
 
         String[] fields = {
-                "Thumbnail", "Title", "State", "Author", "Preview", "Type"
+                "Thumbnail", "Title", "State", "Author", "Preview", "Money"
         };
         int[] fieldIds = {
                 R.id.imageView_thumbnail,
@@ -94,7 +81,7 @@ public class HomeFragment extends Fragment {
                 R.id.textView_state,
                 R.id.textView_author,
                 R.id.textView_preview,
-                R.id.textView_type
+                R.id.textView_money
         };
         List<Map<String, Object>> mapList = new ArrayList<>();
         int n = 50;

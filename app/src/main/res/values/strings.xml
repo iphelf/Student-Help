@@ -69,5 +69,7 @@
     <string name="text_autograph">Autograph</string>
     <string name="buttton_accountSave">Account Save</string>
     <string name="text_photo">Account Photo</string>
+    <string name="toast_loginError_notExist">No such user!</string>
+    <string name="toast_loginError_wrongPassword">Wrong password!</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

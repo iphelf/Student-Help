@@ -91,11 +91,30 @@ public class LoginFragment extends Fragment implements Global {
                             startActivity(intent);
                             requireActivity().finish();
                         } else {
-                            Toast.makeText(
-                                    requireContext(),
-                                    R.string.toast_loginError,
-                                    Toast.LENGTH_SHORT
-                            ).show();
+                            switch ((LoginError) object){
+                                case NotExist:
+                                    Toast.makeText(
+                                            requireContext(),
+                                            R.string.toast_loginError_notExist,
+                                            Toast.LENGTH_SHORT
+                                    ).show();
+                                    break;
+                                case WrongPassword:
+                                    Toast.makeText(
+                                            requireContext(),
+                                            R.string.toast_loginError_wrongPassword,
+                                            Toast.LENGTH_SHORT
+                                    ).show();
+                                    break;
+                                case LoginError:
+                                default:
+                                    Toast.makeText(
+                                            requireContext(),
+                                            R.string.toast_loginError,
+                                            Toast.LENGTH_SHORT
+                                    ).show();
+                                    break;
+                            }
                         }
                     }
                 });

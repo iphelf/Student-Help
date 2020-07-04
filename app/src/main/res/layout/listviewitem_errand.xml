@@ -47,7 +47,7 @@
         app:layout_constraintStart_toEndOf="@+id/imageView_thumbnail" />
 
     <TextView
-        android:id="@+id/textView_type"
+        android:id="@+id/textView_money"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="TextView"

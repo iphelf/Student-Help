@@ -98,11 +98,13 @@ public class Remote extends Service implements Global {
                                 try {
                                     switch (jsonObject.getInt("code")) {
                                         case 0:
-                                        case 4005:
                                             listener.execute(ResultCode.Succeeded, null);
                                             break;
-                                        case 4004:
-                                            listener.execute(ResultCode.Failed, LoginError.LoginError);
+                                        case 4001:
+                                            listener.execute(ResultCode.Failed, LoginError.NotExist);
+                                            break;
+                                        case 4002:
+                                            listener.execute(ResultCode.Failed, LoginError.WrongPassword);
                                             break;
                                         default:
                                             listener.execute(ResultCode.Failed, LoginError.LoginError);
@@ -166,7 +168,7 @@ public class Remote extends Service implements Global {
 
         // /user/myOffer, /user/myPublish
         public void queryErrandList(
-                Account account, String keyword, Tag tag, Errand.State state, Errand.Type type,
+                Account account, String keyword, Tag tag, Errand.State state,
                 final Listener listener
         ) { // HomeFragment.java
             // TODO: 完成Remote.query

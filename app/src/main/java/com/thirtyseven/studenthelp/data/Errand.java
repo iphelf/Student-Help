@@ -1,5 +1,6 @@
 package com.thirtyseven.studenthelp.data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -18,9 +19,7 @@ public class Errand {
     // Properties
     public Tag tagPrimary;
     public List<Tag> tag; // include tagPrimary
-    public Type type;
-    public int amount; // associated with type
+    public BigDecimal money;
     public State state;
     public enum State {Waiting, Ongoing, Complete, Deleted}
-    public enum Type {Deal, Group}
 }

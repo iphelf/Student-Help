@@ -33,7 +33,7 @@ public class ZoneActivity extends AppCompatActivity {
             }
         });
         String[] fields = {
-                "Thumbnail", "Title", "State", "Author", "Preview", "Type"
+                "Thumbnail", "Title", "State", "Author", "Preview", "Money"
         };
         int[] fieldIds = {
                 R.id.imageView_thumbnail,
@@ -41,7 +41,7 @@ public class ZoneActivity extends AppCompatActivity {
                 R.id.textView_state,
                 R.id.textView_author,
                 R.id.textView_preview,
-                R.id.textView_type
+                R.id.textView_money
         };
         List<Map<String, Object>> mapList = new ArrayList<>();
         int n = 50;
