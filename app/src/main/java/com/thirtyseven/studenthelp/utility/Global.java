@@ -9,4 +9,8 @@ public interface Global {
     enum LoginError {
         NetworkError, LoginError, NotExist, WrongPassword
     }
+
+    enum RegisterError{
+        NetworkError,UserExist
+    }
 }

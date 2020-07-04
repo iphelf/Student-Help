@@ -123,6 +123,37 @@ public class Remote extends Service implements Global {
                 final Listener listener
         ) { // RegisterFragment.java
             // TODO: 完成Remote.register
+            call("/user/register", Request.Method.POST,
+                    "?username=" + account.username + "&password=" + account.password,
+                    null,
+                    new Listener() {
+                        public void execute(ResultCode resultCode, Object object) {
+                            if(resultCode == ResultCode.Failed || !(object instanceof JSONObject)){
+                                listener.execute(ResultCode.Failed, null);
+                            }else{
+                                JSONObject jsonObject = (JSONObject) object;
+                                try{
+                                    switch (jsonObject.getInt("code")) {
+                                        case 0:
+                                            listener.execute(ResultCode.Succeeded, null);
+                                            break;
+                                        case 4003:
+                                            listener.execute(ResultCode.Failed, RegisterError.UserExist);
+                                            break;
+                                        default:
+                                            listener.execute(ResultCode.Failed, RegisterError.NetworkError);
+                                            break;
+                                    }
+                                }catch (JSONException e){
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+
+
+            }
+            );
+
         }
 
         // /user/check
