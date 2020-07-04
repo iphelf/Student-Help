@@ -17,7 +17,7 @@
 | layout                           | status |
 | :------------------------------- | :----: |
 | activity_about.xml               |   ✔️   |
-| activity_account.xml             |        |
+| activity_account.xml             |   ✔️   |
 | activity_announcement.xml        |   ✔️   |
 | activity_conversation.xml        |   ✔️   |
 | activity_errand.xml              |   ✔️   |
@@ -27,7 +27,7 @@
 | activity_publish.xml             |   ✔️   |
 | activity_settings.xml            |   ✔️   |
 | activity_wallet.xml              |   ✔️   |
-| activity_zone.xml                |        |
+| activity_zone.xml                |   ✔️   |
 | fragment_certificate.xml         |   ✔️   |
 | fragment_home.xml                |   ✔️   |
 | fragment_login.xml               |   ✔️   |
