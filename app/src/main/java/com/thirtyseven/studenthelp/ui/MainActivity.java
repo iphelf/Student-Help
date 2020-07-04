@@ -3,24 +3,24 @@ package com.thirtyseven.studenthelp.ui;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.thirtyseven.studenthelp.R;
-import com.thirtyseven.studenthelp.data.Account;
-import com.thirtyseven.studenthelp.utility.Local;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.thirtyseven.studenthelp.R;
+import com.thirtyseven.studenthelp.data.Account;
+import com.thirtyseven.studenthelp.utility.Local;
+
 public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Account account= Local.loadAccount();
-        if(account==null){
-            Intent intent=new Intent(MainActivity.this,LoginActivity.class);
+        Account account = Local.loadAccount();
+        if (account == null) {
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
         }

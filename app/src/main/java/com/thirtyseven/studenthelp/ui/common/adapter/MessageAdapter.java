@@ -8,8 +8,6 @@ import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.thirtyseven.studenthelp.R;
 import com.thirtyseven.studenthelp.data.MsgInfo;
 
@@ -25,6 +23,7 @@ public class MessageAdapter extends BaseAdapter {
     public MessageAdapter(Context context) {
         this.context = context;
     }
+
     public void addDataToAdapter(MsgInfo e) {
         datas.add(e);
     }

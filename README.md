@@ -39,3 +39,17 @@
 | fragment_register.xml            |   ✔️   |
 | listviewitem_errand.xml          |   ✔️   |
 | listviewitem_notice.xml          |   ✔️   |
+
+## 网络通信
+
+| 接口  | status |
+| :---- | :----: |
+| login |  ✔️   |
+
+## 业务逻辑
+
+| 界面 |status|
+| :--- |:----:|
+|login |  ✔️ |
+
+## 界面美化

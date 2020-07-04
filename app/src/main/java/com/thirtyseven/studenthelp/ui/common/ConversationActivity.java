@@ -1,15 +1,14 @@
 package com.thirtyseven.studenthelp.ui.common;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.thirtyseven.studenthelp.R;
 import com.thirtyseven.studenthelp.data.MsgInfo;
@@ -27,12 +26,13 @@ public class ConversationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_conversation);
         setTitle(R.string.title_conversation);
         ActionBar actionBar = getSupportActionBar();
-        if(actionBar != null){
+        if (actionBar != null) {
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
         init();
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -49,7 +49,6 @@ public class ConversationActivity extends AppCompatActivity {
         right_btn = findViewById(R.id.btn_right);
 
         final ListView list_conversation = findViewById(R.id.listView_conversation);
-        ;
         final MessageAdapter adapter = new MessageAdapter(ConversationActivity.this);
         list_conversation.setAdapter(adapter);
         left_btn.setOnClickListener(new View.OnClickListener() {

@@ -10,9 +10,9 @@
         android:id="@+id/imageView_logo"
         android:layout_width="128dp"
         android:layout_height="128dp"
+        android:contentDescription="@string/about_copyRight"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:contentDescription="@string/about_copyRight"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -31,8 +31,9 @@
         app:layout_constraintTop_toBottomOf="@+id/imageView_logo"
         app:layout_constraintVertical_bias="0.07999998">
 
-        <TextView style="@style/about_text"
+        <TextView
             android:id="@+id/textView_version"
+            style="@style/about_text"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="@string/text_version"
@@ -43,8 +44,9 @@
             android:layout_height="match_parent"
             android:layout_weight="1" />
 
-        <TextView style="@style/about_text"
+        <TextView
             android:id="@+id/textView_versionNum"
+            style="@style/about_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"

@@ -1,17 +1,12 @@
 package com.thirtyseven.studenthelp.ui.me;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.thirtyseven.studenthelp.R;
-import com.thirtyseven.studenthelp.ui.common.ErrandActivity;
-import com.thirtyseven.studenthelp.ui.common.ZoneActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,25 +20,24 @@ public class AccountActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account);
         setTitle(R.string.title_account);
+
         String[] values = {
                 "家乡", "生日", "性别", "姓名", "学号"
         };
-        int[] fieldIds = {
-                R.id.textView_tag
-        };
+        String[] fields = {"Title"};
+        int[] fieldIds = {R.id.textView_tag};
         List<Map<String, Object>> mapList = new ArrayList<>();
-        for(int i=0;i<values.length;i++){
+        for (String value : values) {
             Map<String, Object> map = new HashMap<>();
-            map.put("title", values[i]);
+            map.put(fields[0], value);
             mapList.add(map);
         }
-
 
         SimpleAdapter simpleAdapter = new SimpleAdapter(
                 this,
                 mapList,
                 R.layout.listviewitem_account,
-                new String[]{"title"},
+                fields,
                 fieldIds
         );
         ListView listViewAccountList = findViewById(R.id.listView_account);

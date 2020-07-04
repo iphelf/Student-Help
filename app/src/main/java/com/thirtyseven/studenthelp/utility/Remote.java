@@ -22,10 +22,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Remote extends Service implements Global {
-    public interface Listener {
-        void execute(ResultCode resultCode, Object object);
-    }
-
     private RequestQueue requestQueue;
     private String urlHost;
     private RemoteBinder remoteBinder = new RemoteBinder();
@@ -53,6 +49,10 @@ public class Remote extends Service implements Global {
         super.onDestroy();
     }
 
+    public interface Listener {
+        void execute(ResultCode resultCode, Object object);
+    }
+
     public class RemoteBinder extends Binder {
 
         public void login(
@@ -66,7 +66,7 @@ public class Remote extends Service implements Global {
                         @Override
                         public void execute(ResultCode resultCode, Object object) {
                             if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
-                                listener.execute(resultCode, null);
+                                listener.execute(ResultCode.Failed, null);
                             } else {
                                 JSONObject jsonObject = (JSONObject) object;
                                 try {
@@ -118,7 +118,7 @@ public class Remote extends Service implements Global {
 
         public void queryConversationList(
                 Account account,
-                final Listener listener){
+                final Listener listener) {
             // TODO: 完成Remote.queryConversationList
             //  返回值object中存放List<Message>
         }

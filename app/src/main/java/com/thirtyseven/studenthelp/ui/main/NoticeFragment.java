@@ -11,14 +11,9 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
-import androidx.navigation.ui.NavigationUI;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 import com.thirtyseven.studenthelp.R;
-import com.thirtyseven.studenthelp.ui.MainActivity;
 
 
 public class NoticeFragment extends Fragment {
@@ -38,7 +33,7 @@ public class NoticeFragment extends Fragment {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 NavOptions navOptions = new NavOptions.Builder()
-                        .setPopUpTo(R.id.noticeConversationFragment,false)
+                        .setPopUpTo(R.id.noticeConversationFragment, false)
                         .build();
                 switch (tab.getPosition()) {
                     case 0:

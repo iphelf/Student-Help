@@ -2,10 +2,11 @@ package com.thirtyseven.studenthelp.utility;
 
 public interface Global {
     // Used to define codes, specification, constant, etc.
-    enum ResultCode{
+    enum ResultCode {
         Succeeded, Failed
     }
-    enum LoginError{
-        NetworkError,LoginError,NotExist,WrongPassword
+
+    enum LoginError {
+        NetworkError, LoginError, NotExist, WrongPassword
     }
 }
