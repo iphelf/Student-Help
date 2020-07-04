@@ -79,6 +79,7 @@ public class Remote extends Service implements Global {
             requestQueue.add(jsonObjectRequest);
         }
 
+        // /user/login
         public void login(
                 Account account,
                 final Listener listener
@@ -116,6 +117,7 @@ public class Remote extends Service implements Global {
             );
         }
 
+        // /user/register
         public void register(
                 Account account,
                 final Listener listener
@@ -123,6 +125,7 @@ public class Remote extends Service implements Global {
             // TODO: 完成Remote.register
         }
 
+        // /user/check
         public void certificate(
                 Account account,
                 final Listener listener
@@ -130,6 +133,7 @@ public class Remote extends Service implements Global {
             // TODO: 完成Remote.certificate
         }
 
+        // /user/myOffer, /user/myPublish
         public void queryErrandList(
                 Account account, String keyword, Tag tag, Errand.State state, Errand.Type type,
                 final Listener listener
@@ -138,6 +142,7 @@ public class Remote extends Service implements Global {
             //  返回值object中存放List<Errand>
         }
 
+        // /errand/publish
         public void publish(
                 Errand errand,
                 final Listener listener
@@ -145,6 +150,7 @@ public class Remote extends Service implements Global {
             // TODO: 完成Remote.publish
         }
 
+        // ?
         public void queryConversationList(
                 Account account,
                 final Listener listener
@@ -153,6 +159,7 @@ public class Remote extends Service implements Global {
             //  返回值object中存放List<Conversation>
         }
 
+        // ?
         public void queryConversation(
                 Conversation conversation,
                 final Listener listener
@@ -161,6 +168,7 @@ public class Remote extends Service implements Global {
             //  返回值object中存放Conversation
         }
 
+        // ?
         public void queryAnnouncementList(
                 Account account,
                 final Listener listener
@@ -169,6 +177,7 @@ public class Remote extends Service implements Global {
             //  返回值object中存放List<Announcement>
         }
 
+        // ?
         public void queryProgressList(
                 Account account,
                 final Listener listener
@@ -177,6 +186,7 @@ public class Remote extends Service implements Global {
             //  返回值object中存放List<Progress>
         }
 
+        // /errand/apply
         public void apply(
                 Account account, Errand errand,
                 final Listener listener
@@ -184,6 +194,7 @@ public class Remote extends Service implements Global {
             // TO-DO: 完成Remote.apply
         }
 
+        // ?
         public void delete(
                 Account account, Errand errand,
                 final Listener listener
@@ -191,6 +202,7 @@ public class Remote extends Service implements Global {
             // TO-DO: 完成Remote.delete
         }
 
+        // ?
         public void resign(
                 Account account, Errand errand,
                 final Listener listener
@@ -198,6 +210,7 @@ public class Remote extends Service implements Global {
             // TO-DO: 完成Remote.resign
         }
 
+        // ?
         public void submit(
                 Account account, Errand errand,
                 final Listener listener
@@ -205,6 +218,7 @@ public class Remote extends Service implements Global {
             // TO-DO: 完成Remote.submit
         }
 
+        // ?
         public void dismiss(
                 Account account, Errand errand,
                 final Listener listener
