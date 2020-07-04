@@ -55,4 +55,6 @@
     <string name="editText_title">请输入标题</string>
     <string name="radioButton_deal">悬赏</string>
     <string name="radioButton_group">组队</string>
+    <string name="text_version">版本号:</string>
+    <string name="button_evaluate">评价我们</string>
 </resources>
