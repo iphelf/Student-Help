@@ -16,7 +16,7 @@
 
 | layout                           | status |
 | :------------------------------- | :----: |
-| activity_about.xml               |      ️  |
+| activity_about.xml               |   ✔️   |
 | activity_account.xml             |        |
 | activity_announcement.xml        |        |
 | activity_conversation.xml        |   ✔️   |
