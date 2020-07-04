@@ -62,4 +62,5 @@
     <string name="button_submit">提交</string>
     <string name="text_version">版本号:</string>
     <string name="button_evaluate">评价我们</string>
+    <string name="text_changeSkin">更换背景颜色</string>
 </resources>
