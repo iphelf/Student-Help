@@ -62,5 +62,7 @@
     <string name="button_resign">Resign</string>
     <string name="button_submit">Submit</string>
     <string name="text_changeSkin">Change Skin</string>
+    <string name="text_username">Username</string>
+    <string name="text_college">College</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

@@ -14,23 +14,25 @@
         app:layout_constraintBottom_toTopOf="@+id/divider6"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/imageView2"
+        app:layout_constraintStart_toEndOf="@+id/imageView_zonePhoto"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.9">
 
         <TextView
-            android:id="@+id/textView9"
+            android:id="@+id/text_zoneUsername"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:gravity="center"
             android:layout_weight="1"
-            android:text="TextView" />
+            android:text="@string/text_username" />
 
         <TextView
-            android:id="@+id/textView12"
+            android:id="@+id/text_zoneCollege"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="@string/title_zone"
+            android:gravity="center"
+            android:text="@string/text_college"
             android:textAlignment="center" />
 
     </LinearLayout>
@@ -48,7 +50,7 @@
         app:layout_constraintVertical_bias="0.8" />
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/imageView_zonePhoto"
         android:layout_width="64dp"
         android:layout_height="64dp"
         app:layout_constraintBottom_toTopOf="@+id/divider6"
