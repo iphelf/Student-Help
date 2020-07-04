@@ -65,4 +65,9 @@
     <string name="toast_loginError">Login failed!</string>
     <string name="text_username">Username</string>
     <string name="text_college">College</string>
+    <string name="text_Nickname">Nickname</string>
+    <string name="text_autograph">Autograph</string>
+    <string name="buttton_accountSave">Account Save</string>
+    <string name="text_photo">Account Photo</string>
+    <!-- TODO: Remove or change this placeholder text -->
 </resources>
