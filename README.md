@@ -42,9 +42,31 @@
 
 ## 网络通信
 
-| 接口  | status |
-| :---- | :----: |
-| login |  ✔️   |
+| 接口                   | status |
+| :--------------------- | :----: |
+| /user/login            |   ✔️    |
+| /user/register         |        |
+| /user/check            |        |
+| /user/myPublish        |        |
+| /user/myOffer          |        |
+| /user/update           |        |
+| /errand/publish        |        |
+| /errand/search         |        |
+| /errand/item           |        |
+| /errand/allErrand      |        |
+| /errand/detail         |        |
+| /errand/apply          |        |
+| /errand/choose         |        |
+| /errand/check          |        |
+| /chat/queryUnsignedMsg |        |
+| /file/upload           |        |
+| /alipay/recharge       |        |
+| /alipay/withdraw       |        |
+| /judge/newJudge        |        |
+| /judge/detail          |        |
+| /judge/userAgree       |        |
+| /judge/handJudge       |        |
+| /judge/status          |        |
 
 ## 业务逻辑
 
