@@ -15,6 +15,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.thirtyseven.studenthelp.R;
 import com.thirtyseven.studenthelp.data.Account;
+import com.thirtyseven.studenthelp.data.Conversation;
 import com.thirtyseven.studenthelp.data.Errand;
 import com.thirtyseven.studenthelp.data.Tag;
 
@@ -55,9 +56,33 @@ public class Remote extends Service implements Global {
 
     public class RemoteBinder extends Binder {
 
+        private void call(
+                String route, int method, String param, JSONObject body,
+                final Listener listener
+        ) {
+            String url = urlHost + route + (param == null ? "" : param);
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                    method, url, body,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            listener.execute(ResultCode.Succeeded, response);
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            listener.execute(ResultCode.Failed, null);
+                        }
+                    }
+            );
+            requestQueue.add(jsonObjectRequest);
+        }
+
         public void login(
                 Account account,
-                final Listener listener) {
+                final Listener listener
+        ) { // LoginFragment.java
             call(
                     "/user/login", Request.Method.POST,
                     "?username=" + account.username + "&password=" + account.password,
@@ -93,54 +118,98 @@ public class Remote extends Service implements Global {
 
         public void register(
                 Account account,
-                final Listener listener) {
+                final Listener listener
+        ) { // RegisterFragment.java
             // TODO: 完成Remote.register
         }
 
         public void certificate(
                 Account account,
-                final Listener listener) {
+                final Listener listener
+        ) { // CertificateFragment.java
             // TODO: 完成Remote.certificate
         }
 
         public void queryErrandList(
                 Account account, String keyword, Tag tag, Errand.State state, Errand.Type type,
-                final Listener listener) {
+                final Listener listener
+        ) { // HomeFragment.java
             // TODO: 完成Remote.query
             //  返回值object中存放List<Errand>
         }
 
         public void publish(
                 Errand errand,
-                final Listener listener) {
+                final Listener listener
+        ) { // PublishActivity.java
             // TODO: 完成Remote.publish
         }
 
         public void queryConversationList(
                 Account account,
-                final Listener listener) {
+                final Listener listener
+        ) { // NoticeConversationActivity.java
             // TODO: 完成Remote.queryConversationList
-            //  返回值object中存放List<Message>
+            //  返回值object中存放List<Conversation>
         }
 
-        private void call(String route, int method, String param, JSONObject body, final Listener listener) {
-            String url = urlHost + route + (param == null ? "" : param);
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                    method, url, body,
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            listener.execute(ResultCode.Succeeded, response);
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            listener.execute(ResultCode.Failed, null);
-                        }
-                    }
-            );
-            requestQueue.add(jsonObjectRequest);
+        public void queryConversation(
+                Conversation conversation,
+                final Listener listener
+        ) { // ConversationActivity.java
+            // TODO: 完成Remote.queryConversation
+            //  返回值object中存放Conversation
+        }
+
+        public void queryAnnouncementList(
+                Account account,
+                final Listener listener
+        ) { // NoticeAnnouncementActivity.java
+            // TODO: 完成Remote.queryAnnouncementList
+            //  返回值object中存放List<Announcement>
+        }
+
+        public void queryProgressList(
+                Account account,
+                final Listener listener
+        ) { // NoticeProgressActivity.java
+            // TODO: 完成Remote.queryProgressList
+            //  返回值object中存放List<Progress>
+        }
+
+        public void apply(
+                Account account, Errand errand,
+                final Listener listener
+        ) { // ErrandActivity.java
+            // TO-DO: 完成Remote.apply
+        }
+
+        public void delete(
+                Account account, Errand errand,
+                final Listener listener
+        ) { // ErrandActivity.java
+            // TO-DO: 完成Remote.delete
+        }
+
+        public void resign(
+                Account account, Errand errand,
+                final Listener listener
+        ) { // ErrandActivity.java
+            // TO-DO: 完成Remote.resign
+        }
+
+        public void submit(
+                Account account, Errand errand,
+                final Listener listener
+        ) { // ErrandActivity.java
+            // TO-DO: 完成Remote.submit
+        }
+
+        public void dismiss(
+                Account account, Errand errand,
+                final Listener listener
+        ) { // ErrandActivity.java
+            // TO-DO: 完成Remote.dismiss
         }
 
     }

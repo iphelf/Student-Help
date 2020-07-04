@@ -10,8 +10,10 @@ public class Errand {
     public Account receiverPrimary;
     public List<Account> receiverList; // include receiverPrimary
     // Information
+    public String id;
     public String title;
     public String content;
+    public Conversation conversation;
     public Date date;
     // Properties
     public Tag tagPrimary;
