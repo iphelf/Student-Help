@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -18,8 +19,8 @@ import com.thirtyseven.studenthelp.data.Account;
 import com.thirtyseven.studenthelp.data.Conversation;
 import com.thirtyseven.studenthelp.data.Errand;
 import com.thirtyseven.studenthelp.data.Message;
-import com.thirtyseven.studenthelp.data.Tag;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,9 +29,14 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.OkHttpClient;
+import okhttp3.WebSocket;
+import okhttp3.WebSocketListener;
+import okio.ByteString;
 
 public class Remote extends Service implements Global {
     private RequestQueue requestQueue;
+    private OkHttpClient okHttpClient;
     private String urlHost;
     private RemoteBinder remoteBinder = new RemoteBinder();
     private boolean success;
@@ -45,6 +51,7 @@ public class Remote extends Service implements Global {
     public void onCreate() {
         super.onCreate();
         requestQueue = Volley.newRequestQueue(this);
+        okHttpClient = new OkHttpClient();
         urlHost = getString(R.string.urlHost);
     }
 
@@ -85,6 +92,14 @@ public class Remote extends Service implements Global {
                     }
             );
             requestQueue.add(jsonObjectRequest);
+        }
+
+        public void startConversation() {
+            okhttp3.Request request = new okhttp3.Request.Builder().url("ws://129.211.5.147:8088/ws").build();
+            RemoteWebSocketListener listener = new RemoteWebSocketListener();
+            WebSocket webSocket = okHttpClient.newWebSocket(request, listener);
+            webSocket.send("{\"action\":1,\"chatMsg\":{\"senderId\":\"20176151\",\"receiverId\":\"20171722\",\"msg\":\"Hello, this is iphelf\",\"msgId\":null},\"extend\":null}");
+            okHttpClient.dispatcher().executorService().shutdown();
         }
 
         // /user/login
@@ -135,7 +150,7 @@ public class Remote extends Service implements Global {
             // TODO: 完成Remote.certificate
         }
 
-        private void queryItem(String queryUrl, String param, final List<Errand> queryList, final Listener queryListener){
+        private void queryItem(String queryUrl, String param, final List<Errand> queryList, final Listener queryListener) {
             call(queryUrl, Request.Method.GET,
                     param,
                     null,
@@ -147,48 +162,48 @@ public class Remote extends Service implements Global {
                             } else {
                                 JSONObject jsonObject = (JSONObject) object;
                                 try {
-                                    if (jsonObject.getInt("code")==0) {
+                                    if (jsonObject.getInt("code") == 0) {
                                         try {
                                             JSONArray data = jsonObject.getJSONArray("data");
                                             for (int i = 0; i < data.length(); i++) {
                                                 JSONObject item = data.getJSONObject(i);
-                                                final Errand errand=new Errand();
-                                                errand.title=item.getString("errandTitle");
-                                                errand.tag=item.getInt("errandItem");
-                                                switch (item.getInt("errandStatus")){
+                                                final Errand errand = new Errand();
+                                                errand.title = item.getString("errandTitle");
+                                                errand.tag = item.getInt("errandItem");
+                                                switch (item.getInt("errandStatus")) {
                                                     case 0:
-                                                        errand.state=errand.state.Waiting;
+                                                        errand.state = Errand.State.Waiting;
                                                         break;
                                                     case 1:
-                                                        errand.state=errand.state.Ongoing;
+                                                        errand.state = Errand.State.Ongoing;
                                                         break;
                                                     case 2:
-                                                        errand.state=errand.state.NotEvaluate;
+                                                        errand.state = Errand.State.NotEvaluate;
                                                         break;
                                                     case 3:
-                                                        errand.state=errand.state.Judging;
+                                                        errand.state = Errand.State.Judging;
                                                         break;
                                                     case 4:
-                                                        errand.state=errand.state.CheckFailed;
+                                                        errand.state = Errand.State.CheckFailed;
                                                         break;
                                                     case 5:
-                                                        errand.state=errand.state.Complete;
+                                                        errand.state = Errand.State.Complete;
                                                         break;
                                                     default:
                                                         break;
                                                 }
-                                                errand.content=item.getString("errandDescription");
-                                                errand.publisher.id=item.getString("publisherId");
-                                                errand.receiver.id=item.getString("offerId");
-                                                errand.money=new BigDecimal(item.getString("errandMoney"));
+                                                errand.content = item.getString("errandDescription");
+                                                errand.publisher.id = item.getString("publisherId");
+                                                errand.receiver.id = item.getString("offerId");
+                                                errand.money = new BigDecimal(item.getString("errandMoney"));
                                                 queryList.add(errand);
                                             }
-                                        }catch (JSONException e){
+                                        } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
-                                        success=true;
-                                    }else{
-                                        success=false;
+                                        success = true;
+                                    } else {
+                                        success = false;
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -197,34 +212,35 @@ public class Remote extends Service implements Global {
                         }
                     });
         }
+
         // /user/myOffer, /user/myPublish, /errand/searchComposite
         public void queryErrandList(
-                Account account, String keyword, int tag,  Errand.State state,
+                Account account, String keyword, int tag, Errand.State state,
                 final Listener listener
         ) { // HomeFragment.java
             // TODO: 完成Remote.queryErrandList
             //  返回值object中存放List<Errand>
-            if(account!=null){
-                List<Errand> errandList=new ArrayList<>();
-                queryItem("/user/myOffer","?studentNumber="+account.id,errandList,listener);
-                queryItem("/user/myPublish","?studentNumber="+account.id,errandList,listener);
-                if(success){
+            if (account != null) {
+                List<Errand> errandList = new ArrayList<>();
+                queryItem("/user/myOffer", "?studentNumber=" + account.id, errandList, listener);
+                queryItem("/user/myPublish", "?studentNumber=" + account.id, errandList, listener);
+                if (success) {
                     listener.execute(ResultCode.Succeeded, errandList);
-                }else {
-                    if(errandList.size()!=0){
+                } else {
+                    if (errandList.size() != 0) {
                         listener.execute(ResultCode.Succeeded, errandList); //如果success被标记为失败，可能是有一次查询失败，若是列表不为空，则说明查询到了数据
-                    }else {
+                    } else {
                         listener.execute(ResultCode.Failed, SearchComposite.SearchFailed);
                     }
                 }
-            }else {
-                List<Errand> errandList=new ArrayList<>();
+            } else {
+                List<Errand> errandList = new ArrayList<>();
                 String param = "?errandItem=" + tag + "&errandStatus=" + state +
                         "&keyword=" + keyword;
-                queryItem("/errand/searchComposite",param,errandList,listener);
-                if(success){
+                queryItem("/errand/searchComposite", param, errandList, listener);
+                if (success) {
                     listener.execute(ResultCode.Succeeded, errandList);
-                }else {
+                } else {
                     listener.execute(ResultCode.Failed, SearchComposite.SearchFailed);
                 }
                 //以下功能被集中到querItem中
@@ -452,7 +468,7 @@ public class Remote extends Service implements Global {
             //待定
             String param = "?offerId=" + errand.id + "&errandId=" + errand.id; //由发布者指定接收人，接收人在errand中
             call("/errand/choose", Request.Method.GET,
-                          param,
+                    param,
                     null,
                     new Listener() {
                         @Override
@@ -509,7 +525,7 @@ public class Remote extends Service implements Global {
                                             listener.execute(ResultCode.Succeeded, null);
                                             break;
                                         case 4015:
-                                            listener.execute(ResultCode.Failed,DeleteError.NotCreator);
+                                            listener.execute(ResultCode.Failed, DeleteError.NotCreator);
                                             break;
                                         default:
                                             listener.execute(ResultCode.Failed, DeleteError.DeleteFailed);
@@ -565,4 +581,48 @@ public class Remote extends Service implements Global {
 
     }
 
+    public final class RemoteWebSocketListener extends WebSocketListener {
+        private static final int NORMAL_CLOSURE_STATUS = 1000;
+
+        @Override
+        public void onOpen(@NotNull WebSocket webSocket, @NotNull okhttp3.Response response) {
+            Log.d("Debug", "onOpen()");
+            super.onOpen(webSocket, response);
+            webSocket.send("{\"action\":1,\"chatMsg\":{\"senderId\":\"20176151\",\"receiverId\":\"20171745\",\"msg\":\"Hello, this is iphelf\",\"msgId\":null},\"extend\":null}");
+            webSocket.send("{\"action\":1,\"chatMsg\":{\"senderId\":\"20176151\",\"receiverId\":\"20171722\",\"msg\":\"Hello, this is iphelf\",\"msgId\":null},\"extend\":null}");
+        }
+
+        @Override
+        public void onClosed(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
+            Log.d("Debug", "onClosed()");
+            super.onClosed(webSocket, code, reason);
+        }
+
+        @Override
+        public void onClosing(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
+            Log.d("Debug", "onClosing()");
+            super.onClosing(webSocket, code, reason);
+        }
+
+        @Override
+        public void onFailure(@NotNull WebSocket webSocket, @NotNull Throwable
+                t, @org.jetbrains.annotations.Nullable okhttp3.Response response) {
+            Log.d("Debug", "onFailure()");
+            super.onFailure(webSocket, t, response);
+        }
+
+        @Override
+        public void onMessage(@NotNull WebSocket webSocket, @NotNull String text) {
+            Log.d("Debug", "onMessage()");
+            super.onMessage(webSocket, text);
+            System.out.println("onMessage: " + text);
+        }
+
+        @Override
+        public void onMessage(@NotNull WebSocket webSocket, @NotNull ByteString bytes) {
+            Log.d("Debug", "onMessage()");
+            super.onMessage(webSocket, bytes);
+        }
+
+    }
 }

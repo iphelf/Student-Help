@@ -35,6 +35,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
                 remoteBinder = (Remote.RemoteBinder) iBinder;
+                remoteBinder.startConversation();
             }
 
             @Override
@@ -107,6 +108,7 @@ public class LoginActivity extends AppCompatActivity {
                 });
             }
         });
+
     }
 
     @Override
