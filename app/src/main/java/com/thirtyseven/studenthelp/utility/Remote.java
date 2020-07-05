@@ -130,7 +130,7 @@ public class Remote extends Service implements Global {
             // TODO: 完成Remote.certificate
         }
 
-        // /user/myOffer, /user/myPublish
+        // /user/myOffer, /user/myPublish, /errand/searchComposite
         public void queryErrandList(
                 Account account, String keyword, Tag tag, Errand.State state,
                 final Listener listener
@@ -221,7 +221,7 @@ public class Remote extends Service implements Global {
 
         }
 
-        // ?
+        // /chat/queryHistoricRecords
         public void queryConversation(
                 Conversation conversation,
                 final Listener listener
