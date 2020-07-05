@@ -12,6 +12,7 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.thirtyseven.studenthelp.R;
 import com.thirtyseven.studenthelp.data.Account;
+import com.thirtyseven.studenthelp.ui.login.LoginActivity;
 import com.thirtyseven.studenthelp.utility.Local;
 
 public class MainActivity extends AppCompatActivity {

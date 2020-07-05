@@ -6,15 +6,12 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.thirtyseven.studenthelp.R;
 import com.thirtyseven.studenthelp.data.Account;
@@ -23,22 +20,17 @@ import com.thirtyseven.studenthelp.utility.Global;
 import com.thirtyseven.studenthelp.utility.Local;
 import com.thirtyseven.studenthelp.utility.Remote;
 
-public class LoginFragment extends Fragment implements Global {
+public class LoginActivity extends AppCompatActivity {
 
     private Remote.RemoteBinder remoteBinder;
     private ServiceConnection serviceConnection;
 
-    public LoginFragment() {
-        // Required empty public constructor
-    }
-
-    public static LoginFragment newInstance() {
-        return new LoginFragment();
-    }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
+
         serviceConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
@@ -50,65 +42,53 @@ public class LoginFragment extends Fragment implements Global {
 
             }
         };
-        requireActivity().bindService(
-                new Intent(requireContext(), Remote.class),
+        bindService(
+                new Intent(this, Remote.class),
                 serviceConnection,
                 Service.BIND_AUTO_CREATE
         );
-    }
 
-    @Override
-    public void onDestroy() {
-        requireActivity().unbindService(serviceConnection);
-        super.onDestroy();
-    }
+        setTitle(R.string.title_login);
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        requireActivity().setTitle(R.string.title_login);
-        // Inflate the layout for this fragment
-        View root = inflater.inflate(R.layout.fragment_login, container, false);
+        final EditText editTextStudentId = findViewById(R.id.editText_studentId);
+        final EditText editTextPassword = findViewById(R.id.editText_password);
 
-        final EditText editTextUsername = root.findViewById(R.id.editText_username);
-        final EditText editTextPassword = root.findViewById(R.id.editText_password);
-
-        final Button buttonLogin = root.findViewById(R.id.button_login);
+        final Button buttonLogin = findViewById(R.id.button_login);
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String username = editTextUsername.getText().toString().trim();
+                String id = editTextStudentId.getText().toString().trim();
                 String password = editTextPassword.getText().toString().trim();
                 final Account account = new Account();
-                account.username = username;
+                account.id = id;
                 account.password = password;
                 remoteBinder.login(account, new Remote.Listener() {
                     @Override
-                    public void execute(ResultCode resultCode, Object object) {
-                        if (resultCode == ResultCode.Succeeded) {
+                    public void execute(Global.ResultCode resultCode, Object object) {
+                        if (resultCode == Global.ResultCode.Succeeded) {
                             Local.saveAccount(account);
-                            Intent intent = new Intent(getActivity(), MainActivity.class);
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             startActivity(intent);
-                            requireActivity().finish();
+                            finish();
                         } else {
-                            switch ((LoginError) object){
+                            switch ((Global.LoginError) object){
                                 case NotExist:
                                     Toast.makeText(
-                                            requireContext(),
+                                            LoginActivity.this,
                                             R.string.toast_loginError_notExist,
                                             Toast.LENGTH_SHORT
                                     ).show();
                                     break;
                                 case WrongPassword:
                                     Toast.makeText(
-                                            requireContext(),
+                                            LoginActivity.this,
                                             R.string.toast_loginError_wrongPassword,
                                             Toast.LENGTH_SHORT
                                     ).show();
                                     break;
                                 case NetworkError:
                                     Toast.makeText(
-                                            requireContext(),
+                                            LoginActivity.this,
                                             R.string.toast_networkError,
                                             Toast.LENGTH_SHORT
                                     ).show();
@@ -116,7 +96,7 @@ public class LoginFragment extends Fragment implements Global {
                                 case LoginError:
                                 default:
                                     Toast.makeText(
-                                            requireContext(),
+                                            LoginActivity.this,
                                             R.string.toast_loginError,
                                             Toast.LENGTH_SHORT
                                     ).show();
@@ -127,12 +107,11 @@ public class LoginFragment extends Fragment implements Global {
                 });
             }
         });
+    }
 
-        Button buttonRegister = root.findViewById(R.id.button_register);
-        buttonRegister.setOnClickListener(
-                Navigation.createNavigateOnClickListener(R.id.action_loginFragment_to_registerFragment, null)
-        );
-
-        return root;
+    @Override
+    public void onDestroy() {
+        unbindService(serviceConnection);
+        super.onDestroy();
     }
 }

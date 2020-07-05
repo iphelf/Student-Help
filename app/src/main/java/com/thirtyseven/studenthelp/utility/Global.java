@@ -10,13 +10,15 @@ public interface Global {
         NetworkError, LoginError, NotExist, WrongPassword
     }
 
-    enum RegisterError{
-        RegisterError,NetworkError,UserExist
+    enum RegisterError {
+        NetworkError, RegisterError, UserExist
     }
-    enum PublishError{
-        CreateFailed,UploadFileFalied,MoneyInsufficient,PublishError
+
+    enum PublishError {
+        NetworkError, CreateFailed, UploadFileFalied, MoneyInsufficient, PublishError
     }
-    enum ApplyError{
+
+    enum ApplyError {
         ApplyError
     }
 }

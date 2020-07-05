@@ -23,6 +23,8 @@ import com.thirtyseven.studenthelp.data.Tag;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import okhttp3.WebSocket;
+
 public class Remote extends Service implements Global {
     private RequestQueue requestQueue;
     private String urlHost;
@@ -86,8 +88,8 @@ public class Remote extends Service implements Global {
                 final Listener listener
         ) { // LoginFragment.java
             call(
-                    "/user/login", Request.Method.POST,
-                    "?username=" + account.username + "&password=" + account.password,
+                    "/user/newLogin", Request.Method.POST,
+                    "?studentNumber=" + account.id + "&password=" + account.password,
                     null,
                     new Listener() {
                         @Override
@@ -109,42 +111,6 @@ public class Remote extends Service implements Global {
                                             break;
                                         default:
                                             listener.execute(ResultCode.Failed, LoginError.LoginError);
-                                            break;
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                    }
-            );
-        }
-
-        // /user/register
-        public void register(
-                Account account,
-                final Listener listener
-        ) { // RegisterFragment.java
-            // TODO: 完成Remote.register
-            call("/user/register", Request.Method.POST,
-                    "?username=" + account.username + "&password=" + account.password,
-                    null,
-                    new Listener() {
-                        public void execute(ResultCode resultCode, Object object) {
-                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
-                                listener.execute(ResultCode.Failed, null);
-                            } else {
-                                JSONObject jsonObject = (JSONObject) object;
-                                try {
-                                    switch (jsonObject.getInt("code")) {
-                                        case 0:
-                                            listener.execute(ResultCode.Succeeded, null);
-                                            break;
-                                        case 4003:
-                                            listener.execute(ResultCode.Failed, RegisterError.UserExist);
-                                            break;
-                                        default:
-                                            listener.execute(ResultCode.Failed, RegisterError.RegisterError);
                                             break;
                                     }
                                 } catch (JSONException e) {
@@ -228,7 +194,7 @@ public class Remote extends Service implements Global {
 
             // 这里暂时存放模板
             call("/user/register", Request.Method.POST,
-                    "?username=" + account.username + "&password=" + account.password,
+                    "?studentNumber=" + account.id + "&password=" + account.password,
                     null,
                     new Listener() {
                         @Override

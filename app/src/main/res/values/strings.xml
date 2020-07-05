@@ -72,5 +72,7 @@
     <string name="toast_loginError_notExist">No such user!</string>
     <string name="toast_loginError_wrongPassword">Wrong password!</string>
     <string name="toast_networkError">Network error!</string>
+    <string name="toast_registerError_existUser">Conflicts with existing username!</string>
+    <string name="toast_registerError">Register failed!</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>
