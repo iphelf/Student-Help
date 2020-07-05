@@ -58,6 +58,7 @@
 | /errand/apply          |   ✔️   |
 | /errand/choose         |        |
 | /errand/check          |        |
+| /errand/delete         |   ✔️   |
 | /chat/queryUnsignedMsg |        |
 | /file/upload           |        |
 | /alipay/recharge       |        |
@@ -67,7 +68,7 @@
 | /judge/userAgree       |        |
 | /judge/handJudge       |        |
 | /judge/status          |        |
-| /judge/delete          |   ✔️   |
+
 
 ## 业务逻辑
 
