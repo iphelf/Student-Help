@@ -6,10 +6,11 @@ import java.util.List;
 
 
 public class Errand {
+    public static final String[] TagName={"二手交易","快递代领","竞赛组队","习题求解","寻物启示"};
     // Related accounts
     public Account publisher;
-    public Account receiverPrimary;
-    public List<Account> receiverList; // include receiverPrimary
+    public Account receiver;
+    public List<Account> receiverList; // include receiver
     // Information
     public String id;
     public String title;
@@ -17,8 +18,8 @@ public class Errand {
     public Conversation conversation;
     public Date date;
     //Properties
-    public Tag tagPrimary;
-    public List<Tag> tag; // include tagPrimary
+    public int tag;
+    public List<int> tagList; // include tag
     public BigDecimal money;
     public State state;
     public enum State {Waiting, Ongoing, Complete, Deleted}
