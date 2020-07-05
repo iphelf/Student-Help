@@ -6,6 +6,25 @@ import java.util.List;
 
 
 public class Errand {
+    public static final String[] TagName = {
+            /* 0: */ "二手交易",
+            /* 1: */ "快递代领",
+            /* 2: */ "竞赛组队",
+            /* 3: */ "习题求解",
+            /* 4: */ "寻物启示"
+    };
+    public static final String[] StateName = {
+            /* 0: */ "等待中",
+            /* 1: */ "进行中",
+            /* 2: */ "待评价",
+            /* 3: */ "裁决中",
+            /* 4: */ "验收失败",
+            /* 5: */ "已完成",
+            /* 6: */ "待验收"
+    };
+
+    public enum State {Waiting, Ongoing, NotEvaluate, Judging, CheckFailed, Complete, ToCheck}
+
     // Related accounts
     public Account publisher;
     public Account receiver;
@@ -21,5 +40,15 @@ public class Errand {
     public List<Integer> tagList; // include tag
     public BigDecimal money;
     public State state;
-    public enum State {Waiting, Ongoing, NotEvaluate,Judging,CheckFailed,Complete,ToCheck}
+
+    public String getContent() {
+        if (content != null) return content;
+        return "";
+    }
+
+    public String getContentPreview() {
+        String preview = getContent();
+        if (preview.length() <= 200) return preview;
+        return preview.substring(0, 200);
+    }
 }

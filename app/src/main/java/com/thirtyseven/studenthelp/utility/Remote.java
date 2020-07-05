@@ -25,7 +25,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,6 +73,14 @@ public class Remote extends Service implements Global {
 
     public class RemoteBinder extends Binder {
 
+        String encode(String string) {
+            try {
+                string = URLEncoder.encode(string, "utf-8");
+            } catch (UnsupportedEncodingException ignored) {
+            }
+            return string;
+        }
+
         private void call(
                 String route, int method, String param, JSONObject body,
                 final Listener listener
@@ -92,6 +102,7 @@ public class Remote extends Service implements Global {
                     }
             );
             requestQueue.add(jsonObjectRequest);
+            Log.d("Debug", "call: " + url);
         }
 
         public void startConversation() {
@@ -115,6 +126,7 @@ public class Remote extends Service implements Global {
                 e.printStackTrace();
             }
         }
+
         // /user/login
         public void login(
                 Account account,
@@ -176,7 +188,7 @@ public class Remote extends Service implements Global {
                             @Override
                             public void execute(ResultCode resultCode, Object object) {
                                 if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
-                                    listener.execute(ResultCode.Failed, SearchComposite.NetworkError);
+                                    listener.execute(ResultCode.Failed, SearchCompositeError.NetworkError);
                                 } else {
                                     JSONObject jsonObject = (JSONObject) object;
                                     try {
@@ -190,7 +202,7 @@ public class Remote extends Service implements Global {
                                             }
                                             listener.execute(ResultCode.Succeeded, errandList);
                                         } else {
-                                            listener.execute(ResultCode.Failed, SearchComposite.SearchFailed);
+                                            listener.execute(ResultCode.Failed, SearchCompositeError.SearchFailed);
                                         }
                                     } catch (JSONException e) {
                                         e.printStackTrace();
@@ -209,7 +221,7 @@ public class Remote extends Service implements Global {
                             @Override
                             public void execute(ResultCode resultCode, Object object) {
                                 if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
-                                    listener.execute(ResultCode.Failed, SearchComposite.NetworkError);
+                                    listener.execute(ResultCode.Failed, SearchCompositeError.NetworkError);
                                 } else {
                                     JSONObject jsonObject = (JSONObject) object;
                                     try {
@@ -223,7 +235,7 @@ public class Remote extends Service implements Global {
                                             }
                                             listener.execute(ResultCode.Succeeded, errandList);
                                         } else {
-                                            listener.execute(ResultCode.Failed, SearchComposite.SearchFailed);
+                                            listener.execute(ResultCode.Failed, SearchCompositeError.SearchFailed);
                                         }
                                     } catch (JSONException e) {
                                         e.printStackTrace();

@@ -74,5 +74,6 @@
     <string name="toast_networkError">Network error!</string>
     <string name="toast_registerError_existUser">Conflicts with existing username!</string>
     <string name="toast_registerError">Register failed!</string>
+    <string name="toast_searchError">Search failed!</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

@@ -20,31 +20,39 @@ public interface Global {
     }
 
     enum ApplyError {
-        NetworkError,ApplyError,HaveApply
+        NetworkError, ApplyError, HaveApply
     }
-    enum ChooseError{
-        NetworkError,ChooseError
+
+    enum ChooseError {
+        NetworkError, ChooseError
     }
-    enum DeleteError{
-        NetworkError,NotCreator,DeleteFailed
+
+    enum DeleteError {
+        NetworkError, NotCreator, DeleteFailed
     }
-    enum SearchComposite{
-        NetworkError,SearchFailed
+
+    enum SearchCompositeError {
+        NetworkError, SearchFailed
     }
-    enum QueryRecordsError{
-        NetworkError,QueryFailed
+
+    enum QueryRecordsError {
+        NetworkError, QueryFailed
     }
-    enum PushError{
-        NetworkError,PushError
+
+    enum PushError {
+        NetworkError, PushError
     }
-    enum CheckError{
-        NetworkError,CheckError
+
+    enum CheckError {
+        NetworkError, CheckError
     }
-    enum RefuseError{
-        NetworkError,RefuseError
+
+    enum RefuseError {
+        NetworkError, RefuseError
     }
-    enum CheckState{
-        CheckRefused,CheckSucceed,InputRightState
+
+    enum CheckState {
+        CheckRefused, CheckSucceed, InputRightState
     }
     enum DetailError{
         NetworkError,DetailError

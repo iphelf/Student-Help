@@ -1,15 +1,23 @@
 package com.thirtyseven.studenthelp.ui.main;
 
+import android.app.Service;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -17,26 +25,69 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.thirtyseven.studenthelp.R;
+import com.thirtyseven.studenthelp.data.Errand;
 import com.thirtyseven.studenthelp.ui.common.ErrandActivity;
 import com.thirtyseven.studenthelp.ui.home.PublishActivity;
+import com.thirtyseven.studenthelp.utility.Global;
+import com.thirtyseven.studenthelp.utility.Remote;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements Global {
+
+    private Remote.RemoteBinder remoteBinder;
+    private ServiceConnection serviceConnection;
 
     private HomeViewModel homeViewModel;
+
+    private EditText editTextKeyword;
+    private ImageButton imageButtonSearch;
+    private ListView listViewErrandList;
+    private FloatingActionButton floatingActionButtonPublish;
+    private Spinner spinnerTag;
+    private Spinner spinnerState;
+    private SimpleAdapter simpleAdapter;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         homeViewModel =
                 ViewModelProviders.of(this).get(HomeViewModel.class);
         requireActivity().setTitle(R.string.title_home);
+
+        serviceConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+                remoteBinder = (Remote.RemoteBinder) iBinder;
+                remoteBinder.startConversation();
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName componentName) {
+
+            }
+        };
+        requireActivity().bindService(
+                new Intent(requireContext(), Remote.class),
+                serviceConnection,
+                Service.BIND_AUTO_CREATE
+        );
+
         View root = inflater.inflate(R.layout.fragment_home, container, false);
 
-        FloatingActionButton floatingActionButtonPublish = root.findViewById(R.id.floatingActionButton_publish);
+        editTextKeyword = root.findViewById(R.id.editText_keyword);
+
+        imageButtonSearch = root.findViewById(R.id.imageButton_search);
+        imageButtonSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pull();
+            }
+        });
+
+        floatingActionButtonPublish = root.findViewById(R.id.floatingActionButton_publish);
         floatingActionButtonPublish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -45,10 +96,10 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        String[] tags = {
-                "全部", "代领快递", "寻物启事", "二手交易", "组队征集", "学习辅导", "问卷调查", "其他"
-        };
-        Spinner spinnerTag = root.findViewById(R.id.spinner_tag);
+        String[] tags = new String[Errand.TagName.length + 1];
+        tags[0] = "全部";
+        System.arraycopy(Errand.TagName, 0, tags, 1, Errand.TagName.length);
+        spinnerTag = root.findViewById(R.id.spinner_tag);
         ArrayAdapter<String> arrayAdapterTag = new ArrayAdapter<>(
                 requireContext(),
                 R.layout.support_simple_spinner_dropdown_item,
@@ -56,49 +107,29 @@ public class HomeFragment extends Fragment {
         );
         spinnerTag.setAdapter(arrayAdapterTag);
 
-
-        String[] states = {
-                getString(R.string.state_all),
-                getString(R.string.state_waiting),
-                getString(R.string.state_ongoing),
-                getString(R.string.state_complete),
-                getString(R.string.state_deleted)
-        };
-        Spinner spinnerState = root.findViewById(R.id.spinner_state);
+        String[] states = new String[Errand.StateName.length + 1];
+        states[0] = "全部";
+        System.arraycopy(Errand.StateName, 0, states, 1, Errand.StateName.length);
+        spinnerState = root.findViewById(R.id.spinner_state);
         ArrayAdapter<String> arrayAdapterState = new ArrayAdapter<>(
                 requireContext(),
                 R.layout.support_simple_spinner_dropdown_item,
                 states
         );
         spinnerState.setAdapter(arrayAdapterState);
+        spinnerState.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                pull();
+            }
 
-        String[] fields = {
-                "Thumbnail", "Title", "State", "Author", "Preview", "Money"
-        };
-        int[] fieldIds = {
-                R.id.imageView_thumbnail,
-                R.id.textView_title,
-                R.id.textView_state,
-                R.id.textView_author,
-                R.id.textView_preview,
-                R.id.textView_money
-        };
-        List<Map<String, Object>> mapList = new ArrayList<>();
-        int n = 50;
-        for (int i = 0; i < n; i++) {
-            Map<String, Object> map = new HashMap<>();
-            map.put(fields[0], R.drawable.ic_logo);
-            for (int j = 1; j < fields.length; j++) map.put(fields[j], fields[j]);
-            mapList.add(map);
-        }
-        SimpleAdapter simpleAdapter = new SimpleAdapter(
-                getContext(),
-                mapList,
-                R.layout.listviewitem_errand,
-                fields,
-                fieldIds
-        );
-        ListView listViewErrandList = root.findViewById(R.id.listView_errandList);
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
+
+
+        listViewErrandList = root.findViewById(R.id.listView_errandList);
         listViewErrandList.setAdapter(simpleAdapter);
         listViewErrandList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -110,4 +141,88 @@ public class HomeFragment extends Fragment {
 
         return root;
     }
+
+    @Override
+    public void onDestroy() {
+        if (serviceConnection != null)
+            requireActivity().unbindService(serviceConnection);
+        super.onDestroy();
+    }
+
+    public String keyword;
+    public int tag;
+    public Errand.State state;
+
+    public void pull() {
+        // TODO [Done]: Pull
+        keyword = editTextKeyword.getText().toString().trim();
+        if(keyword.length()==0) keyword="%";
+        tag = spinnerTag.getSelectedItemPosition();
+        state = Errand.State.values()[spinnerState.getSelectedItemPosition()];
+        remoteBinder.queryErrandList(null, keyword, tag, state, new Remote.Listener() {
+            @Override
+            public void execute(ResultCode resultCode, Object object) {
+                if (resultCode == ResultCode.Succeeded && object instanceof List) {
+                    List<Errand> errandList = (List<Errand>) object;
+                    push(errandList);
+                }
+                else{
+                    switch ((SearchCompositeError) object){
+                        case NetworkError:
+                            Toast.makeText(
+                                    requireContext(),
+                                    R.string.toast_networkError,
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                            break;
+                        case SearchFailed:
+                        default:
+                            Toast.makeText(
+                                    requireContext(),
+                                    R.string.toast_searchError,
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                            break;
+                    }
+                }
+            }
+        });
+    }
+
+    String[] fields = {
+            "Thumbnail", "Title", "State", "Author", "Preview", "Money"
+    };
+    int[] fieldIds = {
+            R.id.imageView_thumbnail,
+            R.id.textView_title,
+            R.id.textView_state,
+            R.id.textView_author,
+            R.id.textView_preview,
+            R.id.textView_money
+    };
+
+    public void push(List<Errand> errandList) {
+        // TODO [Done]: Push
+        List<Map<String, Object>> mapList = new ArrayList<>();
+        int n = errandList.size();
+        for (Errand errand : errandList) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("Thumbnail", R.drawable.ic_logo);
+            map.put("Title", errand.title);
+            map.put("State", errand.state.toString());
+            map.put("Author", errand.publisher.getName());
+            map.put("Preview", errand.getContentPreview());
+            map.put("Money", errand.money.toString());
+            mapList.add(map);
+        }
+        simpleAdapter = new SimpleAdapter(
+                getContext(),
+                mapList,
+                R.layout.listviewitem_errand,
+                fields,
+                fieldIds
+        );
+        listViewErrandList.setAdapter(simpleAdapter);
+    }
+
 }
