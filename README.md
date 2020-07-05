@@ -45,17 +45,17 @@
 | 接口                   | status |
 | :--------------------- | :----: |
 | /user/login            |   ✔️    |
-| /user/register         |        |
+| /user/register         |   ✔️   |
 | /user/check            |        |
 | /user/myPublish        |        |
 | /user/myOffer          |        |
 | /user/update           |        |
-| /errand/publish        |        |
+| /errand/publish        |   ✔️   |
 | /errand/search         |        |
 | /errand/item           |        |
 | /errand/allErrand      |        |
 | /errand/detail         |        |
-| /errand/apply          |        |
+| /errand/apply          |   ✔️   |
 | /errand/choose         |        |
 | /errand/check          |        |
 | /chat/queryUnsignedMsg |        |
@@ -67,6 +67,7 @@
 | /judge/userAgree       |        |
 | /judge/handJudge       |        |
 | /judge/status          |        |
+| /judge/delete          |   ✔️   |
 
 ## 业务逻辑
 
