@@ -16,4 +16,7 @@ public interface Global {
     enum PublishError{
         CreateFailed,UploadFileFalied,MoneyInsufficient,PublishError
     }
+    enum ApplyError{
+        ApplyError
+    }
 }

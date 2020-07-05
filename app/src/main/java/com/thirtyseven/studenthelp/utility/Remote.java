@@ -297,7 +297,7 @@ public class Remote extends Service implements Global {
         ) { // ErrandActivity.java
             // TO-DO: 完成Remote.apply
             String param = "?applierId=" + errand.receiverPrimary.id + "&errandId=" + errand.id;
-            call("/user/register", Request.Method.POST,
+            call("/user/register", Request.Method.GET,
                     param,
                     null,
                     new Listener() {
@@ -313,7 +313,7 @@ public class Remote extends Service implements Global {
                                             listener.execute(ResultCode.Succeeded, null);
                                             break;
                                         default:
-                                            listener.execute(ResultCode.Failed, RegisterError.NetworkError);
+                                            listener.execute(ResultCode.Failed, ApplyError.ApplyError);
                                             break;
                                     }
                                 } catch (JSONException e) {
