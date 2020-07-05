@@ -50,7 +50,7 @@ public class NoticeConversationFragment extends Fragment {
         });
 
         String[] fields = {
-                "Title", "Preview"
+                "会话", "最后一条消息"
         };
         int[] fieldIds = {
                 R.id.textView_title,

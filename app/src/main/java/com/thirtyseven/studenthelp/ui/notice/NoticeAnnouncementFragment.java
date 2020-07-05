@@ -48,7 +48,7 @@ public class NoticeAnnouncementFragment extends Fragment {
         });
 
         String[] fields = {
-                "Title", "Preview"
+                "公告", "公告内容"
         };
         int[] fieldIds = {
                 R.id.textView_title,

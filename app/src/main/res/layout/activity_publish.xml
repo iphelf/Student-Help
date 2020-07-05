@@ -58,7 +58,6 @@
                 android:ems="10"
                 android:hint="@string/editText_title"
                 android:inputType="textPersonName"
-                android:text="Title"
                 tools:layout_editor_absoluteX="133dp"
                 tools:layout_editor_absoluteY="210dp" />
 
@@ -84,8 +83,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:inputType="number"
-                android:text="20176151" />
+                android:inputType="number" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -103,8 +101,7 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:gravity="start|top"
-                android:inputType="textMultiLine"
-                android:text="Too expensive!!!" />
+                android:inputType="textMultiLine" />
 
             <TextView
                 android:id="@+id/textView17"

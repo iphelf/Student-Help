@@ -49,7 +49,7 @@ public class NoticeProgressFragment extends Fragment {
         });
 
         String[] fields = {
-                "Title", "Preview"
+                "活动状态更新", "更新内容"
         };
         int[] fieldIds = {
                 R.id.textView_title,

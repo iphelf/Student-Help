@@ -115,6 +115,7 @@ public class Remote extends Service implements Global {
 
         public void responseErrand(Errand errand, JSONObject item) {
             try {
+                errand.id = item.getString("errandId");
                 errand.title = item.getString("errandTitle");
                 errand.tag = item.getString("errandItem");
                 errand.state = item.getString("errandStatus");
@@ -278,6 +279,7 @@ public class Remote extends Service implements Global {
                         }
                     });
         }
+
         // /errand/search
         public void queryKeyword(
                 final Errand errand,

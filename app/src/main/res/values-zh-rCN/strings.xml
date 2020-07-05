@@ -80,4 +80,8 @@
     <string name="toast_publishError_uploadError">附件上传失败！</string>
     <string name="toast_publishError_createError">活动创建失败！</string>
     <string name="toast_publishError">发布失败！</string>
+    <string name="button_accept">接受</string>
+    <string name="button_reject">拒绝</string>
+    <string name="button_confirm">确认</string>
+    <string name="button_refuse">否决</string>
 </resources>

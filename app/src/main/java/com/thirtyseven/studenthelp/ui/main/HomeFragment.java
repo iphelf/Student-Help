@@ -217,7 +217,7 @@ public class HomeFragment extends Fragment implements Global {
             map.put("State", errand.getStateName());
             map.put("Author", errand.publisher.getName());
             map.put("Preview", errand.getContentPreview());
-            map.put("Money", errand.money.toString());
+            map.put("Money", "悬赏: " + errand.money.toString());
             mapList.add(map);
         }
         simpleAdapter = new SimpleAdapter(

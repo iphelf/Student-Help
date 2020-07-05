@@ -33,8 +33,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="@string/hint_studentId"
-            android:inputType="textPersonName"
-            android:text="20176151" />
+            android:inputType="textPersonName" />
 
         <EditText
             android:id="@+id/editText_password"
@@ -42,8 +41,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="@string/hint_password"
-            android:inputType="textPassword"
-            android:text="flf10101" />
+            android:inputType="textPassword" />
 
     </LinearLayout>
 

@@ -79,5 +79,9 @@
     <string name="toast_publishError_uploadError">Upload failed!</string>
     <string name="toast_publishError_createError">Creation failed!</string>
     <string name="toast_publishError">Publish failed!</string>
+    <string name="button_accept">Accept</string>
+    <string name="button_reject">Reject</string>
+    <string name="button_confirm">Confirm</string>
+    <string name="button_refuse">Refuse</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

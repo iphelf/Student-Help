@@ -64,4 +64,7 @@ public interface Global {
     enum QueryKeywordError{
         NetworkError,QueryKeywordError
     }
+    enum DismissError{
+        NetworkError,DismissError
+    }
 }
