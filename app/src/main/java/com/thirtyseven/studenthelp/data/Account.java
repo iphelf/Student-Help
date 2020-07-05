@@ -7,7 +7,7 @@ public class Account {
     public String password;
     public String nickname;
     public String realName;
-    public int credit;
+    public BigDecimal credit;
     public BigDecimal capital;
 
     public String getName() {
@@ -15,4 +15,10 @@ public class Account {
         if (realName != null) return realName;
         return id;
     }
+
+    public String getCredit() {
+        if (credit != null) return credit.toString();
+        return "";
+    }
+
 }

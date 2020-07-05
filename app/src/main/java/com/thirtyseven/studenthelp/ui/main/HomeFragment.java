@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +28,7 @@ import com.thirtyseven.studenthelp.data.Errand;
 import com.thirtyseven.studenthelp.ui.common.ErrandActivity;
 import com.thirtyseven.studenthelp.ui.home.PublishActivity;
 import com.thirtyseven.studenthelp.utility.Global;
+import com.thirtyseven.studenthelp.utility.Local;
 import com.thirtyseven.studenthelp.utility.Remote;
 
 import java.util.ArrayList;
@@ -106,6 +106,16 @@ public class HomeFragment extends Fragment implements Global {
                 tags
         );
         spinnerTag.setAdapter(arrayAdapterTag);
+        spinnerTag.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                pull();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
 
         String[] states = new String[Errand.StateName.length + 1];
         states[0] = "全部";
@@ -128,12 +138,12 @@ public class HomeFragment extends Fragment implements Global {
             }
         });
 
-
         listViewErrandList = root.findViewById(R.id.listView_errandList);
         listViewErrandList.setAdapter(simpleAdapter);
         listViewErrandList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Local.pushErrand(errandList.get(i));
                 Intent intent = new Intent(getActivity(), ErrandActivity.class);
                 startActivity(intent);
             }
@@ -149,24 +159,21 @@ public class HomeFragment extends Fragment implements Global {
         super.onDestroy();
     }
 
-    public String keyword;
-    public String tag;
-    public String state;
+    private List<Errand> errandList;
 
     public void pull() {
-        keyword = editTextKeyword.getText().toString().trim();
-        if(keyword.length()==0) keyword="%";
-        tag=Errand.tagValueOf(spinnerTag.getSelectedItemPosition()-1);
-        state=Errand.stateValueOf(spinnerState.getSelectedItemPosition()-1);
+        String keyword = editTextKeyword.getText().toString().trim();
+        if (keyword.length() == 0) keyword = "%";
+        String tag = Errand.tagValueOf(spinnerTag.getSelectedItemPosition() - 1);
+        String state = Errand.stateValueOf(spinnerState.getSelectedItemPosition() - 1);
         remoteBinder.queryErrandList(null, keyword, tag, state, new Remote.Listener() {
             @Override
             public void execute(ResultCode resultCode, Object object) {
                 if (resultCode == ResultCode.Succeeded && object instanceof List) {
-                    List<Errand> errandList = (List<Errand>) object;
-                    push(errandList);
-                }
-                else{
-                    switch ((SearchCompositeError) object){
+                    errandList = (List<Errand>) object;
+                    push();
+                } else {
+                    switch ((SearchCompositeError) object) {
                         case NetworkError:
                             Toast.makeText(
                                     requireContext(),
@@ -200,14 +207,14 @@ public class HomeFragment extends Fragment implements Global {
             R.id.textView_money
     };
 
-    public void push(List<Errand> errandList) {
+    public void push() {
         List<Map<String, Object>> mapList = new ArrayList<>();
         int n = errandList.size();
         for (Errand errand : errandList) {
             Map<String, Object> map = new HashMap<>();
             map.put("Thumbnail", R.drawable.ic_logo);
-            map.put("Title", errand.title);
-            map.put("State", errand.state);
+            map.put("Title", errand.getTitle());
+            map.put("State", errand.getStateName());
             map.put("Author", errand.publisher.getName());
             map.put("Preview", errand.getContentPreview());
             map.put("Money", errand.money.toString());

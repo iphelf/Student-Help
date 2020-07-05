@@ -41,8 +41,23 @@ public class Errand {
     public BigDecimal money;
     public String state;
 
+    public String getTitle() {
+        if (title == null) return "";
+        return title;
+    }
+
     public String getContent() {
         if (content != null) return content;
+        return "";
+    }
+
+    public String getDate() {
+        if (date != null) return date.toString();
+        return "";
+    }
+
+    public String getMoney() {
+        if (money != null) return money.toString();
         return "";
     }
 
@@ -50,6 +65,18 @@ public class Errand {
         String preview = getContent();
         if (preview.length() <= 200) return preview;
         return preview.substring(0, 200);
+    }
+
+    public String getStateName() {
+        if (state == null || state.length() == 0 || state.equals("%"))
+            return "";
+        else return StateName[Integer.parseInt(state)];
+    }
+
+    public String getTagName() {
+        if (tag == null || tag.length() == 0 || tag.equals("%"))
+            return "";
+        else return TagName[Integer.parseInt(tag)];
     }
 
     static public String tagValueOf(int i) {
