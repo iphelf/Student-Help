@@ -142,13 +142,6 @@ public class Remote extends Service implements Global {
             );
         }
 
-        // /user/check
-        public void certificate(
-                Account account,
-                final Listener listener
-        ) { // CertificateFragment.java
-            // TODO: 完成Remote.certificate
-        }
 
         private void queryItem(String queryUrl, String param, final List<Errand> queryList, final Listener queryListener) {
             call(queryUrl, Request.Method.GET,
@@ -352,7 +345,7 @@ public class Remote extends Service implements Global {
 
         }
 
-        // ?
+        //?
         public void queryConversationList(
                 Account account,
                 final Listener listener
@@ -391,11 +384,47 @@ public class Remote extends Service implements Global {
 
         // /chat/queryHistoricRecords
         public void queryConversation(
-                Conversation conversation,
+                final Conversation conversation,
                 final Listener listener
         ) { // ConversationActivity.java
             // TODO: 完成Remote.queryConversation
             //  返回值object中存放Conversation
+            String param = "?myId=" + conversation.publisher.id + "&otherId=" + conversation.receiverPrimary.id;
+            call("/chat/queryHistoricRecords", Request.Method.GET,
+                    param,
+                    null,
+                    new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, null);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+                                try {
+                                    switch (jsonObject.getInt("code")) {
+                                        case 0:
+                                            JSONArray jsonMessage=new JSONArray();
+                                            ((JSONObject) object).toJSONArray(jsonMessage);
+                                            for(int i=0;i<jsonMessage.length();i++){
+                                                final Message msg=new Message();
+                                                JSONObject Msg=jsonMessage.getJSONObject(i);
+                                                msg.sender.id=Msg.getString("senderId");
+                                                msg.receiver.id=Msg.getString("receiverId");
+                                                msg.content=Msg.getString("msg");
+                                                conversation.messageList.add(msg);
+                                            }
+                                            listener.execute(ResultCode.Succeeded, conversation);
+                                            break;
+                                        default:
+                                            listener.execute(ResultCode.Failed, QueryRecordsError.QueryFailed);
+                                            break;
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
         }
 
         // ws://129.211.5.147:8088/ws

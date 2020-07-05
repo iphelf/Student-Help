@@ -31,4 +31,7 @@ public interface Global {
     enum SearchComposite{
         SearchFailed
     }
+    enum QueryRecordsError{
+        QueryFailed;
+    }
 }
