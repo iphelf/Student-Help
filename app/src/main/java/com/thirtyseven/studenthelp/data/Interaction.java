@@ -6,4 +6,5 @@ public class Interaction {
     public Account sender;
     public Account receiver;
     public Type type;
+    public boolean read;
 }

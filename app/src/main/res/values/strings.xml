@@ -71,5 +71,6 @@
     <string name="text_photo">Account Photo</string>
     <string name="toast_loginError_notExist">No such user!</string>
     <string name="toast_loginError_wrongPassword">Wrong password!</string>
+    <string name="toast_networkError">Network error!</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

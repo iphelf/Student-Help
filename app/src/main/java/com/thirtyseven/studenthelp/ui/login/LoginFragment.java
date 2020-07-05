@@ -106,6 +106,13 @@ public class LoginFragment extends Fragment implements Global {
                                             Toast.LENGTH_SHORT
                                     ).show();
                                     break;
+                                case NetworkError:
+                                    Toast.makeText(
+                                            requireContext(),
+                                            R.string.toast_networkError,
+                                            Toast.LENGTH_SHORT
+                                    ).show();
+                                    break;
                                 case LoginError:
                                 default:
                                     Toast.makeText(

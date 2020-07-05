@@ -17,6 +17,7 @@ import com.thirtyseven.studenthelp.R;
 import com.thirtyseven.studenthelp.data.Account;
 import com.thirtyseven.studenthelp.data.Conversation;
 import com.thirtyseven.studenthelp.data.Errand;
+import com.thirtyseven.studenthelp.data.Message;
 import com.thirtyseven.studenthelp.data.Tag;
 
 import org.json.JSONException;
@@ -92,7 +93,7 @@ public class Remote extends Service implements Global {
                         @Override
                         public void execute(ResultCode resultCode, Object object) {
                             if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
-                                listener.execute(ResultCode.Failed, null);
+                                listener.execute(ResultCode.Failed, LoginError.NetworkError);
                             } else {
                                 JSONObject jsonObject = (JSONObject) object;
                                 try {
@@ -130,11 +131,11 @@ public class Remote extends Service implements Global {
                     null,
                     new Listener() {
                         public void execute(ResultCode resultCode, Object object) {
-                            if(resultCode == ResultCode.Failed || !(object instanceof JSONObject)){
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
                                 listener.execute(ResultCode.Failed, null);
-                            }else{
+                            } else {
                                 JSONObject jsonObject = (JSONObject) object;
-                                try{
+                                try {
                                     switch (jsonObject.getInt("code")) {
                                         case 0:
                                             listener.execute(ResultCode.Succeeded, null);
@@ -146,16 +147,13 @@ public class Remote extends Service implements Global {
                                             listener.execute(ResultCode.Failed, RegisterError.NetworkError);
                                             break;
                                     }
-                                }catch (JSONException e){
+                                } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
                             }
                         }
-
-
-            }
+                    }
             );
-
         }
 
         // /user/check
@@ -171,7 +169,7 @@ public class Remote extends Service implements Global {
                 Account account, String keyword, Tag tag, Errand.State state,
                 final Listener listener
         ) { // HomeFragment.java
-            // TODO: 完成Remote.query
+            // TODO: 完成Remote.queryErrandList
             //  返回值object中存放List<Errand>
         }
 
@@ -201,6 +199,14 @@ public class Remote extends Service implements Global {
             //  返回值object中存放Conversation
         }
 
+        // ws://129.211.5.147:8088/ws
+        public void sendMessage(
+                Message message,
+                final Listener listener
+        ) { // ConversationActivity.java
+            // TODO: 完成Remote.sendMessage
+        }
+
         // ?
         public void queryAnnouncementList(
                 Account account,
@@ -227,6 +233,22 @@ public class Remote extends Service implements Global {
             // TO-DO: 完成Remote.apply
         }
 
+        // /errand/choose
+        public void acceptApplication(
+                Account account, Errand errand,
+                final Listener listener
+        ) { // ErrandActivity.java
+            // TO-DO: 完成Remote.acceptApplication
+        }
+
+        // /errand/choose
+        public void rejectApplication(
+                Account account, Errand errand,
+                final Listener listener
+        ) { // ErrandActivity.java
+            // TO-DO: 完成Remote.rejectApplication
+        }
+
         // ?
         public void delete(
                 Account account, Errand errand,
@@ -244,6 +266,14 @@ public class Remote extends Service implements Global {
         }
 
         // ?
+        public void dismiss(
+                Account account, Errand errand,
+                final Listener listener
+        ) { // ErrandActivity.java
+            // TO-DO: 完成Remote.dismiss
+        }
+
+        // /errand/push
         public void submit(
                 Account account, Errand errand,
                 final Listener listener
@@ -251,12 +281,20 @@ public class Remote extends Service implements Global {
             // TO-DO: 完成Remote.submit
         }
 
-        // ?
-        public void dismiss(
+        // /errand/choose
+        public void acceptSubmission(
                 Account account, Errand errand,
                 final Listener listener
         ) { // ErrandActivity.java
-            // TO-DO: 完成Remote.dismiss
+            // TO-DO: 完成Remote.acceptApplication
+        }
+
+        // /errand/choose
+        public void rejectSubmission(
+                Account account, Errand errand,
+                final Listener listener
+        ) { // ErrandActivity.java
+            // TO-DO: 完成Remote.rejectApplication
         }
 
     }
