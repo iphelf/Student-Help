@@ -179,7 +179,7 @@ public class Remote extends Service implements Global {
                 final Listener listener
         ) { // PublishActivity.java
             // TODO: 完成Remote.publish
-            call("/errand/publish", Request.Method.GET,
+            call("/errand/publish", Request.Method.POST,
                     "?errandDescription=" + errand.content + "&errandItem =" + errand.tag +
                             "&errandMoney=" + errand.money + "&errandTitle=" + errand.title + "&publisherId=" + errand.publisher.id,
                     null,
@@ -196,13 +196,13 @@ public class Remote extends Service implements Global {
                                             listener.execute(ResultCode.Succeeded, null);
                                             break;
                                         case 4006:
-                                            listener.execute(ResultCode.Failed,PublishError.CreateFailed);
+                                            listener.execute(ResultCode.Failed, PublishError.CreateFailed);
                                             break;
                                         case 4007:
-                                            listener.execute(ResultCode.Failed,PublishError.UploadFileFalied);
+                                            listener.execute(ResultCode.Failed, PublishError.UploadFileFalied);
                                             break;
                                         case 4011:
-                                            listener.execute(ResultCode.Failed,PublishError.MoneyInsufficient);
+                                            listener.execute(ResultCode.Failed, PublishError.MoneyInsufficient);
                                             break;
                                         default:
                                             listener.execute(ResultCode.Failed, PublishError.PublishError);
@@ -296,6 +296,32 @@ public class Remote extends Service implements Global {
                 final Listener listener
         ) { // ErrandActivity.java
             // TO-DO: 完成Remote.apply
+            String param = "?applierId=" + errand.receiverPrimary.id + "&errandId=" + errand.id;
+            call("/user/register", Request.Method.POST,
+                    param,
+                    null,
+                    new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, null);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+                                try {
+                                    switch (jsonObject.getInt("code")) {
+                                        case 0:
+                                            listener.execute(ResultCode.Succeeded, null);
+                                            break;
+                                        default:
+                                            listener.execute(ResultCode.Failed, RegisterError.NetworkError);
+                                            break;
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
         }
 
         // /errand/choose
