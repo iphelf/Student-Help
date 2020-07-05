@@ -151,7 +151,7 @@ public class Remote extends Service implements Global {
                         @Override
                         public void execute(ResultCode resultCode, Object object) {
                             if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
-                                queryListener.execute(ResultCode.Failed,SearchComposite.NetworkError);
+                                queryListener.execute(ResultCode.Failed, SearchComposite.NetworkError);
                             } else {
                                 JSONObject jsonObject = (JSONObject) object;
                                 try {
@@ -163,7 +163,7 @@ public class Remote extends Service implements Global {
                                                 final Errand errand = new Errand();
                                                 errand.title = item.getString("errandTitle");
                                                 errand.tag = item.getInt("errandItem");
-                                                errand.state=Errand.State.values()[item.getInt("errandStatus")];
+                                                errand.state = Errand.State.values()[item.getInt("errandStatus")];
                                                 errand.content = item.getString("errandDescription");
                                                 errand.publisher.id = item.getString("publisherId");
                                                 errand.receiver.id = item.getString("offerId");
@@ -278,6 +278,45 @@ public class Remote extends Service implements Global {
 //                        });
             }
         }
+        // /errand/detail
+        public void queryDetail(
+                final Errand errand,
+                final Listener listener
+        ) {
+            call("/errand/detail", Request.Method.GET,
+                    "?errandId=" + errand.id,
+                    null,
+                    new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, DetailError.NetworkError);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+                                try {
+                                    switch (jsonObject.getInt("code")) {
+                                        case 0:
+                                            JSONObject item=jsonObject.getJSONObject("data");
+                                            errand.title = item.getString("errandTitle");
+                                            errand.tag = item.getInt("errandItem");
+                                            errand.state = Errand.State.values()[item.getInt("errandStatus")];
+                                            errand.content = item.getString("errandDescription");
+                                            errand.publisher.id = item.getString("publisherId");
+                                            errand.receiver.id = item.getString("offerId");
+                                            errand.money = new BigDecimal(item.getString("errandMoney"));
+                                            listener.execute(ResultCode.Succeeded, errand);
+                                            break;
+                                        default:
+                                            listener.execute(ResultCode.Failed, DetailError.DetailError);
+                                            break;
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
+        }
 
         // /errand/publish
         public void publish(
@@ -382,14 +421,14 @@ public class Remote extends Service implements Global {
                                 try {
                                     switch (jsonObject.getInt("code")) {
                                         case 0:
-                                            JSONArray jsonMessage=new JSONArray();
+                                            JSONArray jsonMessage = new JSONArray();
                                             ((JSONObject) object).toJSONArray(jsonMessage);
-                                            for(int i=0;i<jsonMessage.length();i++){
-                                                final Message msg=new Message();
-                                                JSONObject Msg=jsonMessage.getJSONObject(i);
-                                                msg.sender.id=Msg.getString("senderId");
-                                                msg.receiver.id=Msg.getString("receiverId");
-                                                msg.content=Msg.getString("msg");
+                                            for (int i = 0; i < jsonMessage.length(); i++) {
+                                                final Message msg = new Message();
+                                                JSONObject Msg = jsonMessage.getJSONObject(i);
+                                                msg.sender.id = Msg.getString("senderId");
+                                                msg.receiver.id = Msg.getString("receiverId");
+                                                msg.content = Msg.getString("msg");
                                                 conversation.messageList.add(msg);
                                             }
                                             listener.execute(ResultCode.Succeeded, conversation);
@@ -597,7 +636,7 @@ public class Remote extends Service implements Global {
                 final Listener listener
         ) { // ErrandActivity.java
             // TO-DO: 完成Remote.submit
-            String param="?errandId=" + errand.id + "&errandStatus=" +errand.state.ordinal();
+            String param = "?errandId=" + errand.id + "&errandStatus=" + errand.state.ordinal();
             call("/errand/push", Request.Method.GET,
                     param,
                     null,
@@ -646,13 +685,13 @@ public class Remote extends Service implements Global {
                                 try {
                                     switch (jsonObject.getInt("code")) {
                                         case 0:
-                                            JSONObject Msg=jsonObject.getJSONObject("data");
-                                            String msg=Msg.getString("message");
-                                            if(msg.equals("验收失败")){
+                                            JSONObject Msg = jsonObject.getJSONObject("data");
+                                            String msg = Msg.getString("message");
+                                            if (msg.equals("验收失败")) {
                                                 listener.execute(ResultCode.Succeeded, CheckState.CheckRefused);
-                                            }else if(msg.equals("待评价")){
+                                            } else if (msg.equals("待评价")) {
                                                 listener.execute(ResultCode.Succeeded, CheckState.CheckSucceed);
-                                            }else{
+                                            } else {
                                                 listener.execute(ResultCode.Succeeded, CheckState.InputRightState);
                                             }
                                             break;

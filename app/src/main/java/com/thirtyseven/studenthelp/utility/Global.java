@@ -46,4 +46,7 @@ public interface Global {
     enum CheckState{
         CheckRefused,CheckSucceed,InputRightState
     }
+    enum DetailError{
+        NetworkError,DetailError
+    }
 }
