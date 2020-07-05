@@ -25,11 +25,12 @@ public class LoginActivity extends AppCompatActivity {
     private Remote.RemoteBinder remoteBinder;
     private ServiceConnection serviceConnection;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        setTitle(R.string.title_login);
 
         serviceConnection = new ServiceConnection() {
             @Override
@@ -48,8 +49,6 @@ public class LoginActivity extends AppCompatActivity {
                 serviceConnection,
                 Service.BIND_AUTO_CREATE
         );
-
-        setTitle(R.string.title_login);
 
         final EditText editTextStudentId = findViewById(R.id.editText_studentId);
         final EditText editTextPassword = findViewById(R.id.editText_password);
@@ -72,7 +71,7 @@ public class LoginActivity extends AppCompatActivity {
                             startActivity(intent);
                             finish();
                         } else {
-                            switch ((Global.LoginError) object){
+                            switch ((Global.LoginError) object) {
                                 case NotExist:
                                     Toast.makeText(
                                             LoginActivity.this,
@@ -116,4 +115,5 @@ public class LoginActivity extends AppCompatActivity {
         unbindService(serviceConnection);
         super.onDestroy();
     }
+
 }

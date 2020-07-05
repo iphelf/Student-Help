@@ -75,5 +75,9 @@
     <string name="toast_registerError_existUser">Conflicts with existing username!</string>
     <string name="toast_registerError">Register failed!</string>
     <string name="toast_searchError">Search failed!</string>
+    <string name="toast_publishError_moneyInsufficient">Money insufficient!</string>
+    <string name="toast_publishError_uploadError">Upload failed!</string>
+    <string name="toast_publishError_createError">Creation failed!</string>
+    <string name="toast_publishError">Publish failed!</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

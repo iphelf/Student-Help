@@ -1,16 +1,42 @@
 package com.thirtyseven.studenthelp.ui.home;
 
+import android.app.Service;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.thirtyseven.studenthelp.R;
+import com.thirtyseven.studenthelp.data.Account;
+import com.thirtyseven.studenthelp.data.Errand;
+import com.thirtyseven.studenthelp.utility.Global;
+import com.thirtyseven.studenthelp.utility.Local;
+import com.thirtyseven.studenthelp.utility.Remote;
 
-public class PublishActivity extends AppCompatActivity {
+import java.math.BigDecimal;
+
+public class PublishActivity extends AppCompatActivity implements Global {
+
+    private Remote.RemoteBinder remoteBinder;
+    private ServiceConnection serviceConnection;
+
+    private Button buttonCancel;
+    private Button buttonPublish;
+    private EditText editTextTitle;
+    private Spinner spinnerTag;
+    private EditText editTextMoney;
+    private EditText editTextContent;
+    private ImageButton imageButtonAppend;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,30 +44,135 @@ public class PublishActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) getSupportActionBar().hide();
         setContentView(R.layout.activity_publish);
         setTitle(R.string.title_publish);
-        Button buttonPublish = findViewById(R.id.button_publish);
+
+        serviceConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+                remoteBinder = (Remote.RemoteBinder) iBinder;
+                remoteBinder.startConversation();
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName componentName) {
+
+            }
+        };
+        bindService(
+                new Intent(this, Remote.class),
+                serviceConnection,
+                Service.BIND_AUTO_CREATE
+        );
+
+        buttonPublish = findViewById(R.id.button_publish);
         buttonPublish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finish();
+                pull();
             }
         });
-        Button buttonCancel = findViewById(R.id.button_cancel);
+
+        buttonCancel = findViewById(R.id.button_cancel);
         buttonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
             }
         });
-        String[] tags = {
-                "全部", "代领快递", "寻物启事", "二手交易", "组队征集", "学习辅导", "问卷调查", "其他"
-        };
-        Spinner spinnerTag = findViewById(R.id.spinner_tag);
+
+        editTextTitle = findViewById(R.id.editText_title);
+
+        String[] tags = new String[Errand.TagName.length + 1];
+        tags[0] = "全部";
+        System.arraycopy(Errand.TagName, 0, tags, 1, Errand.TagName.length);
+        spinnerTag = findViewById(R.id.spinner_tag);
         ArrayAdapter<String> arrayAdapterTag = new ArrayAdapter<>(
-                this,
+                PublishActivity.this,
                 R.layout.support_simple_spinner_dropdown_item,
                 tags
         );
         spinnerTag.setAdapter(arrayAdapterTag);
 
+        editTextMoney = findViewById(R.id.editText_money);
+        editTextContent = findViewById(R.id.editText_content);
+
+        imageButtonAppend = findViewById(R.id.imageButton_append);
+
     }
+
+    @Override
+    public void onDestroy() {
+        unbindService(serviceConnection);
+        super.onDestroy();
+    }
+
+    private String title;
+    private int tag;
+    private String money;
+    private String content;
+
+    public void pull() {
+        // TODO: Pull
+        title = editTextTitle.getText().toString().trim();
+        tag = spinnerTag.getSelectedItemPosition();
+        money = editTextMoney.getText().toString().trim();
+        content = editTextContent.getText().toString().trim();
+        Errand errand = new Errand();
+        errand.title = title;
+        errand.tag = tag;
+        errand.money = new BigDecimal(money);
+        errand.content = content;
+        errand.publisher= Local.loadAccount();
+        remoteBinder.publish(errand, new Remote.Listener() {
+            @Override
+            public void execute(ResultCode resultCode, Object object) {
+                if (resultCode == ResultCode.Succeeded) {
+                    push();
+                } else {
+                    switch ((PublishError) object) {
+                        case MoneyInsufficient:
+                            Toast.makeText(
+                                    PublishActivity.this,
+                                    R.string.toast_publishError_moneyInsufficient,
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                            break;
+                        case UploadFileFalied:
+                            Toast.makeText(
+                                    PublishActivity.this,
+                                    R.string.toast_publishError_uploadError,
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                            break;
+                        case CreateFailed:
+                            Toast.makeText(
+                                    PublishActivity.this,
+                                    R.string.toast_publishError_createError,
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                            break;
+                        case NetworkError:
+                            Toast.makeText(
+                                    PublishActivity.this,
+                                    R.string.toast_networkError,
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                            break;
+                        case PublishError:
+                        default:
+                            Toast.makeText(
+                                    PublishActivity.this,
+                                    R.string.toast_publishError,
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                            break;
+                    }
+                }
+            }
+        });
+    }
+
+    public void push() {
+        finish();
+    }
+
 }

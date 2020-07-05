@@ -155,6 +155,7 @@ public class HomeFragment extends Fragment implements Global {
 
     public void pull() {
         // TODO [Done]: Pull
+        // FIXME: 编号错位
         keyword = editTextKeyword.getText().toString().trim();
         if(keyword.length()==0) keyword="%";
         tag = spinnerTag.getSelectedItemPosition();

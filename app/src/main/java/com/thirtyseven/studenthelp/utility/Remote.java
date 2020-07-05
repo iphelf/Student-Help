@@ -351,8 +351,8 @@ public class Remote extends Service implements Global {
         ) { // PublishActivity.java
             // TODO: 完成Remote.publish
             call("/errand/publish", Request.Method.POST,
-                    "?errandDescription=" + errand.content + "&errandItem =" + errand.tag +
-                            "&errandMoney=" + errand.money + "&errandTitle=" + errand.title + "&publisherId=" + errand.publisher.id,
+                    "?errandDescription=" + encode(errand.content) + "&errandItem=" + errand.tag +
+                            "&errandMoney=" + errand.money + "&errandTitle=" + encode(errand.title) + "&publisherId=" + errand.publisher.id,
                     null,
                     new Listener() {
                         @Override
@@ -385,7 +385,6 @@ public class Remote extends Service implements Global {
                             }
                         }
                     });
-
 
         }
 
