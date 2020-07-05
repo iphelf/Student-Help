@@ -144,7 +144,7 @@ public class Remote extends Service implements Global {
                                             listener.execute(ResultCode.Failed, RegisterError.UserExist);
                                             break;
                                         default:
-                                            listener.execute(ResultCode.Failed, RegisterError.NetworkError);
+                                            listener.execute(ResultCode.Failed, RegisterError.RegisterError);
                                             break;
                                     }
                                 } catch (JSONException e) {
@@ -179,6 +179,43 @@ public class Remote extends Service implements Global {
                 final Listener listener
         ) { // PublishActivity.java
             // TODO: 完成Remote.publish
+            call("/errand/publish", Request.Method.GET,
+                    "?errandDescription=" + errand.content + "&errandItem =" + errand.tag +
+                            "&errandMoney=" + errand.money + "&errandTitle=" + errand.title + "&publisherId=" + errand.publisher.id,
+                    null,
+                    new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, null);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+                                try {
+                                    switch (jsonObject.getInt("code")) {
+                                        case 0:
+                                            listener.execute(ResultCode.Succeeded, null);
+                                            break;
+                                        case 4006:
+                                            listener.execute(ResultCode.Failed,PublishError.CreateFailed);
+                                            break;
+                                        case 4007:
+                                            listener.execute(ResultCode.Failed,PublishError.UploadFileFalied);
+                                            break;
+                                        case 4011:
+                                            listener.execute(ResultCode.Failed,PublishError.MoneyInsufficient);
+                                            break;
+                                        default:
+                                            listener.execute(ResultCode.Failed, PublishError.PublishError);
+                                            break;
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
+
+
         }
 
         // ?
@@ -188,6 +225,34 @@ public class Remote extends Service implements Global {
         ) { // NoticeConversationActivity.java
             // TODO: 完成Remote.queryConversationList
             //  返回值object中存放List<Conversation>
+
+            // 这里暂时存放模板
+            call("/user/register", Request.Method.POST,
+                    "?username=" + account.username + "&password=" + account.password,
+                    null,
+                    new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, null);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+                                try {
+                                    switch (jsonObject.getInt("code")) {
+                                        case 0:
+                                            listener.execute(ResultCode.Succeeded, null);
+                                            break;
+                                        default:
+                                            listener.execute(ResultCode.Failed, RegisterError.NetworkError);
+                                            break;
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
+
         }
 
         // ?

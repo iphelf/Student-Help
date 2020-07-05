@@ -16,7 +16,7 @@ public class Errand {
     public String content;
     public Conversation conversation;
     public Date date;
-    // Properties
+    //Properties
     public Tag tagPrimary;
     public List<Tag> tag; // include tagPrimary
     public BigDecimal money;

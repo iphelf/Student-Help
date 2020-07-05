@@ -11,6 +11,9 @@ public interface Global {
     }
 
     enum RegisterError{
-        NetworkError,UserExist
+        RegisterError,NetworkError,UserExist
+    }
+    enum PublishError{
+        CreateFailed,UploadFileFalied,MoneyInsufficient,PublishError
     }
 }
