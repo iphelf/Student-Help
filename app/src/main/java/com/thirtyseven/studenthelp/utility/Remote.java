@@ -119,8 +119,12 @@ public class Remote extends Service implements Global {
                 errand.tag = item.getInt("errandItem");
                 errand.state = Errand.State.values()[item.getInt("errandStatus")];
                 errand.content = item.getString("errandDescription");
+                errand.publisher=new Account();
                 errand.publisher.id = item.getString("publisherId");
-                errand.receiver.id = item.getString("offerId");
+                if(item.has("offerId")) {
+                    errand.receiver=new Account();
+                    errand.receiver.id = item.getString("offerId");
+                }
                 errand.money = new BigDecimal(item.getString("errandMoney"));
             }catch (JSONException e){
                 e.printStackTrace();
@@ -212,8 +216,8 @@ public class Remote extends Service implements Global {
                         });
             } else {
                 final List<Errand> errandList = new ArrayList<>();
-                String param = "?errandItem=" + tag + "&errandStatus=" + state +
-                        "&keyword=" + keyword;
+                String param = "?errandItem=" + tag + "&errandStatus=" + state.ordinal() +
+                        "&keyword=" + encode(keyword);
                 call("/errand/searchComposite", Request.Method.GET,
                         param,
                         null,
