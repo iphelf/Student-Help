@@ -150,16 +150,14 @@ public class HomeFragment extends Fragment implements Global {
     }
 
     public String keyword;
-    public int tag;
-    public Errand.State state;
+    public String tag;
+    public String state;
 
     public void pull() {
-        // TODO [Done]: Pull
-        // FIXME: 编号错位
         keyword = editTextKeyword.getText().toString().trim();
         if(keyword.length()==0) keyword="%";
-        tag = spinnerTag.getSelectedItemPosition();
-        state = Errand.State.values()[spinnerState.getSelectedItemPosition()];
+        tag=Errand.tagValueOf(spinnerTag.getSelectedItemPosition()-1);
+        state=Errand.stateValueOf(spinnerState.getSelectedItemPosition()-1);
         remoteBinder.queryErrandList(null, keyword, tag, state, new Remote.Listener() {
             @Override
             public void execute(ResultCode resultCode, Object object) {
@@ -203,14 +201,13 @@ public class HomeFragment extends Fragment implements Global {
     };
 
     public void push(List<Errand> errandList) {
-        // TODO [Done]: Push
         List<Map<String, Object>> mapList = new ArrayList<>();
         int n = errandList.size();
         for (Errand errand : errandList) {
             Map<String, Object> map = new HashMap<>();
             map.put("Thumbnail", R.drawable.ic_logo);
             map.put("Title", errand.title);
-            map.put("State", errand.state.toString());
+            map.put("State", errand.state);
             map.put("Author", errand.publisher.getName());
             map.put("Preview", errand.getContentPreview());
             map.put("Money", errand.money.toString());

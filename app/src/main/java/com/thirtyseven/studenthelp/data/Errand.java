@@ -36,10 +36,10 @@ public class Errand {
     public Conversation conversation;
     public Date date;
     //Properties
-    public int tag;
+    public String tag;
     public List<Integer> tagList; // include tag
     public BigDecimal money;
-    public State state;
+    public String state;
 
     public String getContent() {
         if (content != null) return content;
@@ -50,5 +50,13 @@ public class Errand {
         String preview = getContent();
         if (preview.length() <= 200) return preview;
         return preview.substring(0, 200);
+    }
+
+    static public String tagValueOf(int i) {
+        return i == -1 ? "%" : String.valueOf(i);
+    }
+
+    static public String stateValueOf(int i) {
+        return i == -1 ? "%" : String.valueOf(i);
     }
 }

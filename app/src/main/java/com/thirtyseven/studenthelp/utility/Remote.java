@@ -116,8 +116,8 @@ public class Remote extends Service implements Global {
         public void responseErrand(Errand errand, JSONObject item) {
             try {
                 errand.title = item.getString("errandTitle");
-                errand.tag = item.getInt("errandItem");
-                errand.state = Errand.State.values()[item.getInt("errandStatus")];
+                errand.tag = item.getString("errandItem");
+                errand.state = item.getString("errandStatus");
                 errand.content = item.getString("errandDescription");
                 errand.publisher = new Account();
                 errand.publisher.id = item.getString("publisherId");
@@ -174,7 +174,7 @@ public class Remote extends Service implements Global {
 
         // /user/myOffer, /user/myPublish, /errand/searchComposite
         public void queryErrandList(
-                Account account, String keyword, int tag, Errand.State state,
+                Account account, String keyword, String tag, String state,
                 final Listener listener
         ) { // HomeFragment.java
             // TODO: 完成Remote.queryErrandList
@@ -214,7 +214,7 @@ public class Remote extends Service implements Global {
                         });
             } else {
                 final List<Errand> errandList = new ArrayList<>();
-                String param = "?errandItem=" + tag + "&errandStatus=" + state.ordinal() +
+                String param = "?errandItem=" + encode(tag) + "&errandStatus=" + encode(state) +
                         "&keyword=" + encode(keyword);
                 call("/errand/searchComposite", Request.Method.GET,
                         param,
@@ -661,7 +661,7 @@ public class Remote extends Service implements Global {
                 final Listener listener
         ) { // ErrandActivity.java
             // TO-DO: 完成Remote.submit
-            String param = "?errandId=" + errand.id + "&errandStatus=" + errand.state.ordinal();
+            String param = "?errandId=" + errand.id + "&errandStatus=" + errand.state;
             call("/errand/push", Request.Method.GET,
                     param,
                     null,
@@ -695,7 +695,7 @@ public class Remote extends Service implements Global {
                 final Listener listener
         ) { // ErrandActivity.java
             // TO-DO: 完成Remote.acceptApplication
-            String param = "?errandId=" + errand.id + "&errandStatus=" + errand.state.ordinal();
+            String param = "?errandId=" + errand.id + "&errandStatus=" + errand.state;
             call("/errand/check", Request.Method.GET,
                     param,
                     null,

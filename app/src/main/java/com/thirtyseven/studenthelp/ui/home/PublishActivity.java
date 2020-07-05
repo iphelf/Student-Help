@@ -17,7 +17,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.thirtyseven.studenthelp.R;
-import com.thirtyseven.studenthelp.data.Account;
 import com.thirtyseven.studenthelp.data.Errand;
 import com.thirtyseven.studenthelp.utility.Global;
 import com.thirtyseven.studenthelp.utility.Local;
@@ -81,14 +80,11 @@ public class PublishActivity extends AppCompatActivity implements Global {
 
         editTextTitle = findViewById(R.id.editText_title);
 
-        String[] tags = new String[Errand.TagName.length + 1];
-        tags[0] = "全部";
-        System.arraycopy(Errand.TagName, 0, tags, 1, Errand.TagName.length);
         spinnerTag = findViewById(R.id.spinner_tag);
         ArrayAdapter<String> arrayAdapterTag = new ArrayAdapter<>(
                 PublishActivity.this,
                 R.layout.support_simple_spinner_dropdown_item,
-                tags
+                Errand.TagName
         );
         spinnerTag.setAdapter(arrayAdapterTag);
 
@@ -111,17 +107,16 @@ public class PublishActivity extends AppCompatActivity implements Global {
     private String content;
 
     public void pull() {
-        // TODO: Pull
         title = editTextTitle.getText().toString().trim();
         tag = spinnerTag.getSelectedItemPosition();
         money = editTextMoney.getText().toString().trim();
         content = editTextContent.getText().toString().trim();
         Errand errand = new Errand();
         errand.title = title;
-        errand.tag = tag;
+        errand.tag = Errand.tagValueOf(tag);
         errand.money = new BigDecimal(money);
         errand.content = content;
-        errand.publisher= Local.loadAccount();
+        errand.publisher = Local.loadAccount();
         remoteBinder.publish(errand, new Remote.Listener() {
             @Override
             public void execute(ResultCode resultCode, Object object) {
