@@ -57,4 +57,11 @@ public interface Global {
     enum DetailError{
         NetworkError,DetailError
     }
+
+    enum QueryItemError{
+        NetworkError,QueryItemError
+    }
+    enum QueryKeywordError{
+        NetworkError,QueryKeywordError
+    }
 }

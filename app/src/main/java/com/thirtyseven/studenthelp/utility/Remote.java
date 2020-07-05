@@ -113,20 +113,20 @@ public class Remote extends Service implements Global {
             okHttpClient.dispatcher().executorService().shutdown();
         }
 
-        public void responseErrand(Errand errand,JSONObject item){
+        public void responseErrand(Errand errand, JSONObject item) {
             try {
                 errand.title = item.getString("errandTitle");
                 errand.tag = item.getInt("errandItem");
                 errand.state = Errand.State.values()[item.getInt("errandStatus")];
                 errand.content = item.getString("errandDescription");
-                errand.publisher=new Account();
+                errand.publisher = new Account();
                 errand.publisher.id = item.getString("publisherId");
-                if(item.has("offerId")) {
-                    errand.receiver=new Account();
+                if (item.has("offerId")) {
+                    errand.receiver = new Account();
                     errand.receiver.id = item.getString("offerId");
                 }
                 errand.money = new BigDecimal(item.getString("errandMoney"));
-            }catch (JSONException e){
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
@@ -172,8 +172,6 @@ public class Remote extends Service implements Global {
         }
 
 
-
-
         // /user/myOffer, /user/myPublish, /errand/searchComposite
         public void queryErrandList(
                 Account account, String keyword, int tag, Errand.State state,
@@ -183,8 +181,8 @@ public class Remote extends Service implements Global {
             //  返回值object中存放List<Errand>
             if (account != null) {
                 final List<Errand> errandList = new ArrayList<>();
-                String queryUrl=""; //根据选择的类型调用不同的url
-                String param="?studentNumber="+account.id;
+                String queryUrl = ""; //根据选择的类型调用不同的url
+                String param = "?studentNumber=" + account.id;
                 call(queryUrl, Request.Method.GET,
                         param,
                         null,
@@ -201,7 +199,7 @@ public class Remote extends Service implements Global {
                                             for (int i = 0; i < data.length(); i++) {
                                                 JSONObject item = data.getJSONObject(i);
                                                 final Errand errand = new Errand();
-                                                responseErrand(errand,item);
+                                                responseErrand(errand, item);
                                                 errandList.add(errand);
                                             }
                                             listener.execute(ResultCode.Succeeded, errandList);
@@ -234,7 +232,7 @@ public class Remote extends Service implements Global {
                                             for (int i = 0; i < data.length(); i++) {
                                                 JSONObject item = data.getJSONObject(i);
                                                 final Errand errand = new Errand();
-                                                responseErrand(errand,item);
+                                                responseErrand(errand, item);
                                                 errandList.add(errand);
                                             }
                                             listener.execute(ResultCode.Succeeded, errandList);
@@ -247,71 +245,70 @@ public class Remote extends Service implements Global {
                                 }
                             }
                         });
-                //以下功能被集中到querItem中
-//                call("/errand/searchComposite", Request.Method.GET,
-//                        param,
-//                        null,
-//                        new Listener() {
-//                            @Override
-//                            public void execute(ResultCode resultCode, Object object) {
-//                                if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
-//                                    listener.execute(ResultCode.Failed, null);
-//                                } else {
-//                                    JSONObject jsonObject = (JSONObject) object;
-//                                    try {
-//                                        if (jsonObject.getInt("code")==0) {
-//                                                try {
-//                                                    JSONArray data = jsonObject.getJSONArray("data");
-//                                                    for (int i = 0; i < data.length(); i++) {
-//                                                        JSONObject item = data.getJSONObject(i);
-//                                                        final Errand errand=new Errand();
-//                                                        errand.title=item.getString("errandTitle");
-//                                                        errand.tag=item.getInt("errandItem");
-//                                                        switch (item.getInt("errandStatus")){
-//                                                            case 0:
-//                                                                errand.state=errand.state.Waiting;
-//                                                                break;
-//                                                            case 1:
-//                                                                errand.state=errand.state.Ongoing;
-//                                                                break;
-//                                                            case 2:
-//                                                                errand.state=errand.state.NotEvaluate;
-//                                                                break;
-//                                                            case 3:
-//                                                                errand.state=errand.state.Judging;
-//                                                                break;
-//                                                            case 4:
-//                                                                errand.state=errand.state.CheckFailed;
-//                                                                break;
-//                                                            case 5:
-//                                                                errand.state=errand.state.Complete;
-//                                                                break;
-//                                                            default:
-//                                                                break;
-//                                                        }
-//                                                        errand.content=item.getString("errandDescription");
-//                                                        errand.publisher.id=item.getString("publisherId");
-//                                                        errand.receiver.id=item.getString("offerId");
-//                                                        errand.money=new BigDecimal(item.getString("errandMoney"));
-//                                                        errandList.add(errand);
-//                                                    }
-//                                                }catch (JSONException e){
-//                                                    e.printStackTrace();
-//                                                }
-//                                                listener.execute(ResultCode.Succeeded, errandList);
-//                                        }else{
-//                                                listener.execute(ResultCode.Failed, SearchComposite.SearchFailed);
-//                                        }
-//                                    } catch (JSONException e) {
-//                                        e.printStackTrace();
-//                                    }
-//                                }
-//                            }
-//                        });
             }
         }
-        // /errand/item
 
+        // /errand/item
+        public void queryItem(
+                final Errand errand,
+                final Listener listener
+        ) {
+            call("/errand/item", Request.Method.GET,
+                    "?errandItem=" + errand.tag,
+                    null,
+                    new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, QueryItemError.NetworkError);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+                                try {
+                                    if (jsonObject.getInt("code") == 0) {
+                                        JSONObject item = jsonObject.getJSONObject("data");
+                                        responseErrand(errand, item);
+                                        listener.execute(ResultCode.Succeeded, errand);
+                                    } else {
+                                        listener.execute(ResultCode.Failed, QueryItemError.QueryItemError);
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
+        }
+        // /errand/search
+        public void queryKeyword(
+                final Errand errand,
+                String keyword,
+                final Listener listener
+        ) {
+            call("/errand/search", Request.Method.GET,
+                    "?keyword=" + encode(keyword),
+                    null,
+                    new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, QueryKeywordError.NetworkError);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+                                try {
+                                    if (jsonObject.getInt("code") == 0) {
+                                        JSONObject item = jsonObject.getJSONObject("data");
+                                        responseErrand(errand, item);
+                                        listener.execute(ResultCode.Succeeded, errand);
+                                    } else {
+                                        listener.execute(ResultCode.Failed, QueryKeywordError.QueryKeywordError);
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
+        }
 
         // /errand/detail
         public void queryDetail(
@@ -331,14 +328,8 @@ public class Remote extends Service implements Global {
                                 try {
                                     switch (jsonObject.getInt("code")) {
                                         case 0:
-                                            JSONObject item=jsonObject.getJSONObject("data");
-                                            errand.title = item.getString("errandTitle");
-                                            errand.tag = item.getInt("errandItem");
-                                            errand.state = Errand.State.values()[item.getInt("errandStatus")];
-                                            errand.content = item.getString("errandDescription");
-                                            errand.publisher.id = item.getString("publisherId");
-                                            errand.receiver.id = item.getString("offerId");
-                                            errand.money = new BigDecimal(item.getString("errandMoney"));
+                                            JSONObject item = jsonObject.getJSONObject("data");
+                                            responseErrand(errand, item);
                                             listener.execute(ResultCode.Succeeded, errand);
                                             break;
                                         default:
