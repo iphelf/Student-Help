@@ -54,8 +54,9 @@
 | /errand/allErrand      |        |
 | /errand/detail         |        |
 | /errand/apply          |   ✔️   |
-| /errand/choose         |        |
-| /errand/check          |        |
+| /errand/refuse         |   ✔️   |
+| /errand/choose         |   ✔️   |
+| /errand/check          |   ✔️   |
 | /errand/delete         |   ✔️   |
 | /chat/queryUnsignedMsg |        |
 | /file/upload           |        |
