@@ -6,7 +6,6 @@ import java.util.List;
 
 
 public class Errand {
-    public static final String[] TagName={"二手交易","快递代领","竞赛组队","习题求解","寻物启示"};
     // Related accounts
     public Account publisher;
     public Account receiver;
@@ -19,8 +18,8 @@ public class Errand {
     public Date date;
     //Properties
     public int tag;
-    public List<int> tagList; // include tag
+    public List<Integer> tagList; // include tag
     public BigDecimal money;
     public State state;
-    public enum State {Waiting, Ongoing, Complete, Deleted}
+    public enum State {Waiting, Ongoing, NotEvaluate,Judging,CheckFailed,Complete}
 }

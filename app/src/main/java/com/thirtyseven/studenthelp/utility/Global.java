@@ -22,4 +22,13 @@ public interface Global {
     enum ApplyError {
         ApplyError
     }
+    enum ChooseError{
+        ChooseError
+    }
+    enum DeleteError{
+        NetworkError,NotCreator,DeleteFailed
+    }
+    enum SearchComposite{
+        SearchFailed
+    }
 }
