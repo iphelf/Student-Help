@@ -44,11 +44,9 @@
 
 | 接口                   | status |
 | :--------------------- | :----: |
-| /user/login            |   ✔️    |
-| /user/register         |   ✔️   |
-| /user/check            |        |
-| /user/myPublish        |        |
-| /user/myOffer          |        |
+| /user/login            |   ✔️   |
+| /user/myPublish        |   ✔️   |
+| /user/myOffer          |   ✔️   |
 | /user/update           |        |
 | /errand/publish        |   ✔️   |
 | /errand/search         |        |
