@@ -151,7 +151,7 @@ public class Remote extends Service implements Global {
                         @Override
                         public void execute(ResultCode resultCode, Object object) {
                             if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
-                                queryListener.execute(ResultCode.Failed, null);
+                                queryListener.execute(ResultCode.Failed,SearchComposite.NetworkError);
                             } else {
                                 JSONObject jsonObject = (JSONObject) object;
                                 try {
@@ -163,28 +163,7 @@ public class Remote extends Service implements Global {
                                                 final Errand errand = new Errand();
                                                 errand.title = item.getString("errandTitle");
                                                 errand.tag = item.getInt("errandItem");
-                                                switch (item.getInt("errandStatus")) {
-                                                    case 0:
-                                                        errand.state = Errand.State.Waiting;
-                                                        break;
-                                                    case 1:
-                                                        errand.state = Errand.State.Ongoing;
-                                                        break;
-                                                    case 2:
-                                                        errand.state = Errand.State.NotEvaluate;
-                                                        break;
-                                                    case 3:
-                                                        errand.state = Errand.State.Judging;
-                                                        break;
-                                                    case 4:
-                                                        errand.state = Errand.State.CheckFailed;
-                                                        break;
-                                                    case 5:
-                                                        errand.state = Errand.State.Complete;
-                                                        break;
-                                                    default:
-                                                        break;
-                                                }
+                                                errand.state=Errand.State.values()[item.getInt("errandStatus")];
                                                 errand.content = item.getString("errandDescription");
                                                 errand.publisher.id = item.getString("publisherId");
                                                 errand.receiver.id = item.getString("offerId");
@@ -314,7 +293,7 @@ public class Remote extends Service implements Global {
                         @Override
                         public void execute(ResultCode resultCode, Object object) {
                             if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
-                                listener.execute(ResultCode.Failed, null);
+                                listener.execute(ResultCode.Failed, PublishError.NetworkError);
                             } else {
                                 JSONObject jsonObject = (JSONObject) object;
                                 try {
@@ -397,7 +376,7 @@ public class Remote extends Service implements Global {
                         @Override
                         public void execute(ResultCode resultCode, Object object) {
                             if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
-                                listener.execute(ResultCode.Failed, null);
+                                listener.execute(ResultCode.Failed, QueryRecordsError.NetworkError);
                             } else {
                                 JSONObject jsonObject = (JSONObject) object;
                                 try {
@@ -468,13 +447,16 @@ public class Remote extends Service implements Global {
                         @Override
                         public void execute(ResultCode resultCode, Object object) {
                             if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
-                                listener.execute(ResultCode.Failed, null);
+                                listener.execute(ResultCode.Failed, ApplyError.NetworkError);
                             } else {
                                 JSONObject jsonObject = (JSONObject) object;
                                 try {
                                     switch (jsonObject.getInt("code")) {
                                         case 0:
                                             listener.execute(ResultCode.Succeeded, null);
+                                            break;
+                                        case 4012:
+                                            listener.execute(ResultCode.Failed, ApplyError.HaveApply);
                                             break;
                                         default:
                                             listener.execute(ResultCode.Failed, ApplyError.ApplyError);
@@ -494,8 +476,7 @@ public class Remote extends Service implements Global {
                 final Listener listener
         ) { // ErrandActivity.java
             // TO-DO: 完成Remote.acceptApplication
-            //待定
-            String param = "?offerId=" + errand.id + "&errandId=" + errand.id; //由发布者指定接收人，接收人在errand中
+            String param = "?errandId=" + errand.id + "&offerId=" + account.id;
             call("/errand/choose", Request.Method.GET,
                     param,
                     null,
@@ -503,7 +484,7 @@ public class Remote extends Service implements Global {
                         @Override
                         public void execute(ResultCode resultCode, Object object) {
                             if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
-                                listener.execute(ResultCode.Failed, null);
+                                listener.execute(ResultCode.Failed, ChooseError.NetworkError);
                             } else {
                                 JSONObject jsonObject = (JSONObject) object;
                                 try {
@@ -523,12 +504,38 @@ public class Remote extends Service implements Global {
                     });
         }
 
-        // /errand/choose
+        // /errand/refuse
         public void rejectApplication(
                 Account account, Errand errand,
                 final Listener listener
         ) { // ErrandActivity.java
             // TO-DO: 完成Remote.rejectApplication
+            String param = "?errandId=" + errand.id + "&applierId=" + account.id;
+            call("/errand/refuse", Request.Method.GET,
+                    param,
+                    null,
+                    new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, RefuseError.NetworkError);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+                                try {
+                                    switch (jsonObject.getInt("code")) {
+                                        case 0:
+                                            listener.execute(ResultCode.Succeeded, null);
+                                            break;
+                                        default:
+                                            listener.execute(ResultCode.Failed, RefuseError.RefuseError);
+                                            break;
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
         }
 
         // /errand/deleteErrand
@@ -545,7 +552,7 @@ public class Remote extends Service implements Global {
                         @Override
                         public void execute(ResultCode resultCode, Object object) {
                             if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
-                                listener.execute(ResultCode.Failed, null);
+                                listener.execute(ResultCode.Failed, DeleteError.NetworkError);
                             } else {
                                 JSONObject jsonObject = (JSONObject) object;
                                 try {
@@ -586,21 +593,82 @@ public class Remote extends Service implements Global {
 
         // /errand/push
         public void submit(
-                Account account, Errand errand,
+                Account account, final Errand errand,
                 final Listener listener
         ) { // ErrandActivity.java
             // TO-DO: 完成Remote.submit
+            String param="?errandId=" + errand.id + "&errandStatus=" +errand.state.ordinal();
+            call("/errand/push", Request.Method.GET,
+                    param,
+                    null,
+                    new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, PushError.NetworkError);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+                                try {
+                                    switch (jsonObject.getInt("code")) {
+                                        case 0:
+                                            listener.execute(ResultCode.Succeeded, null);
+                                            break;
+                                        default:
+                                            listener.execute(ResultCode.Failed, PushError.PushError);
+                                            break;
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
         }
 
-        // /errand/choose
-        public void acceptSubmission(
-                Account account, Errand errand,
+        // /errand/check 返回errand
+        public void checkSubmission(
+                Account account, final Errand errand,
                 final Listener listener
         ) { // ErrandActivity.java
             // TO-DO: 完成Remote.acceptApplication
+            String param = "?errandId=" + errand.id + "&errandStatus=" + errand.state.ordinal();
+            call("/errand/check", Request.Method.GET,
+                    param,
+                    null,
+                    new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, CheckError.NetworkError);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+
+                                try {
+                                    switch (jsonObject.getInt("code")) {
+                                        case 0:
+                                            JSONObject Msg=jsonObject.getJSONObject("data");
+                                            String msg=Msg.getString("message");
+                                            if(msg.equals("验收失败")){
+                                                listener.execute(ResultCode.Succeeded, CheckState.CheckRefused);
+                                            }else if(msg.equals("待评价")){
+                                                listener.execute(ResultCode.Succeeded, CheckState.CheckSucceed);
+                                            }else{
+                                                listener.execute(ResultCode.Succeeded, CheckState.InputRightState);
+                                            }
+                                            break;
+                                        default:
+                                            listener.execute(ResultCode.Failed, CheckError.CheckError);
+                                            break;
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
         }
 
-        // /errand/choose
+        // /errand/check 集成在验收
         public void rejectSubmission(
                 Account account, Errand errand,
                 final Listener listener

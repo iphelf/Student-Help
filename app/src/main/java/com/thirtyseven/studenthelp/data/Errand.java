@@ -21,5 +21,5 @@ public class Errand {
     public List<Integer> tagList; // include tag
     public BigDecimal money;
     public State state;
-    public enum State {Waiting, Ongoing, NotEvaluate,Judging,CheckFailed,Complete}
+    public enum State {Waiting, Ongoing, NotEvaluate,Judging,CheckFailed,Complete,ToCheck}
 }
