@@ -73,4 +73,7 @@ public interface Global {
     enum ResignError{
         NetworkError,ResignError
     }
+    enum ConversationListError{
+        NetworkError,ConversationListError
+    }
 }

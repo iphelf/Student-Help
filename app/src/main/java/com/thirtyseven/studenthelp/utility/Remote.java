@@ -29,7 +29,12 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.OkHttpClient;
 import okhttp3.WebSocket;
@@ -130,6 +135,22 @@ public class Remote extends Service implements Global {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        }
+//        {"msg":"server","signFlag":0,"senderId":"server",
+//                "createTime":1593854476000,"msgId":"1593854476193-server-20171722-3429","action":5}
+        public void responseMessage(Message message,JSONObject item){
+            try {
+                message.id = item.getString("msgId");
+                message.sender=new Account();
+                message.sender.id=item.getString("senderId");
+                message.date=new Date(item.getLong("createTime"));
+                message.read=(item.getInt("signFlag")==1)?true:false;
+                //action? 如何转num 5和 if
+
+            }catch (JSONException e){
+                e.printStackTrace();
+            }
+
         }
 
         // /user/login
@@ -394,7 +415,7 @@ public class Remote extends Service implements Global {
         public void firePeople(
                 int errandId,
                 final Listener listener
-        ){
+        ) {
             call("/errand/fire", Request.Method.GET,
                     "?errandId=" + errandId,
                     null,
@@ -425,7 +446,7 @@ public class Remote extends Service implements Global {
         // /errand/resign
         public void resignErrand(
                 int errandId,
-                final Listener listener){
+                final Listener listener) {
             call("/errand/resign", Request.Method.GET,
                     "?errandId=" + errandId,
                     null,
@@ -453,7 +474,7 @@ public class Remote extends Service implements Global {
                     });
         }
 
-        // /chat/queryChatHistoricRecords
+        // /chat/queryNewestMsg
         public void queryConversationList(
                 Account account,
                 final Listener listener
@@ -461,26 +482,79 @@ public class Remote extends Service implements Global {
             // TODO: 完成Remote.queryConversationList
             //  返回值object中存放List<Conversation>
 
-            // 这里暂时存放模板
-            call(" /chat/queryChatHistoricRecords", Request.Method.GET,
-                    "?studentNumber=" + account.id ,
+            call("/chat/queryNewestMsg", Request.Method.GET,
+                    "?studentNumber=" + account.id,
                     null,
                     new Listener() {
                         @Override
                         public void execute(ResultCode resultCode, Object object) {
                             if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
-                                listener.execute(ResultCode.Failed, null);
+                                listener.execute(ResultCode.Failed, ConversationListError.NetworkError);
                             } else {
+                                List<Conversation> conversationList=new ArrayList<>();
+                                List<Map<String,Integer>> mapList=new ArrayList<>();
+                                int flag=0;
                                 JSONObject jsonObject = (JSONObject) object;
                                 try {
-                                    switch (jsonObject.getInt("code")) {
-                                        case 0:
-                                            jsonObject.toString();
-                                            listener.execute(ResultCode.Succeeded, null);
-                                            break;
-                                        default:
-                                            listener.execute(ResultCode.Failed, RegisterError.NetworkError);
-                                            break;
+                                    if (jsonObject.getInt("code")==0) {
+                                        JSONArray data=new JSONArray();
+                                        jsonObject.toJSONArray(data);
+                                        for(int i=0;i<data.length();i++){
+                                            JSONObject item=data.getJSONObject(i);
+                                            Message msg=new Message();
+                                            responseMessage(msg,item);
+                                            Map<String,Integer> map=new HashMap<>();
+                                            if(mapList.size()==0){ //c初始化
+                                                map.put(msg.receiver.id,mapList.size());
+                                                mapList.add(map);
+                                                Conversation conversation=new Conversation();
+                                                conversation.receiverPrimary=new Account();
+                                                conversation.receiverPrimary.id=msg.receiver.id;
+                                                if(conversation.messageList==null)
+                                                    conversation.messageList=new ArrayList<>();
+                                                conversation.messageList.add(msg);
+                                                conversationList.add(conversation);
+                                            }else{
+                                                int idIndex=0;
+                                                for(int j=0;j<mapList.size();j++){
+                                                    if (mapList.get(j).containsValue(msg.receiver.id)) {
+                                                        flag = 1;
+                                                        idIndex=mapList.get(j).get(msg.receiver.id);
+                                                        break;
+                                                    }
+                                                    else
+                                                        flag=0;
+                                                }
+                                                if(flag==1){ //若存在接收者
+                                                    conversationList.get(idIndex).messageList.add(msg);
+                                                }else{  //不存在该接收者
+                                                    map.put(msg.receiver.id,mapList.size());
+                                                    mapList.add(map);
+                                                    Conversation conversation=new Conversation();
+                                                    conversation.receiverPrimary=new Account();
+                                                    conversation.receiverPrimary.id=msg.receiver.id;
+                                                    if(conversation.messageList==null)
+                                                        conversation.messageList=new ArrayList<>();
+                                                    conversation.messageList.add(msg);
+                                                    conversationList.add(conversation);
+                                                }
+
+                                            }
+
+                                        }
+                                        for(int i=0;i<conversationList.size();i++){
+                                            Collections.sort(conversationList.get(i).messageList, new Comparator<Message>() {
+                                                @Override
+                                                public int compare(Message m1, Message m2) {
+                                                    return m1.date.compareTo(m2.date);
+                                                }
+                                            });
+                                            Collections.reverse(conversationList.get(i).messageList); //倒序
+                                            conversationList.get(i).messageLatest= conversationList.get(i).messageList.get(0);
+                                        }
+                                        listener.execute(ResultCode.Succeeded, conversationList);
+                                    }else {
+                                        listener.execute(ResultCode.Failed, ConversationListError.ConversationListError);
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -704,21 +778,6 @@ public class Remote extends Service implements Global {
                     });
         }
 
-        // ?
-        public void resign(
-                Account account, Errand errand,
-                final Listener listener
-        ) { // ErrandActivity.java
-            // TO-DO: 完成Remote.resign
-        }
-
-        // ?
-        public void dismiss(
-                Account account, Errand errand,
-                final Listener listener
-        ) { // ErrandActivity.java
-            // TO-DO: 完成Remote.dismiss
-        }
 
         // /errand/push
         public void submit(
@@ -804,6 +863,8 @@ public class Remote extends Service implements Global {
         ) { // ErrandActivity.java
             // TO-DO: 完成Remote.rejectApplication
         }
+
+
 
     }
 
