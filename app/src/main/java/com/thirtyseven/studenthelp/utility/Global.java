@@ -67,4 +67,10 @@ public interface Global {
     enum DismissError{
         NetworkError,DismissError
     }
+    enum FireError{
+        NetworkError,FireError
+    }
+    enum ResignError{
+        NetworkError,ResignError
+    }
 }

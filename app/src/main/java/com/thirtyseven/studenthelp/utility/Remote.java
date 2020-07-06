@@ -390,17 +390,44 @@ public class Remote extends Service implements Global {
 
         }
 
-        //?
-        public void queryConversationList(
-                Account account,
+        // /errand/fire
+        public void firePeople(
+                int errandId,
                 final Listener listener
-        ) { // NoticeConversationActivity.java
-            // TODO: 完成Remote.queryConversationList
-            //  返回值object中存放List<Conversation>
+        ){
+            call("/errand/fire", Request.Method.GET,
+                    "?errandId=" + errandId,
+                    null,
+                    new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, FireError.NetworkError);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+                                try {
+                                    switch (jsonObject.getInt("code")) {
+                                        case 0:
+                                            listener.execute(ResultCode.Succeeded, null);
+                                            break;
+                                        default:
+                                            listener.execute(ResultCode.Failed, FireError.FireError);
+                                            break;
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
+        }
 
-            // 这里暂时存放模板
-            call("/user/register", Request.Method.POST,
-                    "?studentNumber=" + account.id + "&password=" + account.password,
+        // /errand/resign
+        public void resignErrand(
+                int errandId,
+                final Listener listener){
+            call("/errand/resign", Request.Method.GET,
+                    "?errandId=" + errandId,
                     null,
                     new Listener() {
                         @Override
@@ -412,6 +439,43 @@ public class Remote extends Service implements Global {
                                 try {
                                     switch (jsonObject.getInt("code")) {
                                         case 0:
+                                            listener.execute(ResultCode.Succeeded, ResignError.NetworkError);
+                                            break;
+                                        default:
+                                            listener.execute(ResultCode.Failed, ResignError.ResignError);
+                                            break;
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
+        }
+
+        // /chat/queryChatHistoricRecords
+        public void queryConversationList(
+                Account account,
+                final Listener listener
+        ) { // NoticeConversationActivity.java
+            // TODO: 完成Remote.queryConversationList
+            //  返回值object中存放List<Conversation>
+
+            // 这里暂时存放模板
+            call(" /chat/queryChatHistoricRecords", Request.Method.GET,
+                    "?studentNumber=" + account.id ,
+                    null,
+                    new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, null);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+                                try {
+                                    switch (jsonObject.getInt("code")) {
+                                        case 0:
+                                            jsonObject.toString();
                                             listener.execute(ResultCode.Succeeded, null);
                                             break;
                                         default:
@@ -480,7 +544,7 @@ public class Remote extends Service implements Global {
             // TODO: 完成Remote.sendMessage
         }
 
-        // ?
+        // /chat/queryErrandHistoricRecords
         public void queryAnnouncementList(
                 Account account,
                 final Listener listener
