@@ -110,7 +110,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                     @Override
                     public void execute(ResultCode resultCode, Object object) {
                         if (resultCode == ResultCode.Succeeded) {
-                            refresh();
+                            finish();
                         } else {
                             switch ((DeleteError) object) {
                                 case NotCreator:
@@ -156,6 +156,14 @@ public class ErrandActivity extends AppCompatActivity implements Global {
             @Override
             public void onClick(View view) {
                 Toast.makeText(ErrandActivity.this, R.string.button_apply, Toast.LENGTH_SHORT).show();
+                remoteBinder.apply(Local.loadAccount(), errand, new Remote.Listener() {
+                    @Override
+                    public void execute(ResultCode resultCode, Object object) {
+                        if (resultCode == ResultCode.Succeeded) {
+                            refresh();
+                        }
+                    }
+                });
             }
         });
         buttonApply.setVisibility(View.GONE);
@@ -277,6 +285,12 @@ public class ErrandActivity extends AppCompatActivity implements Global {
     }
 
     private void refresh() {
-
+        remoteBinder.queryDetail(errand, new Remote.Listener() {
+            @Override
+            public void execute(ResultCode resultCode, Object object) {
+                errand = (Errand) object;
+                push();
+            }
+        });
     }
 }

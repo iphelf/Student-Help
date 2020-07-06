@@ -84,4 +84,6 @@
     <string name="button_reject">拒绝</string>
     <string name="button_confirm">确认</string>
     <string name="button_refuse">否决</string>
+    <string name="textView_tag">类型</string>
+    <string name="textView_state">状态</string>
 </resources>

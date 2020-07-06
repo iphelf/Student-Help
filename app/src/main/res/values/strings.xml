@@ -83,5 +83,7 @@
     <string name="button_reject">Reject</string>
     <string name="button_confirm">Confirm</string>
     <string name="button_refuse">Refuse</string>
+    <string name="textView_tag">Tag</string>
+    <string name="textView_state">State</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

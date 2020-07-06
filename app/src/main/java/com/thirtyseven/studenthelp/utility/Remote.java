@@ -504,7 +504,6 @@ public class Remote extends Service implements Global {
                 final Listener listener
         ) { // ErrandActivity.java
             // TO-DO: 完成Remote.apply
-
             String param = "?applierId=" + account.id + "&errandId=" + errand.id;
             call("/errand/apply", Request.Method.GET,
                     param,

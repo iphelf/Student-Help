@@ -17,6 +17,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="TextView"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="@+id/textView_preview"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -25,6 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="TextView"
+        app:layout_constraintBottom_toTopOf="@+id/textView_preview"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -36,7 +39,7 @@
         app:layout_constraintBottom_toTopOf="@+id/textView_author"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageView_thumbnail"
-        app:layout_constraintTop_toBottomOf="@+id/textView_state" />
+        app:layout_constraintTop_toBottomOf="@+id/textView_title" />
 
     <TextView
         android:id="@+id/textView_author"
