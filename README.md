@@ -49,10 +49,10 @@
 | /user/myOffer          |   ✔️   |
 | /user/update           |        |
 | /errand/publish        |   ✔️   |
-| /errand/search         |        |
-| /errand/item           |        |
-| /errand/allErrand      |        |
-| /errand/detail         |        |
+| /errand/search         |   ✔️   |
+| /errand/item           |   ✔️   |
+| /errand/allErrand      |   ✔️   |
+| /errand/detail         |   ✔️   |
 | /errand/apply          |   ✔️   |
 | /errand/refuse         |   ✔️   |
 | /errand/choose         |   ✔️   |
@@ -74,5 +74,6 @@
 | 界面 |status|
 | :--- |:----:|
 |login |  ✔️ |
+
 
 ## 界面美化
