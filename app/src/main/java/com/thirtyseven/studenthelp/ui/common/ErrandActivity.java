@@ -63,6 +63,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
     ListView listViewPulse;
     ListView listViewComment;
 
+    ConstraintLayout constraintLayoutAction;
     ConstraintLayout constraintLayoutPulse;
     ConstraintLayout constraintLayoutComment;
 
@@ -274,8 +275,8 @@ public class ErrandActivity extends AppCompatActivity implements Global {
 
         listViewComment = findViewById(R.id.listView_commentList);
 
+        constraintLayoutAction = findViewById(R.id.constraintLayout_action);
         constraintLayoutPulse = findViewById(R.id.constraintLayout_pulse);
-
         constraintLayoutComment = findViewById(R.id.constraintLayout_comment);
 
         push();
@@ -312,7 +313,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
         for (Button button : buttonList)
             button.setVisibility(View.GONE);
         constraintLayoutComment.setVisibility(View.GONE);
-        // Buttons include:
+        // Action buttons include:
         //   buttonConversation (shows in all states except publisher's Waiting)
         //   buttonDelete (shows in all states in publisher's view)
         //   buttonDismiss (shows in publisher's Ongoing state)
@@ -451,13 +452,14 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                 break;
             }
         if (empty) {
-            constraintLayoutPulse.setVisibility(View.GONE);
+            constraintLayoutAction.setVisibility(View.GONE);
         }
 
         // Show pulse
         if (mapList.isEmpty()) {
             constraintLayoutPulse.setVisibility(View.GONE);
         } else {
+            constraintLayoutPulse.setVisibility(View.VISIBLE);
             SimpleAdapter simpleAdapter = new SimpleAdapter(
                     this,
                     mapList,
@@ -468,14 +470,6 @@ public class ErrandActivity extends AppCompatActivity implements Global {
             listViewPulse.setAdapter(simpleAdapter);
             Utility.setListViewHeightBasedOnChildren(listViewPulse);
         }
-
-//        errand.commentList = new ArrayList<>();
-//        Comment comment = new Comment();
-//        comment.commenter = errand.publisher;
-//        comment.content = "Good";
-//        comment.score = 4;
-//        for (int i = 0; i < 3; i++)
-//            errand.commentList.add(comment);
 
         // Show comments
         if (errand.commentList != null && !errand.commentList.isEmpty()) {
