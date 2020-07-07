@@ -26,7 +26,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -122,16 +121,24 @@ public class Remote extends Service implements Global {
             try {
                 errand.id = item.getString("errandId");
                 errand.title = item.getString("errandTitle");
-                errand.tag = item.getString("errandItem");
-                errand.state = item.getString("errandStatus");
+                errand.tag = Errand.Tag.values()[item.getInt("errandItem")];
+                errand.state = Errand.State.values()[item.getInt("errandStatus")];
                 errand.content = item.getString("errandDescription");
                 errand.publisher = new Account();
                 errand.publisher.id = item.getString("publisherId");
+                if (item.has("applierId")) {
+                    errand.applierList = new ArrayList<>();
+                    for (String applierId : item.getString("applierId").split("\\s*,\\s*")) {
+                        Account applier = new Account();
+                        applier.id = applierId;
+                        errand.applierList.add(applier);
+                    }
+                }
                 if (item.has("offerId")) {
                     errand.receiver = new Account();
                     errand.receiver.id = item.getString("offerId");
                 }
-                errand.money = new BigDecimal(item.getString("errandMoney"));
+                errand.money = item.getString("errandMoney");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -144,7 +151,7 @@ public class Remote extends Service implements Global {
                 message.sender=new Account();
                 message.sender.id=item.getString("senderId");
                 message.date=new Date(item.getLong("createTime"));
-                message.read=(item.getInt("signFlag")==1)?true:false;
+                message.read= item.getInt("signFlag") == 1;
                 //action? 如何转num 5和 if
 
             }catch (JSONException e){
@@ -196,7 +203,7 @@ public class Remote extends Service implements Global {
 
         // /user/myOffer, /user/myPublish, /errand/searchComposite
         public void queryErrandList(
-                Account account, String keyword, String tag, String state,
+                Account account, String keyword, int tag, int state,
                 final Listener listener
         ) { // HomeFragment.java
             // TODO: 完成Remote.queryErrandList
@@ -236,7 +243,7 @@ public class Remote extends Service implements Global {
                         });
             } else {
                 final List<Errand> errandList = new ArrayList<>();
-                String param = "?errandItem=" + encode(tag) + "&errandStatus=" + encode(state) +
+                String param = "?errandItem=" + tag + "&errandStatus=" + state +
                         "&keyword=" + encode(keyword);
                 call("/errand/searchComposite", Request.Method.GET,
                         param,
@@ -863,8 +870,6 @@ public class Remote extends Service implements Global {
         ) { // ErrandActivity.java
             // TO-DO: 完成Remote.rejectApplication
         }
-
-
 
     }
 

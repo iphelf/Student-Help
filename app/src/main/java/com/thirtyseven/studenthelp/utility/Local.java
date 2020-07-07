@@ -1,8 +1,10 @@
 package com.thirtyseven.studenthelp.utility;
 
 import com.thirtyseven.studenthelp.data.Account;
+import com.thirtyseven.studenthelp.data.Conversation;
 import com.thirtyseven.studenthelp.data.Errand;
 
+import java.util.List;
 import java.util.Stack;
 
 public class Local {
@@ -40,6 +42,12 @@ public class Local {
     }
 
     public static Errand popErrand() {
-        return errandStack.pop();
+        if (!errandStack.isEmpty())
+            return errandStack.pop();
+        return null;
+    }
+
+    public static Errand topErrand() {
+        return errandStack.peek();
     }
 }
