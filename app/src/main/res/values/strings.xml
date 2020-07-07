@@ -96,5 +96,7 @@
     <string name="button_comment">Comment</string>
     <string name="toast_conversationListError">get conversationList failed!</string>
     <string name="title_complain">Complain</string>
+    <string name="button_agree">Agree</string>
+    <string name="button_disagree">Disagree</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

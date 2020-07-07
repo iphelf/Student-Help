@@ -97,4 +97,6 @@
     <string name="button_comment">发表评论</string>
     <string name="toast_conversationListError">获取消息失败！</string>
     <string name="title_complain">申诉</string>
+    <string name="button_agree">同意</string>
+    <string name="button_disagree">不同意</string>
 </resources>

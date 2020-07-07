@@ -18,6 +18,7 @@ import com.thirtyseven.studenthelp.R;
 import com.thirtyseven.studenthelp.data.Account;
 import com.thirtyseven.studenthelp.data.Conversation;
 import com.thirtyseven.studenthelp.data.Errand;
+import com.thirtyseven.studenthelp.data.Judge;
 import com.thirtyseven.studenthelp.data.Message;
 
 import org.jetbrains.annotations.NotNull;
@@ -95,14 +96,14 @@ public class Remote extends Service implements Global {
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
-                            Log.d("Debug","successfully return: "+response.toString());
+                            Log.d("Debug", "successfully return: " + response.toString());
                             listener.execute(ResultCode.Succeeded, response);
                         }
                     },
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            Log.d("Debug","unsuccessfully return: "+error.toString());
+                            Log.d("Debug", "unsuccessfully return: " + error.toString());
                             listener.execute(ResultCode.Failed, null);
                         }
                     }
@@ -151,13 +152,13 @@ public class Remote extends Service implements Global {
         public void responseMessage(Message message, JSONObject item) {
             try {
                 message.id = item.getString("msgId");
-                message.sender=new Account();
-                message.sender.id=item.getString("senderId");
-                message.date=new Date(item.getLong("createTime"));
-                message.read= item.getInt("signFlag") == 1;
-                message.content=item.getString("msg");
-                message.type=item.getInt("action");
-            }catch (JSONException e){
+                message.sender = new Account();
+                message.sender.id = item.getString("senderId");
+                message.date = new Date(item.getLong("createTime"));
+                message.read = item.getInt("signFlag") == 1;
+                message.content = item.getString("msg");
+                message.type = item.getInt("action");
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
 
@@ -490,6 +491,38 @@ public class Remote extends Service implements Global {
                 final Listener listener
         ) { // ErrandActivity.java
             // TODO: 完成Remote.comment
+        }
+
+        // ?
+        public void newJudge(
+                Account account, Judge judge,
+                final Listener listener
+        ) { // ErrandActivity.java
+            // TODO
+        }
+
+        // ?
+        public void supressJudge(
+                Account account, Errand errand,
+                final Listener listener
+        ) { // ErrandActivity.java
+            // TODO
+        }
+
+        // /judge/agree
+        public void disagreeJudge(
+                Account account, Judge judge,
+                final Listener listener
+        ) { // ErrandActivity.java
+            // TODO
+        }
+
+        // /judge/agree
+        public void agreeJudge(
+                Account account, Judge judge,
+                final Listener listener
+        ) { // ErrandActivity.java
+            // TODO
         }
 
         // /chat/queryNewestMsg

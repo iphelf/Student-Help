@@ -1,11 +1,8 @@
 package com.thirtyseven.studenthelp.ui.common;
 
-import android.app.Service;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
+import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -63,6 +60,8 @@ public class ErrandActivity extends AppCompatActivity implements Global {
     ConstraintLayout constraintLayoutAction;
     ConstraintLayout constraintLayoutPulse;
     ConstraintLayout constraintLayoutComment;
+
+    enum Pulse {Application, Submission, Judge, Result}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -286,6 +285,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
         for (Button button : buttonList)
             button.setVisibility(View.GONE);
         constraintLayoutComment.setVisibility(View.GONE);
+        final List<Pair<Pulse, String>> pulseList = new ArrayList<>();
         // Action buttons include:
         //   buttonConversation (shows in all states except publisher's Waiting)
         //   buttonDelete (shows in all states in publisher's view)
@@ -299,12 +299,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                     buttonDelete.setVisibility(View.VISIBLE);
                     if (errand.applierList != null && !errand.applierList.isEmpty()) {
                         for (Account applier : errand.applierList) {
-                            map = new HashMap<>();
-                            map.put(pulseField[0], applier.getName());
-                            map.put(pulseField[1], getString(R.string.string_applicationContent));
-                            map.put(pulseField[2], getString(R.string.button_accept));
-                            map.put(pulseField[3], getString(R.string.button_reject));
-                            mapList.add(map);
+                            pulseList.add(Pair.create(Pulse.Application, applier.getName()));
                         }
                     }
                     break;
@@ -317,25 +312,13 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                     buttonConversation.setVisibility(View.VISIBLE);
                     buttonDelete.setVisibility(View.VISIBLE);
                     if (errand.judge.result != null) {
-                        map = new HashMap<>();
-                        map.put(pulseField[0], getString(R.string.string_judge));
-                        if (errand.judge.result == Judge.Result.FaultOnPublisher)
-                            map.put(pulseField[1], getString(R.string.string_resultKeepContent));
-                        else
-                            map.put(pulseField[1], getString(R.string.string_resultCancelContent));
-                        map.put(pulseField[2], getString(R.string.button_yes));
-                        map.put(pulseField[3], getString(R.string.button_no));
+                        pulseList.add(Pair.create(Pulse.Result, (errand.judge.result == Judge.Result.FaultOnPublisher ? "Publisher" : "Receiver")));
                     }
                     break;
                 case CheckFailed:
                     buttonConversation.setVisibility(View.VISIBLE);
                     buttonDelete.setVisibility(View.VISIBLE);
-                    map = new HashMap<>();
-                    map.put(pulseField[0], getString(R.string.string_judge));
-                    map.put(pulseField[1], getString(R.string.string_judgeContent));
-                    map.put(pulseField[2], getString(R.string.button_yes));
-                    map.put(pulseField[3], getString(R.string.button_no));
-                    mapList.add(map);
+                    pulseList.add(Pair.create(Pulse.Judge, ""));
                     break;
                 case Complete:
                     buttonConversation.setVisibility(View.VISIBLE);
@@ -345,12 +328,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                 case ToCheck:
                     buttonConversation.setVisibility(View.VISIBLE);
                     buttonDelete.setVisibility(View.VISIBLE);
-                    map = new HashMap<>();
-                    map.put(pulseField[0], errand.receiver.getName());
-                    map.put(pulseField[1], getString(R.string.string_submissionContent));
-                    map.put(pulseField[2], getString(R.string.button_confirm));
-                    map.put(pulseField[3], getString(R.string.button_refuse));
-                    mapList.add(map);
+                    pulseList.add(Pair.create(Pulse.Submission, errand.receiver.getName()));
                     break;
                 case NotEvaluate:
                     buttonConversation.setVisibility(View.VISIBLE);
@@ -372,24 +350,12 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                 case Judging:
                     buttonConversation.setVisibility(View.VISIBLE);
                     if (errand.judge.result != null) {
-                        map = new HashMap<>();
-                        map.put(pulseField[0], getString(R.string.string_judge));
-                        if (errand.judge.result == Judge.Result.FaultOnPublisher)
-                            map.put(pulseField[1], getString(R.string.string_resultKeepContent));
-                        else
-                            map.put(pulseField[1], getString(R.string.string_resultCancelContent));
-                        map.put(pulseField[2], getString(R.string.button_yes));
-                        map.put(pulseField[3], getString(R.string.button_no));
+                        pulseList.add(Pair.create(Pulse.Result, (errand.judge.result == Judge.Result.FaultOnPublisher ? "Publisher" : "Receiver")));
                     }
                     break;
                 case CheckFailed:
                     buttonConversation.setVisibility(View.VISIBLE);
-                    map = new HashMap<>();
-                    map.put(pulseField[0], getString(R.string.string_judge));
-                    map.put(pulseField[1], getString(R.string.string_judgeContent));
-                    map.put(pulseField[2], getString(R.string.button_yes));
-                    map.put(pulseField[3], getString(R.string.button_no));
-                    mapList.add(map);
+                    pulseList.add(Pair.create(Pulse.Judge, ""));
                     break;
                 case Complete:
                     buttonConversation.setVisibility(View.VISIBLE);
@@ -440,7 +406,149 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                     pulseField,
                     pulseFiledId
             );
-            listViewPulse.setAdapter(simpleAdapter);
+            BaseAdapter baseAdapter = new BaseAdapter() {
+                @Override
+                public int getCount() {
+                    return pulseList.size();
+                }
+
+                @Override
+                public Object getItem(int i) {
+                    return pulseList.get(i);
+                }
+
+                @Override
+                public long getItemId(int i) {
+                    return 0;
+                }
+
+                @Override
+                public View getView(int i, View view, ViewGroup viewGroup) {
+                    View viewPulse = View.inflate(ErrandActivity.this, R.layout.listviewitem_pulse, null);
+                    TextView textViewPulser = viewPulse.findViewById(R.id.textView_pulser);
+                    TextView textViewContent = viewPulse.findViewById(R.id.textView_content);
+                    Button buttonYes = viewPulse.findViewById(R.id.button_yes);
+                    Button buttonNo = viewPulse.findViewById(R.id.button_no);
+                    Pulse type = pulseList.get(i).first;
+                    String string = pulseList.get(i).second;
+                    switch (type) {
+                        case Application:
+                            textViewPulser.setText(string);
+                            textViewContent.setText(R.string.string_applicationContent);
+                            buttonYes.setText(R.string.button_accept);
+                            buttonYes.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Remote.remoteBinder.acceptApplication(Local.loadAccount(), errand, new Remote.Listener() {
+                                        @Override
+                                        public void execute(ResultCode resultCode, Object object) {
+                                            refresh();
+                                        }
+                                    });
+                                }
+                            });
+                            buttonNo.setText(R.string.button_reject);
+                            buttonNo.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Remote.remoteBinder.rejectApplication(Local.loadAccount(), errand, new Remote.Listener() {
+                                        @Override
+                                        public void execute(ResultCode resultCode, Object object) {
+                                            refresh();
+                                        }
+                                    });
+                                }
+                            });
+                            break;
+                        case Submission:
+                            textViewPulser.setText(string);
+                            textViewContent.setText(R.string.string_submissionContent);
+                            buttonYes.setText(R.string.button_confirm);
+                            buttonYes.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Remote.remoteBinder.submit(Local.loadAccount(), errand, new Remote.Listener() {
+                                        @Override
+                                        public void execute(ResultCode resultCode, Object object) {
+                                            refresh();
+                                        }
+                                    });
+                                }
+                            });
+                            buttonNo.setText(R.string.button_refuse);
+                            buttonNo.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Remote.remoteBinder.rejectSubmission(Local.loadAccount(), errand, new Remote.Listener() {
+                                        @Override
+                                        public void execute(ResultCode resultCode, Object object) {
+                                            refresh();
+                                        }
+                                    });
+                                }
+                            });
+                            break;
+                        case Judge:
+                            textViewPulser.setText(R.string.string_judge);
+                            textViewContent.setText(R.string.string_judgeContent);
+                            buttonYes.setText(R.string.button_yes);
+                            buttonYes.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Intent intent = new Intent(ErrandActivity.this, ComplainActivity.class);
+                                    Local.pushErrand(errand);
+                                    startActivity(intent);
+                                }
+                            });
+                            buttonNo.setText(R.string.button_no);
+                            buttonNo.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Remote.remoteBinder.supressJudge(Local.loadAccount(), errand, new Remote.Listener() {
+                                        @Override
+                                        public void execute(ResultCode resultCode, Object object) {
+                                            refresh();
+                                        }
+                                    });
+                                }
+                            });
+                            break;
+                        case Result:
+                            textViewPulser.setText(R.string.string_judge);
+                            if (string.equals("Publisher"))
+                                textViewContent.setText(R.string.string_resultKeepContent);
+                            else
+                                textViewContent.setText(R.string.string_resultCancelContent);
+                            buttonYes.setText(R.string.button_agree);
+                            buttonYes.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Remote.remoteBinder.agreeJudge(Local.loadAccount(), errand.judge, new Remote.Listener() {
+                                        @Override
+                                        public void execute(ResultCode resultCode, Object object) {
+                                            refresh();
+                                        }
+                                    });
+                                }
+                            });
+                            buttonNo.setText(R.string.button_disagree);
+                            buttonNo.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Remote.remoteBinder.disagreeJudge(Local.loadAccount(), errand.judge, new Remote.Listener() {
+                                        @Override
+                                        public void execute(ResultCode resultCode, Object object) {
+                                            refresh();
+                                        }
+                                    });
+                                }
+                            });
+                            break;
+                    }
+                    return viewPulse;
+                }
+            };
+            listViewPulse.setAdapter(baseAdapter);
             Utility.setListViewHeightBasedOnChildren(listViewPulse);
         }
 
@@ -479,7 +587,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
         }
     }
 
-    private void refresh() {
+    public void refresh() {
         Remote.remoteBinder.queryDetail(errand, new Remote.Listener() {
             @Override
             public void execute(ResultCode resultCode, Object object) {
