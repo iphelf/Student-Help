@@ -85,6 +85,15 @@
     <string name="button_refuse">Refuse</string>
     <string name="textView_tag">Tag</string>
     <string name="textView_state">State</string>
+    <string name="string_applicationContent">This one is applying for this errand</string>
+    <string name="string_submissionContent">This one has submitted, please take action</string>
+    <string name="string_judgeContent">Judge or not?</string>
+    <string name="button_yes">Yes</string>
+    <string name="button_no">No</string>
+    <string name="string_judge">Judge</string>
+    <string name="string_resultCancelContent">Judge says this deal should be canceled</string>
+    <string name="string_resultKeepContent">Judge says this deal should go on</string>
+    <string name="button_comment">Comment</string>
     <string name="toast_conversationListError">get conversationList failed!</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

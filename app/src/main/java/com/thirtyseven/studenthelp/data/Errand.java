@@ -31,6 +31,8 @@ public class Errand {
     public Account receiver;
     public List<Account> receiverList; // include receiver
     public List<Account> applierList;
+    // Related judge
+    public Judge judge;
     // Information
     public String id;
     public String title;

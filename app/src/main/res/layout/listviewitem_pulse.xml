@@ -14,10 +14,10 @@
         app:srcCompat="@drawable/ic_logo" />
 
     <TextView
-        android:id="@+id/textView_submitter"
+        android:id="@+id/textView_pulser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Submitter"
+        android:text="Pulser"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@+id/imageView_avatar"
         app:layout_constraintTop_toTopOf="parent" />
@@ -29,19 +29,19 @@
         android:text="Content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageView_avatar"
-        app:layout_constraintTop_toBottomOf="@+id/textView_submitter" />
+        app:layout_constraintTop_toBottomOf="@+id/textView_pulser" />
 
     <Button
-        android:id="@+id/button_confirm"
+        android:id="@+id/button_yes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/button_confirm"
-        app:layout_constraintBottom_toBottomOf="@+id/button_refuse"
-        app:layout_constraintEnd_toStartOf="@+id/button_refuse"
-        app:layout_constraintTop_toTopOf="@+id/button_refuse" />
+        app:layout_constraintBottom_toBottomOf="@+id/button_no"
+        app:layout_constraintEnd_toStartOf="@+id/button_no"
+        app:layout_constraintTop_toTopOf="@+id/button_no" />
 
     <Button
-        android:id="@+id/button_refuse"
+        android:id="@+id/button_no"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/button_refuse"

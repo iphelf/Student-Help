@@ -86,5 +86,14 @@
     <string name="button_refuse">否决</string>
     <string name="textView_tag">类型</string>
     <string name="textView_state">状态</string>
+    <string name="string_applicationContent">向你发送了申请</string>
+    <string name="string_submissionContent">已提交，请确认</string>
+    <string name="string_judgeContent">是否发起投诉？</string>
+    <string name="button_yes">是</string>
+    <string name="button_no">否</string>
+    <string name="string_judge">裁判</string>
+    <string name="string_resultCancelContent">裁决结果决定取消交易</string>
+    <string name="string_resultKeepContent">裁决结果决定保持正常的交易流程</string>
+    <string name="button_comment">发表评论</string>
     <string name="toast_conversationListError">获取消息失败！</string>
 </resources>

@@ -9,8 +9,8 @@ import android.os.IBinder;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,9 +19,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.thirtyseven.studenthelp.R;
 import com.thirtyseven.studenthelp.data.Account;
 import com.thirtyseven.studenthelp.data.Errand;
+import com.thirtyseven.studenthelp.data.Judge;
 import com.thirtyseven.studenthelp.utility.Global;
 import com.thirtyseven.studenthelp.utility.Local;
 import com.thirtyseven.studenthelp.utility.Remote;
+import com.thirtyseven.studenthelp.utility.Utility;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ErrandActivity extends AppCompatActivity implements Global {
 
@@ -46,6 +53,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
     Button buttonApply;
     Button buttonResign;
     Button buttonSubmit;
+    List<Button> buttonList;
 
     ListView listViewQueue;
 
@@ -95,6 +103,8 @@ public class ErrandActivity extends AppCompatActivity implements Global {
         textViewMoney = findViewById(R.id.textView_money);
         textViewContent = findViewById(R.id.textView_content);
 
+        buttonList = new ArrayList<>();
+
         buttonConversation = findViewById(R.id.button_conversation);
         buttonConversation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,6 +113,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                 startActivity(intent);
             }
         });
+        buttonList.add(buttonConversation);
 
         buttonDelete = findViewById(R.id.button_delete);
         buttonDelete.setOnClickListener(new View.OnClickListener() {
@@ -127,7 +138,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                 });
             }
         });
-        buttonDelete.setVisibility(View.GONE);
+        buttonList.add(buttonDelete);
 
         buttonDismiss = findViewById(R.id.button_dismiss);
         buttonDismiss.setOnClickListener(new View.OnClickListener() {
@@ -152,7 +163,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
 //                });
             }
         });
-        buttonDismiss.setVisibility(View.GONE);
+        buttonList.add(buttonDismiss);
 
         buttonApply = findViewById(R.id.button_apply);
         buttonApply.setOnClickListener(new View.OnClickListener() {
@@ -169,7 +180,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                 });
             }
         });
-        buttonApply.setVisibility(View.GONE);
+        buttonList.add(buttonApply);
 
         buttonResign = findViewById(R.id.button_resign);
         buttonResign.setOnClickListener(new View.OnClickListener() {
@@ -178,7 +189,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                 Toast.makeText(ErrandActivity.this, R.string.button_resign, Toast.LENGTH_SHORT).show();
             }
         });
-        buttonResign.setVisibility(View.GONE);
+        buttonList.add(buttonResign);
 
         buttonSubmit = findViewById(R.id.button_submit);
         buttonSubmit.setOnClickListener(new View.OnClickListener() {
@@ -187,7 +198,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                 Toast.makeText(ErrandActivity.this, R.string.button_submit, Toast.LENGTH_SHORT).show();
             }
         });
-        buttonSubmit.setVisibility(View.GONE);
+        buttonList.add(buttonSubmit);
 
         listViewQueue = findViewById(R.id.listView_queue);
 
@@ -211,23 +222,39 @@ public class ErrandActivity extends AppCompatActivity implements Global {
         textViewMoney.setText("悬赏: " + errand.getMoney());
         textViewContent.setText(errand.getContent());
 
-        LinearLayout linearLayout = findViewById(R.id.linearLayout_queue);
-        View viewApplication;
-        for (int i = 0; i < 3; i++) {
-            viewApplication = View.inflate(this, R.layout.listviewitem_application, linearLayout);
-            ((TextView) viewApplication.findViewById(R.id.textView_applier)).setText("Applier #" + i);
-        }
-        for (int i = 0; i < 2; i++) {
-            viewApplication = View.inflate(this, R.layout.listviewitem_submission, linearLayout);
-        }
+        String[] pulseField = {"Pulser", "Content", "Yes", "No"};
+        int[] pulseFiledId = {
+                R.id.textView_pulser,
+                R.id.textView_content,
+                R.id.button_yes,
+                R.id.button_no
+        };
+        List<Map<String, String>> mapList = new ArrayList<>();
+        Map<String, String> map;
 
+        for (Button button : buttonList)
+            button.setVisibility(View.GONE);
+        // Buttons include:
+        //   buttonConversation (shows in all states except publisher's Waiting)
+        //   buttonDelete (shows in all states in publisher's view)
+        //   buttonDismiss (shows in publisher's Ongoing state)
+        //   buttonApply (shows(changes) in receivers and passerby's Waiting state
+        //   buttonResign (shows in receiver's Ongoing state)
+        //   buttonSubmit (shows in receiver's Ongoing state)
         if (Local.loadAccount().id.equals(errand.publisher.id)) {
             // As publisher
             switch (errand.state) {
                 case Waiting:
                     buttonDelete.setVisibility(View.VISIBLE);
-                    for (Account applier : errand.applierList) {
-                        viewApplication = View.inflate(this, R.layout.listviewitem_application, linearLayout);
+                    if (!errand.applierList.isEmpty()) {
+                        for (Account applier : errand.applierList) {
+                            map = new HashMap<>();
+                            map.put(pulseField[0], applier.getName());
+                            map.put(pulseField[1], getString(R.string.string_applicationContent));
+                            map.put(pulseField[2], getString(R.string.button_accept));
+                            map.put(pulseField[3], getString(R.string.button_reject));
+                            mapList.add(map);
+                        }
                     }
                     break;
                 case Ongoing:
@@ -238,10 +265,26 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                 case Judging:
                     buttonConversation.setVisibility(View.VISIBLE);
                     buttonDelete.setVisibility(View.VISIBLE);
+                    if (errand.judge.result != null) {
+                        map = new HashMap<>();
+                        map.put(pulseField[0], getString(R.string.string_judge));
+                        if (errand.judge.result == Judge.Result.FaultOnPublisher)
+                            map.put(pulseField[1], getString(R.string.string_resultKeepContent));
+                        else
+                            map.put(pulseField[1], getString(R.string.string_resultCancelContent));
+                        map.put(pulseField[2], getString(R.string.button_yes));
+                        map.put(pulseField[3], getString(R.string.button_no));
+                    }
                     break;
                 case CheckFailed:
                     buttonConversation.setVisibility(View.VISIBLE);
                     buttonDelete.setVisibility(View.VISIBLE);
+                    map = new HashMap<>();
+                    map.put(pulseField[0], getString(R.string.string_judge));
+                    map.put(pulseField[1], getString(R.string.string_judgeContent));
+                    map.put(pulseField[2], getString(R.string.button_yes));
+                    map.put(pulseField[3], getString(R.string.button_no));
+                    mapList.add(map);
                     break;
                 case Complete:
                     buttonConversation.setVisibility(View.VISIBLE);
@@ -250,6 +293,12 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                 case ToCheck:
                     buttonConversation.setVisibility(View.VISIBLE);
                     buttonDelete.setVisibility(View.VISIBLE);
+                    map = new HashMap<>();
+                    map.put(pulseField[0], errand.receiver.getName());
+                    map.put(pulseField[1], getString(R.string.string_submissionContent));
+                    map.put(pulseField[2], getString(R.string.button_confirm));
+                    map.put(pulseField[3], getString(R.string.button_refuse));
+                    mapList.add(map);
                     break;
                 case NotEvaluate:
                     buttonConversation.setVisibility(View.VISIBLE);
@@ -299,6 +348,17 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                     break;
             }
         }
+
+        // Show pulse
+        SimpleAdapter simpleAdapter = new SimpleAdapter(
+                this,
+                mapList,
+                R.layout.listviewitem_pulse,
+                pulseField,
+                pulseFiledId
+        );
+        listViewQueue.setAdapter(simpleAdapter);
+        Utility.setListViewHeightBasedOnChildren(listViewQueue);
     }
 
     private void refresh() {
