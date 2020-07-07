@@ -152,6 +152,7 @@ public class Remote extends Service implements Global {
                 message.sender.id=item.getString("senderId");
                 message.date=new Date(item.getLong("createTime"));
                 message.read= item.getInt("signFlag") == 1;
+                message.content=item.getString("msg");
                 //action? 如何转num 5和 if
 
             }catch (JSONException e){
@@ -499,47 +500,40 @@ public class Remote extends Service implements Global {
                                 listener.execute(ResultCode.Failed, ConversationListError.NetworkError);
                             } else {
                                 List<Conversation> conversationList=new ArrayList<>();
-                                List<Map<String,Integer>> mapList=new ArrayList<>();
+                                Map<String,Integer> map=new HashMap<>();
+                                Map<String,Conversation>responseMap=new HashMap<>();
                                 int flag=0;
                                 JSONObject jsonObject = (JSONObject) object;
                                 try {
-                                    if (jsonObject.getInt("code")==0) {
-                                        JSONArray data=new JSONArray();
-                                        jsonObject.toJSONArray(data);
+                                        JSONArray data=jsonObject.getJSONArray("data");
                                         for(int i=0;i<data.length();i++){
                                             JSONObject item=data.getJSONObject(i);
                                             Message msg=new Message();
                                             responseMessage(msg,item);
-                                            Map<String,Integer> map=new HashMap<>();
-                                            if(mapList.size()==0){ //c初始化
-                                                map.put(msg.receiver.id,mapList.size());
-                                                mapList.add(map);
+                                            if(map.size()==0){ //c初始化
+                                                map.put(msg.sender.id,map.size());
                                                 Conversation conversation=new Conversation();
-                                                conversation.receiverPrimary=new Account();
-                                                conversation.receiverPrimary.id=msg.receiver.id;
+                                                conversation.sender =new Account();
+                                                conversation.sender.id=msg.sender.id;
                                                 if(conversation.messageList==null)
                                                     conversation.messageList=new ArrayList<>();
                                                 conversation.messageList.add(msg);
                                                 conversationList.add(conversation);
                                             }else{
                                                 int idIndex=0;
-                                                for(int j=0;j<mapList.size();j++){
-                                                    if (mapList.get(j).containsValue(msg.receiver.id)) {
+                                                    if (map.containsKey(msg.sender.id)) {
                                                         flag = 1;
-                                                        idIndex=mapList.get(j).get(msg.receiver.id);
-                                                        break;
+                                                        idIndex=map.get(msg.sender.id);
                                                     }
                                                     else
                                                         flag=0;
-                                                }
                                                 if(flag==1){ //若存在接收者
                                                     conversationList.get(idIndex).messageList.add(msg);
                                                 }else{  //不存在该接收者
-                                                    map.put(msg.receiver.id,mapList.size());
-                                                    mapList.add(map);
+                                                    map.put(msg.sender.id,map.size());
                                                     Conversation conversation=new Conversation();
-                                                    conversation.receiverPrimary=new Account();
-                                                    conversation.receiverPrimary.id=msg.receiver.id;
+                                                    conversation.sender =new Account();
+                                                    conversation.sender.id=msg.sender.id;
                                                     if(conversation.messageList==null)
                                                         conversation.messageList=new ArrayList<>();
                                                     conversation.messageList.add(msg);
@@ -558,11 +552,13 @@ public class Remote extends Service implements Global {
                                             });
                                             Collections.reverse(conversationList.get(i).messageList); //倒序
                                             conversationList.get(i).messageLatest= conversationList.get(i).messageList.get(0);
+                                            conversationList.get(i).time=conversationList.get(i).messageList.get(0).date;
                                         }
-                                        listener.execute(ResultCode.Succeeded, conversationList);
-                                    }else {
-                                        listener.execute(ResultCode.Failed, ConversationListError.ConversationListError);
-                                    }
+                                        for(int i=0;i<conversationList.size();i++){
+                                            responseMap.put(conversationList.get(i).sender.id,conversationList.get(i));
+                                        }
+
+                                        listener.execute(ResultCode.Succeeded, responseMap);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -579,7 +575,7 @@ public class Remote extends Service implements Global {
         ) { // ConversationActivity.java
             // TODO: 完成Remote.queryConversation
             //  返回值object中存放Conversation
-            String param = "?myId=" + conversation.publisher.id + "&otherId=" + conversation.receiverPrimary.id;
+            String param = "?myId=" + conversation.sender.id + "&otherId=" + conversation.receiverPrimary.id;
             call("/chat/queryHistoricRecords", Request.Method.GET,
                     param,
                     null,

@@ -85,5 +85,6 @@
     <string name="button_refuse">Refuse</string>
     <string name="textView_tag">Tag</string>
     <string name="textView_state">State</string>
+    <string name="toast_conversationListError">get conversationList failed!</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>
