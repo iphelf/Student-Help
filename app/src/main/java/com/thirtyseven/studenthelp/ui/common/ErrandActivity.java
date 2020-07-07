@@ -109,7 +109,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
             @Override
             public void onClick(View view) {
                 Toast.makeText(ErrandActivity.this, R.string.button_delete, Toast.LENGTH_SHORT).show();
-                Local.remoteBinder.delete(Local.loadAccount(), errand, new Remote.Listener() {
+                Remote.remoteBinder.delete(Local.loadAccount(), errand, new Remote.Listener() {
                     @Override
                     public void execute(ResultCode resultCode, Object object) {
                         if (resultCode == ResultCode.Succeeded) {
@@ -134,7 +134,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
             @Override
             public void onClick(View view) {
                 Toast.makeText(ErrandActivity.this, R.string.button_dismiss, Toast.LENGTH_SHORT).show();
-                Local.remoteBinder.firePeople(errand, new Remote.Listener() {
+                Remote.remoteBinder.firePeople(errand, new Remote.Listener() {
                     @Override
                     public void execute(ResultCode resultCode, Object object) {
                         if (resultCode == ResultCode.Succeeded) {
@@ -158,7 +158,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
             @Override
             public void onClick(View view) {
                 Toast.makeText(ErrandActivity.this, R.string.button_apply, Toast.LENGTH_SHORT).show();
-                Local.remoteBinder.apply(Local.loadAccount(), errand, new Remote.Listener() {
+                Remote.remoteBinder.apply(Local.loadAccount(), errand, new Remote.Listener() {
                     @Override
                     public void execute(ResultCode resultCode, Object object) {
                         if (resultCode == ResultCode.Succeeded) {
@@ -183,7 +183,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
             @Override
             public void onClick(View view) {
                 Toast.makeText(ErrandActivity.this, R.string.button_resign, Toast.LENGTH_SHORT).show();
-                Local.remoteBinder.resignErrand(errand, new Remote.Listener() {
+                Remote.remoteBinder.resignErrand(errand, new Remote.Listener() {
                     @Override
                     public void execute(ResultCode resultCode, Object object) {
                         if (resultCode == ResultCode.Succeeded) {
@@ -207,7 +207,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
             @Override
             public void onClick(View view) {
                 Toast.makeText(ErrandActivity.this, R.string.button_submit, Toast.LENGTH_SHORT).show();
-                Local.remoteBinder.submit(Local.loadAccount(), errand, new Remote.Listener() {
+                Remote.remoteBinder.submit(Local.loadAccount(), errand, new Remote.Listener() {
                     @Override
                     public void execute(ResultCode resultCode, Object object) {
                         if (resultCode == ResultCode.Succeeded) {
@@ -231,7 +231,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
             @Override
             public void onClick(View view) {
                 Toast.makeText(ErrandActivity.this, R.string.button_comment, Toast.LENGTH_SHORT).show();
-                Local.remoteBinder.comment(Local.loadAccount(), errand, new Remote.Listener() {
+                Remote.remoteBinder.comment(Local.loadAccount(), errand, new Remote.Listener() {
                     @Override
                     public void execute(ResultCode resultCode, Object object) {
                         if (resultCode == ResultCode.Succeeded) {
@@ -480,7 +480,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
     }
 
     private void refresh() {
-        Local.remoteBinder.queryDetail(errand, new Remote.Listener() {
+        Remote.remoteBinder.queryDetail(errand, new Remote.Listener() {
             @Override
             public void execute(ResultCode resultCode, Object object) {
                 errand = (Errand) object;

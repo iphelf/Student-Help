@@ -25,9 +25,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent intent=new Intent(MainActivity.this,Remote.class);
+        startService(intent);
         Account account = Local.loadAccount();
         if (account == null) {
-            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
         }

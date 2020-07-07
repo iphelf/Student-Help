@@ -74,7 +74,7 @@ public class NoticeConversationFragment extends Fragment {
     }
 
     public void refresh() {
-        Local.remoteBinder.queryConversationList(Local.loadAccount(), new Remote.Listener() {
+        Remote.remoteBinder.queryConversationList(Local.loadAccount(), new Remote.Listener() {
                     @Override
                     public void execute(Global.ResultCode resultCode, Object object) {
                         Local.saveConversationMap((Map<String, Conversation>) object);

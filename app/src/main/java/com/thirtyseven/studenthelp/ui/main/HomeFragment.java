@@ -142,7 +142,7 @@ public class HomeFragment extends Fragment implements Global {
         if (keyword.length() == 0) keyword = "";
         int tag = spinnerTag.getSelectedItemPosition() - 1;
         int state = spinnerState.getSelectedItemPosition() - 1;
-        Local.remoteBinder.queryErrandList(null, keyword, tag, state, new Remote.Listener() {
+        Remote.remoteBinder.queryErrandList(null, keyword, tag, state, new Remote.Listener() {
             @Override
             public void execute(ResultCode resultCode, Object object) {
                 if (resultCode == ResultCode.Succeeded && object instanceof List) {

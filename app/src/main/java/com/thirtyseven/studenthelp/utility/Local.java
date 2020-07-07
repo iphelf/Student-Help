@@ -15,7 +15,6 @@ public class Local {
     private static Stack<Errand> errandStack = new Stack<>();
     private static Map<String, Conversation> conversationMap = null;
     private static List<Conversation> conversationList = null;
-    public static Remote.RemoteBinder remoteBinder;
 
     public static Account loadAccount() {
         return account;
