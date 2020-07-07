@@ -37,10 +37,6 @@ import java.util.List;
 import java.util.Map;
 
 public class HomeFragment extends Fragment implements Global {
-
-    private Remote.RemoteBinder remoteBinder;
-    private ServiceConnection serviceConnection;
-
     private HomeViewModel homeViewModel;
 
     private EditText editTextKeyword;
@@ -56,24 +52,6 @@ public class HomeFragment extends Fragment implements Global {
         homeViewModel =
                 ViewModelProviders.of(this).get(HomeViewModel.class);
         requireActivity().setTitle(R.string.title_home);
-
-        serviceConnection = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-                remoteBinder = (Remote.RemoteBinder) iBinder;
-                remoteBinder.startConversation();
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName componentName) {
-
-            }
-        };
-        requireActivity().bindService(
-                new Intent(requireContext(), Remote.class),
-                serviceConnection,
-                Service.BIND_AUTO_CREATE
-        );
 
         View root = inflater.inflate(R.layout.fragment_home, container, false);
 
@@ -154,8 +132,6 @@ public class HomeFragment extends Fragment implements Global {
 
     @Override
     public void onDestroy() {
-        if (serviceConnection != null)
-            requireActivity().unbindService(serviceConnection);
         super.onDestroy();
     }
 
@@ -166,7 +142,7 @@ public class HomeFragment extends Fragment implements Global {
         if (keyword.length() == 0) keyword = "";
         int tag = spinnerTag.getSelectedItemPosition() - 1;
         int state = spinnerState.getSelectedItemPosition() - 1;
-        remoteBinder.queryErrandList(null, keyword, tag, state, new Remote.Listener() {
+        Local.remoteBinder.queryErrandList(null, keyword, tag, state, new Remote.Listener() {
             @Override
             public void execute(ResultCode resultCode, Object object) {
                 if (resultCode == ResultCode.Succeeded && object instanceof List) {

@@ -1,34 +1,38 @@
 package com.thirtyseven.studenthelp.ui.notice;
 
+import android.app.Service;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 
 import androidx.fragment.app.Fragment;
 
 import com.thirtyseven.studenthelp.R;
 import com.thirtyseven.studenthelp.data.Conversation;
-import com.thirtyseven.studenthelp.data.Message;
 import com.thirtyseven.studenthelp.ui.common.ConversationActivity;
 import com.thirtyseven.studenthelp.ui.common.adapter.ConversationListAdapter;
+import com.thirtyseven.studenthelp.utility.Global;
 import com.thirtyseven.studenthelp.utility.Local;
+import com.thirtyseven.studenthelp.utility.Remote;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class NoticeConversationFragment extends Fragment {
+
+    private Remote.RemoteBinder remoteBinder;
+    private ServiceConnection serviceConnection;
+
     private ListView listViewConversationList;
     private List<Conversation> conversationList;
+
     public NoticeConversationFragment() {
         // Required empty public constructor
     }
@@ -40,6 +44,23 @@ public class NoticeConversationFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        serviceConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+                remoteBinder = (Remote.RemoteBinder) iBinder;
+                remoteBinder.startConversation();
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName componentName) {
+
+            }
+        };
+        requireActivity().bindService(
+                new Intent(requireContext(), Remote.class),
+                serviceConnection,
+                Service.BIND_AUTO_CREATE
+        );
     }
 
     @Override
@@ -47,8 +68,24 @@ public class NoticeConversationFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_notice_conversation, container, false);
-        conversationList= Local.loadConversationList();
         listViewConversationList = root.findViewById(R.id.listView_conversationList);
+        refresh();
+        return root;
+    }
+
+    public void refresh() {
+        Local.remoteBinder.queryConversationList(Local.loadAccount(), new Remote.Listener() {
+                    @Override
+                    public void execute(Global.ResultCode resultCode, Object object) {
+                        Local.saveConversationMap((Map<String, Conversation>) object);
+                        push();
+                    }
+                }
+        );
+    }
+
+    public void push() {
+        conversationList = Local.loadConversationList();
         ConversationListAdapter conversationListAdapter = new ConversationListAdapter(getContext(), conversationList);
         listViewConversationList.setAdapter(conversationListAdapter);
         listViewConversationList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -58,54 +95,12 @@ public class NoticeConversationFragment extends Fragment {
                 startActivity(intent);
             }
         });
-
-
-
-
-//        int n = 50;
-//        for (int i = 0; i < n; i++) {
-//            Map<String, Object> map = new HashMap<>();
-//            for (String field : fields) map.put(field, field);
-//            mapList.add(map);
-//        }
-//        SimpleAdapter simpleAdapter = new SimpleAdapter(
-//                getContext(),
-//                mapList,
-//                R.layout.listviewitem_notice,
-//                fields,
-//                fieldIds
-//        );
-       // listViewConversationList.setAdapter(simpleAdapter);
-       // push();
-        return root;
     }
-//    String[] fields = {
-//            "联系人", "最后一条消息","时间"
-//    };
-//    int[] fieldIds = {
-//            R.id.textView_title,
-//            R.id.textView_preview,
-//            R.id.textView_time
-//    };
-//
-//    public void push(){
-//        List<Map<String, Object>> mapList = new ArrayList<>();
-//        int n=conversationList.size();
-//        for(Conversation conversation:conversationList){
-//            Map<String,Object> map=new HashMap<>();
-//            map.put("联系人",conversation.getSender().id);
-//            map.put("最后一条消息",conversation.messageLatest.content);
-//            SimpleDateFormat formatter = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss");
-//            map.put("时间",formatter.format(conversation.getMessage().date));
-//            mapList.add(map);
-//        }
-//        SimpleAdapter simpleAdapter = new SimpleAdapter(
-//                getContext(),
-//                mapList,
-//                R.layout.listviewitem_notice,
-//                fields,
-//                fieldIds
-//        );
-//        listViewConversationList.setAdapter(simpleAdapter);
-//    }
+
+    @Override
+    public void onDestroy() {
+        if (serviceConnection != null)
+            requireActivity().unbindService(serviceConnection);
+        super.onDestroy();
+    }
 }

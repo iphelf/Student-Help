@@ -29,34 +29,12 @@ import java.util.List;
 import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
-
-    private Remote.RemoteBinder remoteBinder;
-    private ServiceConnection serviceConnection;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
         setTitle(R.string.title_login);
-
-        serviceConnection = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-                remoteBinder = (Remote.RemoteBinder) iBinder;
-                remoteBinder.startConversation();
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName componentName) {
-
-            }
-        };
-        bindService(
-                new Intent(this, Remote.class),
-                serviceConnection,
-                Service.BIND_AUTO_CREATE
-        );
 
         final EditText editTextStudentId = findViewById(R.id.editText_studentId);
         final EditText editTextPassword = findViewById(R.id.editText_password);
@@ -70,12 +48,12 @@ public class LoginActivity extends AppCompatActivity {
                 final Account account = new Account();
                 account.id = id;
                 account.password = password;
-                remoteBinder.login(account, new Remote.Listener() {
+                Local.remoteBinder.login(account, new Remote.Listener() {
                     @Override
                     public void execute(Global.ResultCode resultCode, Object object) {
                         if (resultCode == Global.ResultCode.Succeeded) {
                             Local.saveAccount(account);
-                            remoteBinder.queryConversationList(account, new Remote.Listener() {
+                            Local.remoteBinder.queryConversationList(account, new Remote.Listener() {
                                 @Override
                                 public void execute(Global.ResultCode resultCode, Object object) {
                                     if (resultCode == Global.ResultCode.Succeeded) {
@@ -157,12 +135,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-    }
-
-    @Override
-    public void onDestroy() {
-        unbindService(serviceConnection);
-        super.onDestroy();
     }
 
 }

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
@@ -17,20 +16,13 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.thirtyseven.studenthelp.R;
 import com.thirtyseven.studenthelp.data.Account;
-import com.thirtyseven.studenthelp.data.Conversation;
 import com.thirtyseven.studenthelp.ui.login.LoginActivity;
-import com.thirtyseven.studenthelp.utility.Global;
 import com.thirtyseven.studenthelp.utility.Local;
 import com.thirtyseven.studenthelp.utility.Remote;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class MainActivity extends AppCompatActivity {
-    private Remote.RemoteBinder remoteBinder;
     private ServiceConnection serviceConnection;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,8 +46,8 @@ public class MainActivity extends AppCompatActivity {
         serviceConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-                remoteBinder = (Remote.RemoteBinder) iBinder;
-                remoteBinder.startConversation();
+                Local.remoteBinder = (Remote.RemoteBinder) iBinder;
+                Local.remoteBinder.startConversation();
             }
 
             @Override
@@ -68,10 +60,8 @@ public class MainActivity extends AppCompatActivity {
                 serviceConnection,
                 Service.BIND_AUTO_CREATE
         );
-
-
-
     }
+
     @Override
     public void onDestroy() {
         unbindService(serviceConnection);

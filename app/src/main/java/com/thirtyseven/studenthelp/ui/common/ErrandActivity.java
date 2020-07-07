@@ -36,9 +36,6 @@ import java.util.Map;
 
 public class ErrandActivity extends AppCompatActivity implements Global {
 
-    private Remote.RemoteBinder remoteBinder;
-    private ServiceConnection serviceConnection;
-
     Errand errand;
 
     ImageView imageViewAvatar;
@@ -77,24 +74,6 @@ public class ErrandActivity extends AppCompatActivity implements Global {
         if (errand == null)
             finish();
 
-        serviceConnection = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-                remoteBinder = (Remote.RemoteBinder) iBinder;
-                remoteBinder.startConversation();
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName componentName) {
-
-            }
-        };
-        bindService(
-                new Intent(this, Remote.class),
-                serviceConnection,
-                Service.BIND_AUTO_CREATE
-        );
-
         imageViewAvatar = findViewById(R.id.imageView_avatar);
         imageViewAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,7 +109,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
             @Override
             public void onClick(View view) {
                 Toast.makeText(ErrandActivity.this, R.string.button_delete, Toast.LENGTH_SHORT).show();
-                remoteBinder.delete(Local.loadAccount(), errand, new Remote.Listener() {
+                Local.remoteBinder.delete(Local.loadAccount(), errand, new Remote.Listener() {
                     @Override
                     public void execute(ResultCode resultCode, Object object) {
                         if (resultCode == ResultCode.Succeeded) {
@@ -155,7 +134,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
             @Override
             public void onClick(View view) {
                 Toast.makeText(ErrandActivity.this, R.string.button_dismiss, Toast.LENGTH_SHORT).show();
-                remoteBinder.firePeople(errand, new Remote.Listener() {
+                Local.remoteBinder.firePeople(errand, new Remote.Listener() {
                     @Override
                     public void execute(ResultCode resultCode, Object object) {
                         if (resultCode == ResultCode.Succeeded) {
@@ -179,7 +158,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
             @Override
             public void onClick(View view) {
                 Toast.makeText(ErrandActivity.this, R.string.button_apply, Toast.LENGTH_SHORT).show();
-                remoteBinder.apply(Local.loadAccount(), errand, new Remote.Listener() {
+                Local.remoteBinder.apply(Local.loadAccount(), errand, new Remote.Listener() {
                     @Override
                     public void execute(ResultCode resultCode, Object object) {
                         if (resultCode == ResultCode.Succeeded) {
@@ -204,7 +183,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
             @Override
             public void onClick(View view) {
                 Toast.makeText(ErrandActivity.this, R.string.button_resign, Toast.LENGTH_SHORT).show();
-                remoteBinder.resignErrand(errand, new Remote.Listener() {
+                Local.remoteBinder.resignErrand(errand, new Remote.Listener() {
                     @Override
                     public void execute(ResultCode resultCode, Object object) {
                         if (resultCode == ResultCode.Succeeded) {
@@ -228,7 +207,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
             @Override
             public void onClick(View view) {
                 Toast.makeText(ErrandActivity.this, R.string.button_submit, Toast.LENGTH_SHORT).show();
-                remoteBinder.submit(Local.loadAccount(), errand, new Remote.Listener() {
+                Local.remoteBinder.submit(Local.loadAccount(), errand, new Remote.Listener() {
                     @Override
                     public void execute(ResultCode resultCode, Object object) {
                         if (resultCode == ResultCode.Succeeded) {
@@ -252,7 +231,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
             @Override
             public void onClick(View view) {
                 Toast.makeText(ErrandActivity.this, R.string.button_comment, Toast.LENGTH_SHORT).show();
-                remoteBinder.comment(Local.loadAccount(), errand, new Remote.Listener() {
+                Local.remoteBinder.comment(Local.loadAccount(), errand, new Remote.Listener() {
                     @Override
                     public void execute(ResultCode resultCode, Object object) {
                         if (resultCode == ResultCode.Succeeded) {
@@ -281,12 +260,6 @@ public class ErrandActivity extends AppCompatActivity implements Global {
 
         push();
 
-    }
-
-    @Override
-    public void onDestroy() {
-        unbindService(serviceConnection);
-        super.onDestroy();
     }
 
     public void push() {
@@ -507,7 +480,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
     }
 
     private void refresh() {
-        remoteBinder.queryDetail(errand, new Remote.Listener() {
+        Local.remoteBinder.queryDetail(errand, new Remote.Listener() {
             @Override
             public void execute(ResultCode resultCode, Object object) {
                 errand = (Errand) object;
