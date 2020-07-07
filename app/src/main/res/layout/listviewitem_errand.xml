@@ -19,6 +19,7 @@
         android:text="TextView"
         android:textSize="24sp"
         android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/textView_state"
         app:layout_constraintStart_toStartOf="@+id/textView_preview"
         app:layout_constraintTop_toTopOf="parent" />
 

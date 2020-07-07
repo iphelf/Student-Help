@@ -95,12 +95,14 @@ public class Remote extends Service implements Global {
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
+                            Log.d("Debug","successfully return: "+response.toString());
                             listener.execute(ResultCode.Succeeded, response);
                         }
                     },
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
+                            Log.d("Debug","unsuccessfully return: "+error.toString());
                             listener.execute(ResultCode.Failed, null);
                         }
                     }
@@ -143,9 +145,10 @@ public class Remote extends Service implements Global {
                 e.printStackTrace();
             }
         }
-//        {"msg":"server","signFlag":0,"senderId":"server",
+
+        //        {"msg":"server","signFlag":0,"senderId":"server",
 //                "createTime":1593854476000,"msgId":"1593854476193-server-20171722-3429","action":5}
-        public void responseMessage(Message message,JSONObject item){
+        public void responseMessage(Message message, JSONObject item) {
             try {
                 message.id = item.getString("msgId");
                 message.sender=new Account();
@@ -381,7 +384,7 @@ public class Remote extends Service implements Global {
         ) { // PublishActivity.java
             // TODO: 完成Remote.publish
             call("/errand/publish", Request.Method.POST,
-                    "?errandDescription=" + encode(errand.content) + "&errandItem=" + errand.tag +
+                    "?errandDescription=" + encode(errand.content) + "&errandItem=" + errand.tag.ordinal() +
                             "&errandMoney=" + errand.money + "&errandTitle=" + encode(errand.title) + "&publisherId=" + errand.publisher.id,
                     null,
                     new Listener() {
@@ -420,11 +423,11 @@ public class Remote extends Service implements Global {
 
         // /errand/fire
         public void firePeople(
-                int errandId,
+                Errand errand,
                 final Listener listener
         ) {
             call("/errand/fire", Request.Method.GET,
-                    "?errandId=" + errandId,
+                    "?errandId=" + errand.id,
                     null,
                     new Listener() {
                         @Override
@@ -452,10 +455,10 @@ public class Remote extends Service implements Global {
 
         // /errand/resign
         public void resignErrand(
-                int errandId,
+                Errand errand,
                 final Listener listener) {
             call("/errand/resign", Request.Method.GET,
-                    "?errandId=" + errandId,
+                    "?errandId=" + errand.id,
                     null,
                     new Listener() {
                         @Override
@@ -481,6 +484,14 @@ public class Remote extends Service implements Global {
                     });
         }
 
+        // /errand/newComment
+        public void comment(
+                Account account, Errand errand,
+                final Listener listener
+        ) { // ErrandActivity.java
+            // TODO: 完成Remote.comment
+        }
+
         // /chat/queryNewestMsg
         public void queryConversationList(
                 Account account,
@@ -498,66 +509,65 @@ public class Remote extends Service implements Global {
                             if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
                                 listener.execute(ResultCode.Failed, ConversationListError.NetworkError);
                             } else {
-                                List<Conversation> conversationList=new ArrayList<>();
-                                Map<String,Integer> map=new HashMap<>();
-                                Map<String,Conversation>responseMap=new HashMap<>();
-                                int flag=0;
+                                List<Conversation> conversationList = new ArrayList<>();
+                                Map<String, Integer> map = new HashMap<>();
+                                Map<String, Conversation> responseMap = new HashMap<>();
+                                int flag = 0;
                                 JSONObject jsonObject = (JSONObject) object;
                                 try {
-                                        JSONArray data=jsonObject.getJSONArray("data");
-                                        for(int i=0;i<data.length();i++){
-                                            JSONObject item=data.getJSONObject(i);
-                                            Message msg=new Message();
-                                            responseMessage(msg,item);
-                                            if(map.size()==0){ //c初始化
-                                                map.put(msg.sender.id,map.size());
-                                                Conversation conversation=new Conversation();
-                                                conversation.sender =new Account();
-                                                conversation.sender.id=msg.sender.id;
-                                                if(conversation.messageList==null)
-                                                    conversation.messageList=new ArrayList<>();
+                                    JSONArray data = jsonObject.getJSONArray("data");
+                                    for (int i = 0; i < data.length(); i++) {
+                                        JSONObject item = data.getJSONObject(i);
+                                        Message msg = new Message();
+                                        responseMessage(msg, item);
+                                        if (map.size() == 0) { //c初始化
+                                            map.put(msg.sender.id, map.size());
+                                            Conversation conversation = new Conversation();
+                                            conversation.sender = new Account();
+                                            conversation.sender.id = msg.sender.id;
+                                            if (conversation.messageList == null)
+                                                conversation.messageList = new ArrayList<>();
+                                            conversation.messageList.add(msg);
+                                            conversationList.add(conversation);
+                                        } else {
+                                            int idIndex = 0;
+                                            if (map.containsKey(msg.sender.id)) {
+                                                flag = 1;
+                                                idIndex = map.get(msg.sender.id);
+                                            } else
+                                                flag = 0;
+                                            if (flag == 1) { //若存在接收者
+                                                conversationList.get(idIndex).messageList.add(msg);
+                                            } else {  //不存在该接收者
+                                                map.put(msg.sender.id, map.size());
+                                                Conversation conversation = new Conversation();
+                                                conversation.sender = new Account();
+                                                conversation.sender.id = msg.sender.id;
+                                                if (conversation.messageList == null)
+                                                    conversation.messageList = new ArrayList<>();
                                                 conversation.messageList.add(msg);
                                                 conversationList.add(conversation);
-                                            }else{
-                                                int idIndex=0;
-                                                    if (map.containsKey(msg.sender.id)) {
-                                                        flag = 1;
-                                                        idIndex=map.get(msg.sender.id);
-                                                    }
-                                                    else
-                                                        flag=0;
-                                                if(flag==1){ //若存在接收者
-                                                    conversationList.get(idIndex).messageList.add(msg);
-                                                }else{  //不存在该接收者
-                                                    map.put(msg.sender.id,map.size());
-                                                    Conversation conversation=new Conversation();
-                                                    conversation.sender =new Account();
-                                                    conversation.sender.id=msg.sender.id;
-                                                    if(conversation.messageList==null)
-                                                        conversation.messageList=new ArrayList<>();
-                                                    conversation.messageList.add(msg);
-                                                    conversationList.add(conversation);
-                                                }
-
                                             }
 
                                         }
-                                        for(int i=0;i<conversationList.size();i++){
-                                            Collections.sort(conversationList.get(i).messageList, new Comparator<Message>() {
-                                                @Override
-                                                public int compare(Message m1, Message m2) {
-                                                    return m1.date.compareTo(m2.date);
-                                                }
-                                            });
-                                            Collections.reverse(conversationList.get(i).messageList); //倒序
-                                            conversationList.get(i).messageLatest= conversationList.get(i).messageList.get(0);
-                                            conversationList.get(i).time=conversationList.get(i).messageList.get(0).date;
-                                        }
-                                        for(int i=0;i<conversationList.size();i++){
-                                            responseMap.put(conversationList.get(i).sender.id,conversationList.get(i));
-                                        }
 
-                                        listener.execute(ResultCode.Succeeded, responseMap);
+                                    }
+                                    for (int i = 0; i < conversationList.size(); i++) {
+                                        Collections.sort(conversationList.get(i).messageList, new Comparator<Message>() {
+                                            @Override
+                                            public int compare(Message m1, Message m2) {
+                                                return m1.date.compareTo(m2.date);
+                                            }
+                                        });
+                                        Collections.reverse(conversationList.get(i).messageList); //倒序
+                                        conversationList.get(i).messageLatest = conversationList.get(i).messageList.get(0);
+                                        conversationList.get(i).time = conversationList.get(i).messageList.get(0).date;
+                                    }
+                                    for (int i = 0; i < conversationList.size(); i++) {
+                                        responseMap.put(conversationList.get(i).sender.id, conversationList.get(i));
+                                    }
+
+                                    listener.execute(ResultCode.Succeeded, responseMap);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }

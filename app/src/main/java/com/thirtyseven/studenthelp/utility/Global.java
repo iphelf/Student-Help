@@ -51,29 +51,39 @@ public interface Global {
         NetworkError, RefuseError
     }
 
+    enum CommentError {
+        NetworkError, CommentError
+    }
+
     enum CheckState {
         CheckRefused, CheckSucceed, InputRightState
     }
-    enum DetailError{
-        NetworkError,DetailError
+
+    enum DetailError {
+        NetworkError, DetailError
     }
 
-    enum QueryItemError{
-        NetworkError,QueryItemError
+    enum QueryItemError {
+        NetworkError, QueryItemError
     }
-    enum QueryKeywordError{
-        NetworkError,QueryKeywordError
+
+    enum QueryKeywordError {
+        NetworkError, QueryKeywordError
     }
-    enum DismissError{
-        NetworkError,DismissError
+
+    enum DismissError {
+        NetworkError, DismissError
     }
-    enum FireError{
-        NetworkError,FireError
+
+    enum FireError {
+        NetworkError, FireError
     }
-    enum ResignError{
-        NetworkError,ResignError
+
+    enum ResignError {
+        NetworkError, ResignError
     }
-    enum ConversationListError{
-        NetworkError,ConversationListError
+
+    enum ConversationListError {
+        NetworkError, ConversationListError
     }
 }

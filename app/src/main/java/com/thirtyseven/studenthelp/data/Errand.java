@@ -33,6 +33,8 @@ public class Errand {
     public List<Account> applierList;
     // Related judge
     public Judge judge;
+    // Related comment
+    public List<Comment> commentList;
     // Information
     public String id;
     public String title;

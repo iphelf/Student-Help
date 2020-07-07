@@ -7,14 +7,18 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RatingBar;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.thirtyseven.studenthelp.R;
 import com.thirtyseven.studenthelp.data.Account;
@@ -53,9 +57,14 @@ public class ErrandActivity extends AppCompatActivity implements Global {
     Button buttonApply;
     Button buttonResign;
     Button buttonSubmit;
+    Button buttonComment;
     List<Button> buttonList;
 
-    ListView listViewQueue;
+    ListView listViewPulse;
+    ListView listViewComment;
+
+    ConstraintLayout constraintLayoutPulse;
+    ConstraintLayout constraintLayoutComment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,22 +154,21 @@ public class ErrandActivity extends AppCompatActivity implements Global {
             @Override
             public void onClick(View view) {
                 Toast.makeText(ErrandActivity.this, R.string.button_dismiss, Toast.LENGTH_SHORT).show();
-//                remoteBinder.dismiss(Local.loadAccount(), errand, new Remote.Listener() {
-//                    @Override
-//                    public void execute(ResultCode resultCode, Object object) {
-//                        if(resultCode==ResultCode.Succeeded){
-//                            refresh();
-//                        }
-//                        else{
-//                            switch ((DismissError)object){
-//                                case NetworkError:
-//                                case DismissError:
-//                                default:
-//                                    break;
-//                            }
-//                        }
-//                    }
-//                });
+                remoteBinder.firePeople(errand, new Remote.Listener() {
+                    @Override
+                    public void execute(ResultCode resultCode, Object object) {
+                        if (resultCode == ResultCode.Succeeded) {
+                            refresh();
+                        } else {
+                            switch ((DismissError) object) {
+                                case NetworkError:
+                                case DismissError:
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                });
             }
         });
         buttonList.add(buttonDismiss);
@@ -175,6 +183,14 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                     public void execute(ResultCode resultCode, Object object) {
                         if (resultCode == ResultCode.Succeeded) {
                             refresh();
+                        } else {
+                            switch ((ApplyError) object) {
+                                case HaveApply:
+                                case NetworkError:
+                                case ApplyError:
+                                default:
+                                    break;
+                            }
                         }
                     }
                 });
@@ -187,6 +203,21 @@ public class ErrandActivity extends AppCompatActivity implements Global {
             @Override
             public void onClick(View view) {
                 Toast.makeText(ErrandActivity.this, R.string.button_resign, Toast.LENGTH_SHORT).show();
+                remoteBinder.resignErrand(errand, new Remote.Listener() {
+                    @Override
+                    public void execute(ResultCode resultCode, Object object) {
+                        if (resultCode == ResultCode.Succeeded) {
+                            refresh();
+                        } else {
+                            switch ((ResignError) object) {
+                                case NetworkError:
+                                case ResignError:
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                });
             }
         });
         buttonList.add(buttonResign);
@@ -196,11 +227,56 @@ public class ErrandActivity extends AppCompatActivity implements Global {
             @Override
             public void onClick(View view) {
                 Toast.makeText(ErrandActivity.this, R.string.button_submit, Toast.LENGTH_SHORT).show();
+                remoteBinder.submit(Local.loadAccount(), errand, new Remote.Listener() {
+                    @Override
+                    public void execute(ResultCode resultCode, Object object) {
+                        if (resultCode == ResultCode.Succeeded) {
+                            refresh();
+                        } else {
+                            switch ((PushError) object) {
+                                case NetworkError:
+                                case PushError:
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                });
             }
         });
         buttonList.add(buttonSubmit);
 
-        listViewQueue = findViewById(R.id.listView_queue);
+        buttonComment = findViewById(R.id.button_comment);
+        buttonComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(ErrandActivity.this, R.string.button_comment, Toast.LENGTH_SHORT).show();
+                remoteBinder.comment(Local.loadAccount(), errand, new Remote.Listener() {
+                    @Override
+                    public void execute(ResultCode resultCode, Object object) {
+                        if (resultCode == ResultCode.Succeeded) {
+                            refresh();
+                        } else {
+                            switch ((CommentError) object) {
+                                case NetworkError:
+                                case CommentError:
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                });
+            }
+        });
+        buttonList.add(buttonComment);
+
+        listViewPulse = findViewById(R.id.listView_pulse);
+
+        listViewComment = findViewById(R.id.listView_commentList);
+
+        constraintLayoutPulse = findViewById(R.id.constraintLayout_pulse);
+
+        constraintLayoutComment = findViewById(R.id.constraintLayout_comment);
 
         push();
 
@@ -229,11 +305,13 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                 R.id.button_yes,
                 R.id.button_no
         };
-        List<Map<String, String>> mapList = new ArrayList<>();
+        final List<Map<String, String>> mapList = new ArrayList<>();
         Map<String, String> map;
 
+        // Show buttons
         for (Button button : buttonList)
             button.setVisibility(View.GONE);
+        constraintLayoutComment.setVisibility(View.GONE);
         // Buttons include:
         //   buttonConversation (shows in all states except publisher's Waiting)
         //   buttonDelete (shows in all states in publisher's view)
@@ -241,12 +319,11 @@ public class ErrandActivity extends AppCompatActivity implements Global {
         //   buttonApply (shows(changes) in receivers and passerby's Waiting state
         //   buttonResign (shows in receiver's Ongoing state)
         //   buttonSubmit (shows in receiver's Ongoing state)
-        if (Local.loadAccount().id.equals(errand.publisher.id)) {
-            // As publisher
+        if (Local.loadAccount().id.equals(errand.publisher.id)) { // As publisher
             switch (errand.state) {
                 case Waiting:
                     buttonDelete.setVisibility(View.VISIBLE);
-                    if (!errand.applierList.isEmpty()) {
+                    if (errand.applierList != null && !errand.applierList.isEmpty()) {
                         for (Account applier : errand.applierList) {
                             map = new HashMap<>();
                             map.put(pulseField[0], applier.getName());
@@ -289,6 +366,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                 case Complete:
                     buttonConversation.setVisibility(View.VISIBLE);
                     buttonDelete.setVisibility(View.VISIBLE);
+                    buttonComment.setVisibility(View.GONE); // ?
                     break;
                 case ToCheck:
                     buttonConversation.setVisibility(View.VISIBLE);
@@ -303,37 +381,53 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                 case NotEvaluate:
                     buttonConversation.setVisibility(View.VISIBLE);
                     buttonDelete.setVisibility(View.VISIBLE);
+                    constraintLayoutComment.setVisibility(View.VISIBLE);
                     break;
                 default:
                     buttonDelete.setVisibility(View.VISIBLE);
                     break;
             }
-        } else if (errand.receiver != null && Local.loadAccount().id.equals(errand.receiver.id)) {
-            // As receiver
+        } else if (errand.receiver != null && Local.loadAccount().id.equals(errand.receiver.id)) { // As receiver
             switch (errand.state) {
-                case Waiting:
-                    buttonConversation.setVisibility(View.VISIBLE);
-                    buttonApply.setVisibility(View.VISIBLE);
-                    break;
                 case Ongoing:
                     buttonConversation.setVisibility(View.VISIBLE);
+                    buttonSubmit.setEnabled(true);
                     buttonSubmit.setVisibility(View.VISIBLE);
                     buttonResign.setVisibility(View.VISIBLE);
                     break;
                 case Judging:
                     buttonConversation.setVisibility(View.VISIBLE);
+                    if (errand.judge.result != null) {
+                        map = new HashMap<>();
+                        map.put(pulseField[0], getString(R.string.string_judge));
+                        if (errand.judge.result == Judge.Result.FaultOnPublisher)
+                            map.put(pulseField[1], getString(R.string.string_resultKeepContent));
+                        else
+                            map.put(pulseField[1], getString(R.string.string_resultCancelContent));
+                        map.put(pulseField[2], getString(R.string.button_yes));
+                        map.put(pulseField[3], getString(R.string.button_no));
+                    }
                     break;
                 case CheckFailed:
                     buttonConversation.setVisibility(View.VISIBLE);
+                    map = new HashMap<>();
+                    map.put(pulseField[0], getString(R.string.string_judge));
+                    map.put(pulseField[1], getString(R.string.string_judgeContent));
+                    map.put(pulseField[2], getString(R.string.button_yes));
+                    map.put(pulseField[3], getString(R.string.button_no));
+                    mapList.add(map);
                     break;
                 case Complete:
                     buttonConversation.setVisibility(View.VISIBLE);
                     break;
                 case ToCheck:
                     buttonConversation.setVisibility(View.VISIBLE);
+                    buttonSubmit.setVisibility(View.VISIBLE);
+                    buttonSubmit.setEnabled(false);
                     break;
                 case NotEvaluate:
                     buttonConversation.setVisibility(View.VISIBLE);
+                    constraintLayoutComment.setVisibility(View.VISIBLE);
                     break;
                 default:
                     buttonConversation.setVisibility(View.VISIBLE);
@@ -345,20 +439,77 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                 case Waiting:
                     buttonConversation.setVisibility(View.VISIBLE);
                     buttonApply.setVisibility(View.VISIBLE);
+                    if (errand.applierList != null && errand.applierList.contains(Local.loadAccount()))
+                        buttonApply.setEnabled(false);
                     break;
             }
         }
+        boolean empty = true;
+        for (Button button : buttonList)
+            if (button.getVisibility() == View.VISIBLE) {
+                empty = false;
+                break;
+            }
+        if (empty) {
+            constraintLayoutPulse.setVisibility(View.GONE);
+        }
 
         // Show pulse
-        SimpleAdapter simpleAdapter = new SimpleAdapter(
-                this,
-                mapList,
-                R.layout.listviewitem_pulse,
-                pulseField,
-                pulseFiledId
-        );
-        listViewQueue.setAdapter(simpleAdapter);
-        Utility.setListViewHeightBasedOnChildren(listViewQueue);
+        if (mapList.isEmpty()) {
+            constraintLayoutPulse.setVisibility(View.GONE);
+        } else {
+            SimpleAdapter simpleAdapter = new SimpleAdapter(
+                    this,
+                    mapList,
+                    R.layout.listviewitem_pulse,
+                    pulseField,
+                    pulseFiledId
+            );
+            listViewPulse.setAdapter(simpleAdapter);
+            Utility.setListViewHeightBasedOnChildren(listViewPulse);
+        }
+
+//        errand.commentList = new ArrayList<>();
+//        Comment comment = new Comment();
+//        comment.commenter = errand.publisher;
+//        comment.content = "Good";
+//        comment.score = 4;
+//        for (int i = 0; i < 3; i++)
+//            errand.commentList.add(comment);
+
+        // Show comments
+        if (errand.commentList != null && !errand.commentList.isEmpty()) {
+            BaseAdapter baseAdapter = new BaseAdapter() {
+                @Override
+                public int getCount() {
+                    return errand.commentList.size();
+                }
+
+                @Override
+                public Object getItem(int i) {
+                    return errand.commentList.get(i);
+                }
+
+                @Override
+                public long getItemId(int i) {
+                    return 0;
+                }
+
+                @Override
+                public View getView(int i, View view, ViewGroup viewGroup) {
+                    view = View.inflate(ErrandActivity.this, R.layout.listviewitem_comment, null);
+                    TextView textViewCommenter = view.findViewById(R.id.textView_commenter);
+                    textViewCommenter.setText(errand.commentList.get(i).commenter.getName());
+                    TextView textViewContent = view.findViewById(R.id.textView_content);
+                    textViewContent.setText(errand.commentList.get(i).content);
+                    RatingBar ratingBar = view.findViewById(R.id.ratingBar_score);
+                    ratingBar.setRating(errand.commentList.get(i).score);
+                    return view;
+                }
+            };
+            listViewComment.setAdapter(baseAdapter);
+            Utility.setListViewHeightBasedOnChildren(listViewComment);
+        }
     }
 
     private void refresh() {

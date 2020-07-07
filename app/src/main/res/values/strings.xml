@@ -95,5 +95,6 @@
     <string name="string_resultKeepContent">Judge says this deal should go on</string>
     <string name="button_comment">Comment</string>
     <string name="toast_conversationListError">get conversationList failed!</string>
+    <string name="title_complain">Complain</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

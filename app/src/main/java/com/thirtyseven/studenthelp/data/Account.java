@@ -21,4 +21,10 @@ public class Account {
         return "";
     }
 
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof Account)) return false;
+        return ((Account) object).id.equals(id);
+    }
+
 }
