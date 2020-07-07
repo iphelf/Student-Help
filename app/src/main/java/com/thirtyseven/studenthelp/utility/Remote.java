@@ -153,8 +153,7 @@ public class Remote extends Service implements Global {
                 message.date=new Date(item.getLong("createTime"));
                 message.read= item.getInt("signFlag") == 1;
                 message.content=item.getString("msg");
-                //action? 如何转num 5和 if
-
+                message.type=item.getInt("action");
             }catch (JSONException e){
                 e.printStackTrace();
             }

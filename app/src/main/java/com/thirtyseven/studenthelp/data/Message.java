@@ -8,7 +8,7 @@ public class Message {
     public Account receiver;
     public String content;
     public Date date;
-    public Type type;
+    public int type;
     public boolean read;
-    public enum Type {Normal, Complaint}
+    //public enum Type {Normal, Complaint}
 }
