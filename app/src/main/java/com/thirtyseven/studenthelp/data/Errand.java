@@ -1,6 +1,5 @@
 package com.thirtyseven.studenthelp.data;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -25,10 +24,13 @@ public class Errand {
 
     public enum State {Waiting, Ongoing, NotEvaluate, Judging, CheckFailed, Complete, ToCheck}
 
+    public enum Tag {SecondHand, Express, Group, Study, LostAndFound}
+
     // Related accounts
     public Account publisher;
     public Account receiver;
     public List<Account> receiverList; // include receiver
+    public List<Account> applierList;
     // Information
     public String id;
     public String title;
@@ -36,10 +38,10 @@ public class Errand {
     public Conversation conversation;
     public Date date;
     //Properties
-    public String tag;
+    public Tag tag;
     public List<Integer> tagList; // include tag
-    public BigDecimal money;
-    public String state;
+    public String money;
+    public State state;
 
     public String getTitle() {
         if (title == null) return "";
@@ -57,7 +59,7 @@ public class Errand {
     }
 
     public String getMoney() {
-        if (money != null) return money.toString();
+        if (money != null) return money;
         return "";
     }
 
@@ -68,22 +70,10 @@ public class Errand {
     }
 
     public String getStateName() {
-        if (state == null || state.length() == 0 || state.equals("%"))
-            return "";
-        else return StateName[Integer.parseInt(state)];
+        return StateName[state.ordinal()];
     }
 
     public String getTagName() {
-        if (tag == null || tag.length() == 0 || tag.equals("%"))
-            return "";
-        else return TagName[Integer.parseInt(tag)];
-    }
-
-    static public String tagValueOf(int i) {
-        return i == -1 ? "%" : String.valueOf(i);
-    }
-
-    static public String stateValueOf(int i) {
-        return i == -1 ? "%" : String.valueOf(i);
+        return TagName[tag.ordinal()];
     }
 }

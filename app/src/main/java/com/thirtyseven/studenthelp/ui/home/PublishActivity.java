@@ -22,8 +22,6 @@ import com.thirtyseven.studenthelp.utility.Global;
 import com.thirtyseven.studenthelp.utility.Local;
 import com.thirtyseven.studenthelp.utility.Remote;
 
-import java.math.BigDecimal;
-
 public class PublishActivity extends AppCompatActivity implements Global {
 
     private Remote.RemoteBinder remoteBinder;
@@ -113,8 +111,8 @@ public class PublishActivity extends AppCompatActivity implements Global {
         content = editTextContent.getText().toString().trim();
         Errand errand = new Errand();
         errand.title = title;
-        errand.tag = Errand.tagValueOf(tag);
-        errand.money = new BigDecimal(money);
+        errand.tag = Errand.Tag.values()[tag];
+        errand.money = money;
         errand.content = content;
         errand.publisher = Local.loadAccount();
         remoteBinder.publish(errand, new Remote.Listener() {

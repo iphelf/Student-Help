@@ -163,9 +163,9 @@ public class HomeFragment extends Fragment implements Global {
 
     public void pull() {
         String keyword = editTextKeyword.getText().toString().trim();
-        if (keyword.length() == 0) keyword = "%";
-        String tag = Errand.tagValueOf(spinnerTag.getSelectedItemPosition() - 1);
-        String state = Errand.stateValueOf(spinnerState.getSelectedItemPosition() - 1);
+        if (keyword.length() == 0) keyword = "";
+        int tag = spinnerTag.getSelectedItemPosition() - 1;
+        int state = spinnerState.getSelectedItemPosition() - 1;
         remoteBinder.queryErrandList(null, keyword, tag, state, new Remote.Listener() {
             @Override
             public void execute(ResultCode resultCode, Object object) {
@@ -217,7 +217,7 @@ public class HomeFragment extends Fragment implements Global {
             map.put("State", errand.getStateName());
             map.put("Author", errand.publisher.getName());
             map.put("Preview", errand.getContentPreview());
-            map.put("Money", "悬赏: " + errand.money.toString());
+            map.put("Money", "悬赏: " + errand.money);
             mapList.add(map);
         }
         simpleAdapter = new SimpleAdapter(

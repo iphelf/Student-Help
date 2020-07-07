@@ -17,6 +17,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.thirtyseven.studenthelp.R;
+import com.thirtyseven.studenthelp.data.Account;
 import com.thirtyseven.studenthelp.data.Errand;
 import com.thirtyseven.studenthelp.utility.Global;
 import com.thirtyseven.studenthelp.utility.Local;
@@ -55,6 +56,8 @@ public class ErrandActivity extends AppCompatActivity implements Global {
         setTitle(R.string.title_errand);
 
         errand = Local.popErrand();
+        if (errand == null)
+            finish();
 
         serviceConnection = new ServiceConnection() {
             @Override
@@ -212,15 +215,20 @@ public class ErrandActivity extends AppCompatActivity implements Global {
         View viewApplication;
         for (int i = 0; i < 3; i++) {
             viewApplication = View.inflate(this, R.layout.listviewitem_application, linearLayout);
+            ((TextView) viewApplication.findViewById(R.id.textView_applier)).setText("Applier #" + i);
         }
         for (int i = 0; i < 2; i++) {
             viewApplication = View.inflate(this, R.layout.listviewitem_submission, linearLayout);
         }
 
         if (Local.loadAccount().id.equals(errand.publisher.id)) {
-            switch (Errand.State.values()[Integer.parseInt(errand.state)]) {
+            // As publisher
+            switch (errand.state) {
                 case Waiting:
                     buttonDelete.setVisibility(View.VISIBLE);
+                    for (Account applier : errand.applierList) {
+                        viewApplication = View.inflate(this, R.layout.listviewitem_application, linearLayout);
+                    }
                     break;
                 case Ongoing:
                     buttonConversation.setVisibility(View.VISIBLE);
@@ -251,8 +259,9 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                     buttonDelete.setVisibility(View.VISIBLE);
                     break;
             }
-        } else {
-            switch (Errand.State.values()[Integer.parseInt(errand.state)]) {
+        } else if (errand.receiver != null && Local.loadAccount().id.equals(errand.receiver.id)) {
+            // As receiver
+            switch (errand.state) {
                 case Waiting:
                     buttonConversation.setVisibility(View.VISIBLE);
                     buttonApply.setVisibility(View.VISIBLE);
@@ -279,6 +288,14 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                     break;
                 default:
                     buttonConversation.setVisibility(View.VISIBLE);
+                    break;
+            }
+        } else {
+            // As passerby
+            switch (errand.state) {
+                case Waiting:
+                    buttonConversation.setVisibility(View.VISIBLE);
+                    buttonApply.setVisibility(View.VISIBLE);
                     break;
             }
         }
