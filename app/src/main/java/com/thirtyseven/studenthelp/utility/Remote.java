@@ -41,10 +41,10 @@ import okhttp3.WebSocketListener;
 import okio.ByteString;
 
 public class Remote extends Service implements Global {
-    private RequestQueue requestQueue;
-    private OkHttpClient okHttpClient;
-    private String urlHost;
-    private RemoteBinder remoteBinder = new RemoteBinder();
+    static private RequestQueue requestQueue;
+    static private OkHttpClient okHttpClient;
+    static private String urlHost;
+    static public RemoteBinder remoteBinder = new RemoteBinder();
     private boolean success;
 
     @Nullable
@@ -75,7 +75,7 @@ public class Remote extends Service implements Global {
         void execute(ResultCode resultCode, Object object);
     }
 
-    public class RemoteBinder extends Binder {
+    public static class RemoteBinder extends Binder {
 
         String encode(String string) {
             try {
@@ -878,7 +878,7 @@ public class Remote extends Service implements Global {
 
     }
 
-    public final class RemoteWebSocketListener extends WebSocketListener {
+    public static final class RemoteWebSocketListener extends WebSocketListener {
         private static final int NORMAL_CLOSURE_STATUS = 1000;
 
         @Override

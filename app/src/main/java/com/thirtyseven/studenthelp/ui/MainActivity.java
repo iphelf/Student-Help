@@ -21,7 +21,6 @@ import com.thirtyseven.studenthelp.utility.Local;
 import com.thirtyseven.studenthelp.utility.Remote;
 
 public class MainActivity extends AppCompatActivity {
-    private ServiceConnection serviceConnection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,28 +42,6 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
-        serviceConnection = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-                Local.remoteBinder = (Remote.RemoteBinder) iBinder;
-                Local.remoteBinder.startConversation();
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName componentName) {
-
-            }
-        };
-        bindService(
-                new Intent(this, Remote.class),
-                serviceConnection,
-                Service.BIND_AUTO_CREATE
-        );
     }
 
-    @Override
-    public void onDestroy() {
-        unbindService(serviceConnection);
-        super.onDestroy();
-    }
 }

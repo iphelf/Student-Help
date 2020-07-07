@@ -48,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
                 final Account account = new Account();
                 account.id = id;
                 account.password = password;
-                Local.remoteBinder.login(account, new Remote.Listener() {
+                Remote.remoteBinder.login(account, new Remote.Listener() {
                     @Override
                     public void execute(Global.ResultCode resultCode, Object object) {
                         if (resultCode == Global.ResultCode.Succeeded) {
