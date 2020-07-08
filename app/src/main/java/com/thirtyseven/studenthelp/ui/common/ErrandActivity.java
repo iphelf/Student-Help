@@ -27,7 +27,6 @@ import com.thirtyseven.studenthelp.utility.Remote;
 import com.thirtyseven.studenthelp.utility.Utility;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -206,7 +205,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
             @Override
             public void onClick(View view) {
                 Toast.makeText(ErrandActivity.this, R.string.button_submit, Toast.LENGTH_SHORT).show();
-                Remote.remoteBinder.submit(Local.loadAccount(), errand, new Remote.Listener() {
+                Remote.remoteBinder.submit(errand, new Remote.Listener() {
                     @Override
                     public void execute(ResultCode resultCode, Object object) {
                         if (resultCode == ResultCode.Succeeded) {
@@ -299,7 +298,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                     buttonDelete.setVisibility(View.VISIBLE);
                     if (errand.applierList != null && !errand.applierList.isEmpty()) {
                         for (Account applier : errand.applierList) {
-                            pulseList.add(Pair.create(Pulse.Application, applier.getName()));
+                            pulseList.add(Pair.create(Pulse.Application, applier.id));
                         }
                     }
                     break;
@@ -395,7 +394,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
         }
 
         // Show pulse
-        if (mapList.isEmpty()) {
+        if (pulseList.isEmpty()) {
             constraintLayoutPulse.setVisibility(View.GONE);
         } else {
             constraintLayoutPulse.setVisibility(View.VISIBLE);
@@ -430,16 +429,18 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                     Button buttonYes = viewPulse.findViewById(R.id.button_yes);
                     Button buttonNo = viewPulse.findViewById(R.id.button_no);
                     Pulse type = pulseList.get(i).first;
-                    String string = pulseList.get(i).second;
+                    final String string = pulseList.get(i).second;
                     switch (type) {
                         case Application:
                             textViewPulser.setText(string);
                             textViewContent.setText(R.string.string_applicationContent);
                             buttonYes.setText(R.string.button_accept);
+                            final Account applier = new Account();
+                            applier.id = string;
                             buttonYes.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    Remote.remoteBinder.acceptApplication(Local.loadAccount(), errand, new Remote.Listener() {
+                                    Remote.remoteBinder.acceptApplication(applier, errand, new Remote.Listener() {
                                         @Override
                                         public void execute(ResultCode resultCode, Object object) {
                                             refresh();
@@ -451,7 +452,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                             buttonNo.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    Remote.remoteBinder.rejectApplication(Local.loadAccount(), errand, new Remote.Listener() {
+                                    Remote.remoteBinder.rejectApplication(applier, errand, new Remote.Listener() {
                                         @Override
                                         public void execute(ResultCode resultCode, Object object) {
                                             refresh();
@@ -467,7 +468,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                             buttonYes.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    Remote.remoteBinder.submit(Local.loadAccount(), errand, new Remote.Listener() {
+                                    Remote.remoteBinder.checkSubmission(errand, new Remote.Listener() {
                                         @Override
                                         public void execute(ResultCode resultCode, Object object) {
                                             refresh();
@@ -479,7 +480,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                             buttonNo.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    Remote.remoteBinder.rejectSubmission(Local.loadAccount(), errand, new Remote.Listener() {
+                                    Remote.remoteBinder.rejectSubmission(errand, new Remote.Listener() {
                                         @Override
                                         public void execute(ResultCode resultCode, Object object) {
                                             refresh();

@@ -826,11 +826,11 @@ public class Remote extends Service implements Global {
 
         // /errand/push
         public void submit(
-                Account account, final Errand errand,
+                final Errand errand,
                 final Listener listener
         ) { // ErrandActivity.java
             // TO-DO: 完成Remote.submit
-            String param = "?errandId=" + errand.id + "&errandStatus=" + errand.state;
+            String param = "?errandId=" + errand.id + "&errandStatus=" + Errand.State.ToCheck.ordinal();
             call("/errand/push", Request.Method.GET,
                     param,
                     null,
@@ -860,7 +860,7 @@ public class Remote extends Service implements Global {
 
         // /errand/check 返回errand
         public void checkSubmission(
-                Account account, final Errand errand,
+                final Errand errand,
                 final Listener listener
         ) { // ErrandActivity.java
             // TO-DO: 完成Remote.acceptApplication
@@ -903,7 +903,7 @@ public class Remote extends Service implements Global {
 
         // /errand/check 集成在验收
         public void rejectSubmission(
-                Account account, Errand errand,
+                Errand errand,
                 final Listener listener
         ) { // ErrandActivity.java
             // TO-DO: 完成Remote.rejectApplication
