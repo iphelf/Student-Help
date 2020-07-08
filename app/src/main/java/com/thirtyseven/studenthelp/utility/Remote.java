@@ -202,14 +202,14 @@ public class Remote extends Service implements Global {
                             } else {
                                 JSONObject jsonObject = (JSONObject) object;
                                 try {
-                                    if (jsonObject.getInt("code")==0) {
+                                    if (jsonObject.getInt("code") == 0) {
                                         String info;
-                                        info=jsonObject.getString("data");
+                                        info = jsonObject.getString("data");
                                         listener.execute(ResultCode.Succeeded, info);
                                     } else {
                                         listener.execute(ResultCode.Failed, ApilyError.ApilyError);
                                     }
-                                }catch (JSONException e){
+                                } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
                             }
@@ -218,6 +218,7 @@ public class Remote extends Service implements Global {
                     }
             );
         }
+
         public void alipaySuccess(
                 String money, String studentNumber,
                 final Listener listener
@@ -234,12 +235,12 @@ public class Remote extends Service implements Global {
                             } else {
                                 JSONObject jsonObject = (JSONObject) object;
                                 try {
-                                    if (jsonObject.getInt("code")==0) {
+                                    if (jsonObject.getInt("code") == 0) {
                                         listener.execute(ResultCode.Succeeded, null);
                                     } else {
                                         listener.execute(ResultCode.Failed, ApilyError.ApilyError);
                                     }
-                                }catch (JSONException e){
+                                } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
                             }
@@ -248,13 +249,14 @@ public class Remote extends Service implements Global {
                     }
             );
         }
+
         public void withdraw(
-                String money, String studentNumber,String account,
+                String money, String studentNumber, String account,
                 final Listener listener
         ) {
             call(
                     "/alipay/withdraw", Request.Method.POST,
-                    "?studentNumber=" + studentNumber + "&amount=" + money+"&account="+account,
+                    "?studentNumber=" + studentNumber + "&amount=" + money + "&account=" + account,
                     null,
                     new Listener() {
                         @Override
@@ -264,12 +266,12 @@ public class Remote extends Service implements Global {
                             } else {
                                 JSONObject jsonObject = (JSONObject) object;
                                 try {
-                                    if (jsonObject.getInt("code")==0) {
+                                    if (jsonObject.getInt("code") == 0) {
                                         listener.execute(ResultCode.Succeeded, null);
                                     } else {
                                         listener.execute(ResultCode.Failed, ApilyError.ApilyError);
                                     }
-                                }catch (JSONException e){
+                                } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
                             }
@@ -278,6 +280,7 @@ public class Remote extends Service implements Global {
                     }
             );
         }
+
         // /user/login
         public void login(
                 Account account,
@@ -834,6 +837,66 @@ public class Remote extends Service implements Global {
                     });
         }
 
+        // /judge/detailByErrandId
+        public void queryJudge(
+                Errand errand,
+                final Listener listener
+        ) { // ErrantActivity.java
+            call("/judge/detailByErrandId", Request.Method.GET,
+                    "?ErrandId=" + errand.id,
+                    null, new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, QueryJudge.NetworkError);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+                                try {
+                                    switch (jsonObject.getInt("code")) {
+                                        case 0:
+                                            JSONArray jsonArray = jsonObject.getJSONArray("data");
+                                            Judge judge = null;
+                                            if (jsonArray.length() > 0) {
+                                                jsonObject = jsonArray.getJSONObject(0);
+                                                judge = new Judge();
+                                                //       "judgeId": 26,
+                                                judge.id = jsonObject.getString("judgeId");
+                                                //      "judgeErrandId": 29,
+                                                judge.errand = new Errand();
+                                                judge.errand.id = jsonObject.getString("judgeErrandId");
+                                                //      "complainantId": "20171745",
+                                                judge.plaintiff = new Account();
+                                                judge.plaintiff.id = jsonObject.getString("complainantId");
+                                                //      "respondentId": "20176151",
+                                                judge.defendant = new Account();
+                                                judge.defendant.id = jsonObject.getString("respondentId");
+                                                //      "judgeTitle": "Complaint",
+                                                judge.title = jsonObject.getString("judgeTitle");
+                                                //      "judgeReason": "",
+                                                judge.reason = jsonObject.getString("judgeReason");
+                                                //      "JudgeResult"
+                                                judge.result = Judge.Result.values()[jsonObject.getInt("judgeResult")];
+                                                //      "judgeStatus": 0,
+                                                judge.status = Judge.Status.values()[jsonObject.getInt("judgeStatus")];
+                                                //      "createTime": "2020-07-08T14:53:32.000+00:00",
+//                                            judge.createTime
+                                                //      "updateTime": "2020-07-08T14:53:32.000+00:00"
+//                                            judge.updateTime
+                                            }
+                                            listener.execute(ResultCode.Succeeded, judge);
+                                            break;
+                                        default:
+                                            listener.execute(ResultCode.Failed, DisagreeError.DisagreeError);
+                                            break;
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
+        }
+
         // /chat/queryNewestMsg
         public void queryConversationList(
                 Account account,
@@ -918,9 +981,9 @@ public class Remote extends Service implements Global {
         }
 
         // /chat/queryHistoricRecords
-        public void queryConversation(
-                final Conversation conversation,
-                final Listener listener
+        public void queryConversation( // Deprecated
+                                       final Conversation conversation,
+                                       final Listener listener
         ) { // ConversationActivity.java
             String param = "?myId=" + conversation.sender.id + "&otherId=" + conversation.receiver.id;
             call("/chat/queryHistoricRecords", Request.Method.GET,
@@ -1272,9 +1335,12 @@ public class Remote extends Service implements Global {
             for (Listener listener : listenerMap.values()) {
                 listener.execute(ResultCode.Succeeded, message);
             }
-            messageSignature.toSignList.clear();
-            messageSignature.toSignList.add(message);
-            remoteBinder.send(messageSignature);
+            if (!message.id.equals("null")) {
+
+                messageSignature.toSignList.clear();
+                messageSignature.toSignList.add(message);
+                remoteBinder.send(messageSignature);
+            }
         }
 
         @Override

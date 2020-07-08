@@ -46,12 +46,13 @@ public class WalletActivity extends AppCompatActivity {
                        R.string.toast_recharge_success,
                        Toast.LENGTH_SHORT
                ).show();
-//               myCoinNumber=Integer.parseInt(amount);
-//               myCoin.setText(Integer.toString(myCoinNumber));
-//               Remote.remoteBinder.alipaySuccess(amount,studentNumber,new Remote.Listener(){
-//                   public void execute(Global.ResultCode resultCode, Object object) {
-//                   } 
-//               });
+               myCoinNumber=Integer.parseInt(amount);
+               myCoin.setText(Integer.toString(myCoinNumber));
+               Remote.remoteBinder.alipaySuccess(amount,studentNumber,new Remote.Listener(){
+                   public void execute(Global.ResultCode resultCode, Object object) {
+//                       Remote.remoteBinder;
+                   }
+               });
            }
            else{
                Toast.makeText(
@@ -72,8 +73,8 @@ public class WalletActivity extends AppCompatActivity {
         myCoinNumber=0;
         Account account= Local.loadAccount();
         studentNumber=account.id;
-        editRecharge=(EditText)findViewById(R.id.editText_recharge);
-        editWithDraw=(EditText)findViewById(R.id.editText_withdraw);
+        editRecharge= findViewById(R.id.editText_recharge);
+        editWithDraw= findViewById(R.id.editText_withdraw);
         myCoin=findViewById(R.id.textView_myCoin);
         amount=editRecharge.getText().toString();
         apilyAccount="nxiwfa8023@sandbox.com";

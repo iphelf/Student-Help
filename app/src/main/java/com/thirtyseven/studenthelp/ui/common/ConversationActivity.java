@@ -80,6 +80,14 @@ public class ConversationActivity extends AppCompatActivity {
                 push();
             }
         });
+        Remote.remoteBinder.queryConversationList(
+                Local.loadAccount(), new Remote.Listener() {
+                    @Override
+                    public void execute(Global.ResultCode resultCode, Object object) {
+                        conversation = Local.loadConversationMap().get(conversation.receiver.id);
+                    }
+                }
+        );
     }
 
     public void add(Message message) {

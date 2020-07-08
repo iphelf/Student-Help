@@ -364,19 +364,20 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                 case Judging:
                     buttonConversation.setVisibility(View.VISIBLE);
                     buttonDelete.setVisibility(View.VISIBLE);
-                    if (errand.judge.result != null) {
+                    if (errand.judge == null) break;
+                    if (errand.judge.result != null && errand.judge.status == Judge.Status.Ongoing)
                         pulseList.add(Pair.create(Pulse.Result, (errand.judge.result == Judge.Result.FaultOnPublisher ? "Publisher" : "Receiver")));
-                    }
                     break;
                 case CheckFailed:
                     buttonConversation.setVisibility(View.VISIBLE);
                     buttonDelete.setVisibility(View.VISIBLE);
-                    pulseList.add(Pair.create(Pulse.Judge, ""));
+//                    pulseList.add(Pair.create(Pulse.Judge, ""));
                     break;
                 case Complete:
                     buttonConversation.setVisibility(View.VISIBLE);
                     buttonDelete.setVisibility(View.VISIBLE);
-                    buttonComment.setVisibility(View.GONE); // ?
+                    constraintLayoutComment.setVisibility(View.VISIBLE);
+                    buttonComment.setVisibility(View.GONE);
                     break;
                 case ToCheck:
                     buttonConversation.setVisibility(View.VISIBLE);
@@ -403,9 +404,9 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                     break;
                 case Judging:
                     buttonConversation.setVisibility(View.VISIBLE);
-                    if (errand.judge.result != null) {
+                    if (errand.judge == null) break;
+                    if (errand.judge.result != null && errand.judge.status == Judge.Status.Ongoing)
                         pulseList.add(Pair.create(Pulse.Result, (errand.judge.result == Judge.Result.FaultOnPublisher ? "Publisher" : "Receiver")));
-                    }
                     break;
                 case CheckFailed:
                     buttonConversation.setVisibility(View.VISIBLE);
@@ -413,6 +414,8 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                     break;
                 case Complete:
                     buttonConversation.setVisibility(View.VISIBLE);
+                    constraintLayoutComment.setVisibility(View.VISIBLE);
+                    buttonComment.setVisibility(View.GONE);
                     break;
                 case ToCheck:
                     buttonConversation.setVisibility(View.VISIBLE);
@@ -674,7 +677,14 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                             @Override
                             public void execute(ResultCode resultCode, Object object) {
                                 errand = (Errand) object;
-                                push();
+                                Remote.remoteBinder.queryJudge(errand, new Remote.Listener() {
+                                    @Override
+                                    public void execute(ResultCode resultCode, Object object) {
+                                        if (resultCode == ResultCode.Succeeded)
+                                            errand.judge = (Judge) object;
+                                        push();
+                                    }
+                                });
                             }
                         });
                     }
