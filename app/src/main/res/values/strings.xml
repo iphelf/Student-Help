@@ -101,5 +101,9 @@
     <string name="button_send">Send</string>
     <string name="toast_complainError">Complain failed!</string>
     <string name="hint_newComment">Please input comment</string>
+    <string name="toast_recharge_success">Recharge Success!</string>
+    <string name="toast_recharge_failed">Recharge Failed!</string>
+    <string name="toast_withdraw_success">Withdraw Success!</string>
+    <string name="toast_withdraw_failed">Withdraw Failed!</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

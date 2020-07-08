@@ -218,13 +218,43 @@ public class Remote extends Service implements Global {
                     }
             );
         }
-        public void withdraw(
-                int money, int studentNumber,
+        public void alipaySuccess(
+                String money, String studentNumber,
                 final Listener listener
         ) {
             call(
-                    "/alipay/recharge", Request.Method.POST,
+                    "/alipay/success", Request.Method.GET,
                     "?studentNumber=" + studentNumber + "&amount=" + money,
+                    null,
+                    new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, ApilyError.NetworkError);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+                                try {
+                                    if (jsonObject.getInt("code")==0) {
+                                        listener.execute(ResultCode.Succeeded, null);
+                                    } else {
+                                        listener.execute(ResultCode.Failed, ApilyError.ApilyError);
+                                    }
+                                }catch (JSONException e){
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+
+                    }
+            );
+        }
+        public void withdraw(
+                String money, String studentNumber,String account,
+                final Listener listener
+        ) {
+            call(
+                    "/alipay/withdraw", Request.Method.POST,
+                    "?studentNumber=" + studentNumber + "&amount=" + money+"&account="+account,
                     null,
                     new Listener() {
                         @Override
