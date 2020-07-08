@@ -21,15 +21,10 @@ import com.thirtyseven.studenthelp.utility.Remote;
 
 import java.util.ArrayList;
 
-import okhttp3.WebSocket;
-
 public class ConversationActivity extends AppCompatActivity {
-    // 每隔2秒发送一次心跳包，检测连接没有断开
-    private static final long HEART_BEAT_RATE = 5 * 1000;
     Conversation conversation;
     MessageAdapter messageAdapter;
     ListView list_conversation;
-    WebSocket webSocket;
     private EditText editTextMsg;
     private Button buttonSend;
     private String msg;
@@ -150,5 +145,6 @@ public class ConversationActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Remote.remoteBinder.unsubscribe(Local.loadAccount().id);
     }
 }

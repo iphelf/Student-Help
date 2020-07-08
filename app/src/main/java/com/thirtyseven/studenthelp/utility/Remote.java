@@ -8,7 +8,6 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.android.volley.NetworkError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -102,6 +101,10 @@ public class Remote extends Service implements Global {
             listenerMap.put(id, listener);
         }
 
+        public void unsubscribe(String id) {
+            listenerMap.remove(id);
+        }
+
         String encode(String string) {
             try {
                 string = URLEncoder.encode(string, "utf-8");
@@ -109,8 +112,6 @@ public class Remote extends Service implements Global {
             }
             return string;
         }
-
-
 
         private void call(
                 String route, int method, String param, JSONObject body,
@@ -150,6 +151,7 @@ public class Remote extends Service implements Global {
                 if (item.has("applierId")) {
                     errand.applierList = new ArrayList<>();
                     for (String applierId : item.getString("applierId").split("\\s*,\\s*")) {
+                        if (applierId.trim().length() == 0) continue;
                         Account applier = new Account();
                         applier.id = applierId;
                         errand.applierList.add(applier);
@@ -265,8 +267,6 @@ public class Remote extends Service implements Global {
                 Account account, String keyword, int tag, int state,
                 final Listener listener
         ) { // HomeFragment.java
-            // TODO: 完成Remote.queryErrandList
-            //  返回值object中存放List<Errand>
             if (account != null) {
                 final List<Errand> errandList = new ArrayList<>();
                 String queryUrl = ""; //根据选择的类型调用不同的url
@@ -438,7 +438,6 @@ public class Remote extends Service implements Global {
                 Errand errand,
                 final Listener listener
         ) { // PublishActivity.java
-            // TODO: 完成Remote.publish
             call("/errand/publish", Request.Method.POST,
                     "?errandDescription=" + encode(errand.content) + "&errandItem=" + errand.tag.ordinal() +
                             "&errandMoney=" + errand.money + "&errandTitle=" + encode(errand.title) + "&publisherId=" + errand.publisher.id,
@@ -541,14 +540,13 @@ public class Remote extends Service implements Global {
         }
 
         // /errand/newComment
-        public void comment(
+        public void newComment(
                 Account account, Errand errand, Comment comment,
                 final Listener listener
         ) { // ErrandActivity.java
-            // TODO: 完成Remote.comment
             call("/errand/newComment", Request.Method.POST,
-                    "?commentContent=" + comment.content + "&commentScore" + comment.score
-                            + "&errandId" + errand.id + "&userId" + account.id,
+                    "?commentContent=" + encode(comment.content) + "&commentScore=" + comment.score
+                            + "&errandId=" + errand.id + "&userId=" + account.id,
                     null,
                     new Listener() {
                         @Override
@@ -579,8 +577,8 @@ public class Remote extends Service implements Global {
                 final Listener listener
         ) {
             call("/errand/comment", Request.Method.GET,
-                    "?viewType=" + comment.type
-                            + "&errandId" + errand.id + "&userId" + account.id,
+                    "?viewType=" + comment.type.ordinal()
+                            + "&errandId=" + errand.id + "&userId=" + account.id,
                     null,
                     new Listener() {
                         @Override
@@ -592,7 +590,16 @@ public class Remote extends Service implements Global {
                                 try {
                                     switch (jsonObject.getInt("code")) {
                                         case 0:
-                                            listener.execute(ResultCode.Succeeded, null);
+                                            jsonObject = jsonObject.getJSONObject("data");
+                                            Comment comment = new Comment();
+                                            comment.id = jsonObject.getString("commentId");
+                                            comment.commenter = new Account();
+                                            comment.commenter.id = jsonObject.getString("userId");
+                                            comment.errand = new Errand();
+                                            comment.errand.id = jsonObject.getString("errandId");
+                                            comment.score = (float) jsonObject.getDouble("commentScore");
+                                            comment.content = jsonObject.getString("commentContent");
+                                            listener.execute(ResultCode.Succeeded, comment);
                                             break;
                                         default:
                                             listener.execute(ResultCode.Failed, NewCommentError.CommentError);
@@ -606,22 +613,21 @@ public class Remote extends Service implements Global {
                     });
         }
 
-        // ?
+        // /judge/newJudge
         public void newJudge(
                 Account account, Judge judge, Errand errand,
                 final Listener listener
         ) { // ErrandActivity.java
-            // TODO
             call("/judge/newJudge", Request.Method.POST,
-                    "?complainantId=" + judge.id
-                            + "&judgeErrandId" + errand.id + "&judgeImage" + judge.image
-                            + "&judgeReason" + judge.reason + "&judgeTitle" + judge.title + "&respondentId" + errand.receiver.id,
+                    "?complainantId=" + account.id
+                            + "&judgeErrandId=" + errand.id + "&judgeImage=" + encode(judge.image)
+                            + "&judgeReason=" + encode(judge.reason) + "&judgeTitle=" + encode(judge.title) + "&respondentId=" + errand.receiver.id,
                     null,
                     new Listener() {
                         @Override
                         public void execute(ResultCode resultCode, Object object) {
                             if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
-                                listener.execute(ResultCode.Failed, NewCommentError.NetworkError);
+                                listener.execute(ResultCode.Failed, NewJudgeError.NetworkError);
                             } else {
                                 JSONObject jsonObject = (JSONObject) object;
                                 try {
@@ -630,7 +636,7 @@ public class Remote extends Service implements Global {
                                             listener.execute(ResultCode.Succeeded, null);
                                             break;
                                         default:
-                                            listener.execute(ResultCode.Failed, NewCommentError.CommentError);
+                                            listener.execute(ResultCode.Failed, NewJudgeError.NewJudgeError);
                                             break;
                                     }
                                 } catch (JSONException e) {
@@ -641,20 +647,35 @@ public class Remote extends Service implements Global {
                     });
         }
 
-        // ?
-        public void supressJudge(
+        // /errand/noJudge
+        public void suppressJudge(
                 Account account, Errand errand,
                 final Listener listener
         ) { // ErrandActivity.java
-            // TODO
-        }
-
-        // /judge/agree
-        public void disagreeJudge(
-                Account account, Judge judge,
-                final Listener listener
-        ) { // ErrandActivity.java
-            // TODO
+            call("/errand/noJudge", Request.Method.GET,
+                    "?errandId=" + errand.id + "&errandStatus=" + Errand.State.NotEvaluate.ordinal(),
+                    null, new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, SuppressError.NetworkError);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+                                try {
+                                    switch (jsonObject.getInt("code")) {
+                                        case 0:
+                                            listener.execute(ResultCode.Succeeded, null);
+                                            break;
+                                        default:
+                                            listener.execute(ResultCode.Failed, SuppressError.SuppressError);
+                                            break;
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
         }
 
         // /judge/agree
@@ -662,7 +683,61 @@ public class Remote extends Service implements Global {
                 Account account, Judge judge,
                 final Listener listener
         ) { // ErrandActivity.java
-            // TODO
+            call("/judge/agree", Request.Method.POST,
+                    "?isAgree=1&judgeId=" + judge.id + "&studentNumber=" + account.id,
+                    null, new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, AgreeError.NetworkError);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+                                try {
+                                    switch (jsonObject.getInt("code")) {
+                                        case 0:
+                                            listener.execute(ResultCode.Succeeded, null);
+                                            break;
+                                        default:
+                                            listener.execute(ResultCode.Failed, AgreeError.AgreeError);
+                                            break;
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
+        }
+
+        // /judge/agree
+        public void disagreeJudge(
+                Account account, Judge judge,
+                final Listener listener
+        ) { // ErrandActivity.java
+            call("/judge/agree", Request.Method.POST,
+                    "?isAgree=0&judgeId=" + judge.id + "&studentNumber=" + account.id,
+                    null, new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, DisagreeError.NetworkError);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+                                try {
+                                    switch (jsonObject.getInt("code")) {
+                                        case 0:
+                                            listener.execute(ResultCode.Succeeded, null);
+                                            break;
+                                        default:
+                                            listener.execute(ResultCode.Failed, DisagreeError.DisagreeError);
+                                            break;
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
         }
 
         // /chat/queryNewestMsg
@@ -670,8 +745,6 @@ public class Remote extends Service implements Global {
                 Account account,
                 final Listener listener
         ) { // NoticeConversationActivity.java
-            // TODO: 完成Remote.queryConversationList
-            //  返回值object中存放List<Conversation>
 
             call("/chat/queryNewestMsg", Request.Method.GET,
                     "?studentNumber=" + account.id,
@@ -755,8 +828,6 @@ public class Remote extends Service implements Global {
                 final Conversation conversation,
                 final Listener listener
         ) { // ConversationActivity.java
-            // TODO: 完成Remote.queryConversation
-            //  返回值object中存放Conversation
             String param = "?myId=" + conversation.sender.id + "&otherId=" + conversation.receiver.id;
             call("/chat/queryHistoricRecords", Request.Method.GET,
                     param,
@@ -795,32 +866,6 @@ public class Remote extends Service implements Global {
                             }
                         }
                     });
-        }
-
-        // ws://129.211.5.147:8088/ws
-        public void sendMessage(
-                Message message,
-                final Listener listener
-        ) { // ConversationActivity.java
-            // TODO: 完成Remote.sendMessage
-        }
-
-        // /chat/queryErrandHistoricRecords
-        public void queryAnnouncementList(
-                Account account,
-                final Listener listener
-        ) { // NoticeAnnouncementActivity.java
-            // TODO: 完成Remote.queryAnnouncementList
-            //  返回值object中存放List<Announcement>
-        }
-
-        // ?
-        public void queryProgressList(
-                Account account,
-                final Listener listener
-        ) { // NoticeProgressActivity.java
-            // TODO: 完成Remote.queryProgressList
-            //  返回值object中存放List<Progress>
         }
 
         // /errand/apply
@@ -1006,7 +1051,7 @@ public class Remote extends Service implements Global {
                 final Listener listener
         ) { // ErrandActivity.java
             // TO-DO: 完成Remote.acceptApplication
-            String param = "?errandId=" + errand.id + "&errandStatus=" + errand.state;
+            String param = "?errandId=" + errand.id + "&errandStatus=" + Errand.State.NotEvaluate.ordinal();
             call("/errand/check", Request.Method.GET,
                     param,
                     null,
@@ -1049,6 +1094,41 @@ public class Remote extends Service implements Global {
                 final Listener listener
         ) { // ErrandActivity.java
             // TO-DO: 完成Remote.rejectApplication
+            String param = "?errandId=" + errand.id + "&errandStatus=" + Errand.State.CheckFailed.ordinal();
+            call("/errand/check", Request.Method.GET,
+                    param,
+                    null,
+                    new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, CheckError.NetworkError);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+
+                                try {
+                                    switch (jsonObject.getInt("code")) {
+                                        case 0:
+                                            JSONObject Msg = jsonObject.getJSONObject("data");
+                                            String msg = Msg.getString("message");
+                                            if (msg.equals("验收失败")) {
+                                                listener.execute(ResultCode.Succeeded, CheckState.CheckRefused);
+                                            } else if (msg.equals("待评价")) {
+                                                listener.execute(ResultCode.Succeeded, CheckState.CheckSucceed);
+                                            } else {
+                                                listener.execute(ResultCode.Succeeded, CheckState.InputRightState);
+                                            }
+                                            break;
+                                        default:
+                                            listener.execute(ResultCode.Failed, CheckError.CheckError);
+                                            break;
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
         }
     }
 
@@ -1079,7 +1159,7 @@ public class Remote extends Service implements Global {
 
         @Override
         public void onClosing(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
-            Log.d("Debug", "onClosing(): "+reason);
+            Log.d("Debug", "onClosing(): " + reason);
             super.onClosing(webSocket, code, reason);
         }
 
