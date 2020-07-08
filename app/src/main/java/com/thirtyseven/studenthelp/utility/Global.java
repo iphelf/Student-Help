@@ -89,4 +89,7 @@ public interface Global {
     enum NewCommentError{
         NetworkError,CommentError
     }
+    enum ApilyError{
+        NetworkError,ApilyError
+    }
 }

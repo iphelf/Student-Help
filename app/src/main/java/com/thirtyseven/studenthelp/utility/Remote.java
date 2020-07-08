@@ -89,7 +89,6 @@ public class Remote extends Service implements Global {
         }
 
 
-
         private void call(
                 String route, int method, String param, JSONObject body,
                 final Listener listener
@@ -151,6 +150,7 @@ public class Remote extends Service implements Global {
             }
         }
 
+
         //        {"msg":"server","signFlag":0,"senderId":"server",
 //                "createTime":1593854476000,"msgId":"1593854476193-server-20171722-3429","action":5}
         public void responseMessage(Message message, JSONObject item) {
@@ -168,6 +168,68 @@ public class Remote extends Service implements Global {
 
         }
 
+        public void recharge(
+                String money, String studentNumber,
+                final Listener listener
+        ) {
+            call(
+                    "/alipay/recharge", Request.Method.POST,
+                    "?studentNumber=" + studentNumber + "&amount=" + money,
+                    null,
+                    new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, ApilyError.NetworkError);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+                                try {
+                                    if (jsonObject.getInt("code")==0) {
+                                        String info;
+                                        info=jsonObject.getString("data");
+                                        listener.execute(ResultCode.Succeeded, info);
+                                    } else {
+                                        listener.execute(ResultCode.Failed, ApilyError.ApilyError);
+                                    }
+                                }catch (JSONException e){
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+
+                    }
+            );
+        }
+        public void withdraw(
+                int money, int studentNumber,
+                final Listener listener
+        ) {
+            call(
+                    "/alipay/recharge", Request.Method.POST,
+                    "?studentNumber=" + studentNumber + "&amount=" + money,
+                    null,
+                    new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, ApilyError.NetworkError);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+                                try {
+                                    if (jsonObject.getInt("code")==0) {
+                                        listener.execute(ResultCode.Succeeded, null);
+                                    } else {
+                                        listener.execute(ResultCode.Failed, ApilyError.ApilyError);
+                                    }
+                                }catch (JSONException e){
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+
+                    }
+            );
+        }
         // /user/login
         public void login(
                 Account account,
