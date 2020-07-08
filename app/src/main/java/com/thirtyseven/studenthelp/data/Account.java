@@ -7,8 +7,9 @@ public class Account {
     public String password;
     public String nickname;
     public String realName;
-    public BigDecimal credit;
-    public BigDecimal capital;
+    public String credit;
+    public String capital;
+    public String userImage;
 
     public String getName() {
         if (nickname != null) return nickname;
@@ -17,7 +18,7 @@ public class Account {
     }
 
     public String getCredit() {
-        if (credit != null) return credit.toString();
+        if (credit != null) return credit;
         return "";
     }
 

@@ -22,63 +22,69 @@ import com.thirtyseven.studenthelp.utility.Global;
 import com.thirtyseven.studenthelp.utility.Local;
 import com.thirtyseven.studenthelp.utility.Remote;
 
+import java.util.List;
 import java.util.Map;
 
 public class WalletActivity extends AppCompatActivity {
     private Button rechargeBtn;
+    private Button withdrawBtn;
     private static final int SDK_PAY_FLAG = 1;
     private static final int SDK_AUTH_FLAG = 2;
     private String amount;
     private String studentNumber;
     private String apilyAccount;
     private EditText editRecharge;
-    private EditText editWithDraw;
+    private EditText editWithdraw;
     private TextView myCoin;
-    private int myCoinNumber;
+    private int myCoinNumber=0;
     private Account account;
+    private String ordNo;
+    @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
-       @Override
-       public void handleMessage(Message msg) {
-           super.handleMessage(msg);
-           if (msg.what == SDK_PAY_FLAG) {
-               Toast.makeText(
-                       WalletActivity.this,
-                       R.string.toast_recharge_success,
-                       Toast.LENGTH_SHORT
-               ).show();
-               myCoinNumber=Integer.parseInt(amount);
-               myCoin.setText(Integer.toString(myCoinNumber));
-               Remote.remoteBinder.alipaySuccess(amount,studentNumber,new Remote.Listener(){
-                   public void execute(Global.ResultCode resultCode, Object object) {
-//                       Remote.remoteBinder;
-                   }
-               });
-           }
-           else{
-               Toast.makeText(
-                       WalletActivity.this,
-                       R.string.toast_recharge_failed,
-                       Toast.LENGTH_SHORT
-               ).show();
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == SDK_PAY_FLAG) {
+                Toast.makeText(
+                        WalletActivity.this,
+                        R.string.toast_recharge_success,
+                        Toast.LENGTH_SHORT
+                ).show();
+                Remote.remoteBinder.alipaySuccess(amount, studentNumber, ordNo, new Remote.Listener() {
+                    public void execute(Global.ResultCode resultCode, Object object) {
+                        myCoinNumber=Integer.parseInt(editRecharge.getText().toString());
+                        myCoinNumber=myCoinNumber+Integer.parseInt(account.capital);
+                        account.capital=Integer.toString(myCoinNumber);
+                        myCoin.setText(account.capital);
+                    }
+                });
+            } else {
+                Toast.makeText(
+                        WalletActivity.this,
+                        R.string.toast_recharge_failed,
+                        Toast.LENGTH_SHORT
+                ).show();
 
-           }
-       }
-   };
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         EnvUtils.setEnv(EnvUtils.EnvEnum.SANDBOX);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wallet);
         setTitle(R.string.title_wallet);
-        myCoinNumber=0;
-        Account account= Local.loadAccount();
-        studentNumber=account.id;
-        editRecharge= findViewById(R.id.editText_recharge);
-        editWithDraw= findViewById(R.id.editText_withdraw);
-        myCoin=findViewById(R.id.textView_myCoin);
-        amount=editRecharge.getText().toString();
-        apilyAccount="nxiwfa8023@sandbox.com";
-        rechargeBtn=findViewById(R.id.button_recharge);
+        account = Local.loadAccount();
+        studentNumber = account.id;
+        editRecharge = (EditText) findViewById(R.id.editText_recharge);
+        editWithdraw = (EditText) findViewById(R.id.editText_withdraw);
+        myCoin = findViewById(R.id.textView_coinNum);
+        amount = editRecharge.getText().toString();
+        myCoin.setText(account.capital);
+        apilyAccount = "nxiwfa8023@sandbox.com";
+        rechargeBtn = findViewById(R.id.button_recharge);
+        withdrawBtn = findViewById(R.id.button_withdrawal);
         rechargeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -102,8 +108,53 @@ public class WalletActivity extends AppCompatActivity {
                             // 必须异步调用
                             Thread payThread = new Thread(payRunnable);
                             payThread.start();
-                        }else{
+                        } else {
+                            Toast.makeText(
+                                    WalletActivity.this,
+                                    R.string.toast_networkError,
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                        }
+                    }
+                });
+            }
+        });
+        withdrawBtn.setOnClickListener(new View.OnClickListener() {
 
+            @Override
+            public void onClick(View view) {
+                amount = editWithdraw.getText().toString();
+                Remote.remoteBinder.withdraw(amount, studentNumber,apilyAccount, new Remote.Listener() {
+                    public void execute(Global.ResultCode resultCode, Object object) {
+                        if (resultCode == Global.ResultCode.Succeeded) {
+                            if (resultCode == Global.ResultCode.Succeeded) {
+
+                                if (object == null) {
+                                    Toast.makeText(
+                                            WalletActivity.this,
+                                            R.string.toast_withdraw_success,
+                                            Toast.LENGTH_SHORT
+                                    ).show();
+                                } else {
+                                    Toast.makeText(
+                                            WalletActivity.this,
+                                            R.string.toast_withdraw_money,
+                                            Toast.LENGTH_SHORT
+                                    ).show();
+                                }
+                            } else {
+                                Toast.makeText(
+                                        WalletActivity.this,
+                                        R.string.toast_withdraw_failed,
+                                        Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        } else {
+                            Toast.makeText(
+                                    WalletActivity.this,
+                                    R.string.toast_withdraw_failed,
+                                    Toast.LENGTH_SHORT
+                            ).show();
                         }
                     }
                 });

@@ -103,9 +103,10 @@
     <string name="toast_recharge_success">充值成功！</string>
     <string name="toast_recharge_failed">充值失败！</string>
     <string name="toast_withdraw_success">提现成功！</string>
-    <string name="toast_withdraw_failed">提现失败！</string>
+    <string name="toast_withdraw_failed">支付繁忙，请稍后再试！</string>
     <string name="toast_complainError">申诉失败！</string>
     <string name="hint_newComment">请输入评论</string>
+    <string name="toast_withdraw_money">余额不足！</string>
     <string name="string_judge_waitingForOpponent">请等待对方做出选择</string>
     <string name="string_judge_waitingForJudge">请等待管理员做出决策</string>
 </resources>

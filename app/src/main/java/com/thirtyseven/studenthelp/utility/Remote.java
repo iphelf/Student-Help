@@ -202,14 +202,20 @@ public class Remote extends Service implements Global {
                             } else {
                                 JSONObject jsonObject = (JSONObject) object;
                                 try {
-                                    if (jsonObject.getInt("code") == 0) {
+                                    if (jsonObject.getInt("code")==0) {
                                         String info;
-                                        info = jsonObject.getString("data");
-                                        listener.execute(ResultCode.Succeeded, info);
+                                        String outTradeNo;
+                                        List<String> list=new ArrayList<>();
+                                        JSONObject data=jsonObject.getJSONObject("data");
+                                        info=data.getString("form:");
+                                        outTradeNo=data.getString("outTradeNo:");
+                                        list.add(info);
+                                        list.add(outTradeNo);
+                                        listener.execute(ResultCode.Succeeded, list);
                                     } else {
                                         listener.execute(ResultCode.Failed, ApilyError.ApilyError);
                                     }
-                                } catch (JSONException e) {
+                                }catch (JSONException e){
                                     e.printStackTrace();
                                 }
                             }
@@ -220,12 +226,13 @@ public class Remote extends Service implements Global {
         }
 
         public void alipaySuccess(
-                String money, String studentNumber,
+                String money, String studentNumber, String ordNo,
                 final Listener listener
         ) {
             call(
                     "/alipay/success", Request.Method.GET,
-                    "?studentNumber=" + studentNumber + "&amount=" + money,
+                    "?studentNumber=" + studentNumber + "&amount=" + money
+                    +"&outTradeNo="+ordNo,
                     null,
                     new Listener() {
                         @Override
@@ -268,6 +275,8 @@ public class Remote extends Service implements Global {
                                 try {
                                     if (jsonObject.getInt("code") == 0) {
                                         listener.execute(ResultCode.Succeeded, null);
+                                    }else if(jsonObject.getInt("code")==4011){
+                                        listener.execute(ResultCode.Succeeded, ApilyError.MoneyNotInEnough);
                                     } else {
                                         listener.execute(ResultCode.Failed, ApilyError.ApilyError);
                                     }
@@ -279,6 +288,42 @@ public class Remote extends Service implements Global {
 
                     }
             );
+        }
+        public void information(
+                Account account,
+                final Listener listener
+        ){
+            call(
+                    "/user/findUser", Request.Method.GET,
+                    "?studentNumber=" + account.id,
+                    null,
+                    new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, LoginError.NetworkError);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+                                try {
+                                    Account account=new Account();
+                                    JSONObject data=jsonObject.getJSONObject("data");
+                                    if(jsonObject.getInt("code")==0){
+                                        account.id=data.getString("userStudentNumber");
+                                        account.realName=data.getString("userRealName");
+                                        account.nickname=data.getString("userNickname");
+                                        account.credit=data.getString("userCredit");
+                                        account.capital=data.getString("userMoney");
+                                        account.userImage=data.getString("userAvatar");
+                                        listener.execute(ResultCode.Succeeded,account);
+                                    }else{
+                                        listener.execute(ResultCode.Failed, LoginError.LoginError);
+                                    }
+                                }catch (JSONException e){
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
         }
 
         // /user/login
@@ -1014,9 +1059,9 @@ public class Remote extends Service implements Global {
         }
 
         // /chat/queryHistoricRecords
-        public void queryConversation( // Deprecated
-                                       final Conversation conversation,
-                                       final Listener listener
+        public void queryConversation(
+                final Conversation conversation,
+                final Listener listener
         ) { // ConversationActivity.java
             String param = "?myId=" + conversation.sender.id + "&otherId=" + conversation.receiver.id;
             call("/chat/queryHistoricRecords", Request.Method.GET,

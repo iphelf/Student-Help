@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
+    private  Account account;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,16 +46,30 @@ public class LoginActivity extends AppCompatActivity {
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String id = editTextStudentId.getText().toString().trim();
-                String password = editTextPassword.getText().toString().trim();
-                final Account account = new Account();
+                final String id = editTextStudentId.getText().toString().trim();
+                final String password = editTextPassword.getText().toString().trim();
+                account = new Account();
                 account.id = id;
                 account.password = password;
                 Remote.remoteBinder.login(account, new Remote.Listener() {
                     @Override
                     public void execute(Global.ResultCode resultCode, Object object) {
                         if (resultCode == Global.ResultCode.Succeeded) {
-                            Local.saveAccount(account);
+                            Remote.remoteBinder.information(account, new Remote.Listener() {
+                                public void execute(Global.ResultCode resultCode, Object object) {
+                                    if (resultCode == Global.ResultCode.Succeeded) {
+                                        account=(Account) object;
+                                        Local.saveAccount(account);
+                                    }else{
+                                        Toast.makeText(
+                                                LoginActivity.this,
+                                                R.string.toast_networkError,
+                                                Toast.LENGTH_SHORT
+                                        ).show();
+                                    }
+                                }
+                            });
+
                             Remote.remoteBinder.connect(account);
                             Remote.remoteBinder.queryConversationList(account, new Remote.Listener() {
                                 @Override

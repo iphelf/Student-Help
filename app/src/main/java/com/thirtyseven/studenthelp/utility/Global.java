@@ -106,10 +106,10 @@ public interface Global {
     enum DisagreeError {
         NetworkError, DisagreeError
     }
-
     enum ApilyError {
-        NetworkError, ApilyError
+        NetworkError, ApilyError, MoneyNotInEnough
     }
+
 
     enum QueryJudge {
         NetworkError, QueryJudgeError
