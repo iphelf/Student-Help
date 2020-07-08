@@ -55,6 +55,7 @@ public class LoginActivity extends AppCompatActivity {
                     public void execute(Global.ResultCode resultCode, Object object) {
                         if (resultCode == Global.ResultCode.Succeeded) {
                             Local.saveAccount(account);
+                            Remote.remoteBinder.connect(account);
                             Remote.remoteBinder.queryConversationList(account, new Remote.Listener() {
                                 @Override
                                 public void execute(Global.ResultCode resultCode, Object object) {

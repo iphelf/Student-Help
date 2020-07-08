@@ -37,6 +37,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import okhttp3.OkHttpClient;
 import okhttp3.WebSocket;
@@ -47,8 +48,10 @@ public class Remote extends Service implements Global {
     private static RequestQueue requestQueue;
     private static OkHttpClient okHttpClient;
     private static String urlHost;
+    private static String urlWs;
     static public RemoteBinder remoteBinder = new RemoteBinder();
-    private boolean success;
+    static public WebSocket webSocket;
+    static public Map<String, Listener> listenerMap;
 
     @Nullable
     @Override
@@ -61,7 +64,9 @@ public class Remote extends Service implements Global {
         super.onCreate();
         requestQueue = Volley.newRequestQueue(this);
         okHttpClient = new OkHttpClient();
-        urlHost = getString(R.string.urlHost);
+        urlHost = getString(R.string.url_host);
+        urlWs = getString(R.string.url_ws);
+        listenerMap = new HashMap<>();
     }
 
     @Override
@@ -79,6 +84,23 @@ public class Remote extends Service implements Global {
     }
 
     public static class RemoteBinder extends Binder {
+
+        public void connect(Account account) {
+            okhttp3.Request request = new okhttp3.Request.Builder().url(urlWs).build();
+            RemoteWebSocketListener listener = new RemoteWebSocketListener();
+            webSocket = okHttpClient.newWebSocket(request, listener);
+            okHttpClient.dispatcher().executorService().shutdown();
+        }
+
+        public void send(Message message) {
+            String text = message.pack();
+            webSocket.send(text);
+            Log.e("WebSocket", "Sent: " + text);
+        }
+
+        public void subscribe(String id, Listener listener) {
+            listenerMap.put(id, listener);
+        }
 
         String encode(String string) {
             try {
@@ -114,14 +136,6 @@ public class Remote extends Service implements Global {
             );
             requestQueue.add(jsonObjectRequest);
             Log.d("Debug", "call: " + url);
-        }
-
-        public void startConversation() {
-            okhttp3.Request request = new okhttp3.Request.Builder().url("ws://129.211.5.147:8088/ws").build();
-            RemoteWebSocketListener listener = new RemoteWebSocketListener();
-            WebSocket webSocket = okHttpClient.newWebSocket(request, listener);
-            webSocket.send("{\"action\":1,\"chatMsg\":{\"senderId\":\"20176151\",\"receiverId\":\"20171722\",\"msg\":\"Hello, this is iphelf\",\"msgId\":null},\"extend\":null}");
-            okHttpClient.dispatcher().executorService().shutdown();
         }
 
         public void responseErrand(Errand errand, JSONObject item) {
@@ -685,7 +699,7 @@ public class Remote extends Service implements Global {
                                             conversation.receiver = new Account();
                                             conversation.receiver.id = msg.sender.id;
                                             if (conversation.messageList == null)
-                                                conversation.messageList = new ArrayList<>();
+                                                conversation.messageList = new Vector<>();
                                             conversation.messageList.add(msg);
                                             conversationList.add(conversation);
                                         } else {
@@ -703,7 +717,7 @@ public class Remote extends Service implements Global {
                                                 conversation.receiver = new Account();
                                                 conversation.receiver.id = msg.sender.id;
                                                 if (conversation.messageList == null)
-                                                    conversation.messageList = new ArrayList<>();
+                                                    conversation.messageList = new Vector<>();
                                                 conversation.messageList.add(msg);
                                                 conversationList.add(conversation);
                                             }
@@ -758,7 +772,7 @@ public class Remote extends Service implements Global {
                                     switch (jsonObject.getInt("code")) {
                                         case 0:
                                             JSONArray jsonMessage = jsonObject.getJSONArray("data");
-                                            conversation.messageList = new ArrayList<>();
+                                            conversation.messageList = new Vector<>();
                                             for (int i = 0; i < jsonMessage.length(); i++) {
                                                 final Message msg = new Message();
                                                 JSONObject Msg = jsonMessage.getJSONObject(i);
@@ -1040,11 +1054,21 @@ public class Remote extends Service implements Global {
 
     public static final class RemoteWebSocketListener extends WebSocketListener {
         private static final int NORMAL_CLOSURE_STATUS = 1000;
+        Message messageConnect;
+        Message messageSignature;
 
         @Override
         public void onOpen(@NotNull WebSocket webSocket, @NotNull okhttp3.Response response) {
             Log.d("Debug", "onOpen()");
             super.onOpen(webSocket, response);
+            messageConnect = new Message();
+            messageConnect.type = Message.Type.Connect;
+            messageConnect.sender = Local.loadAccount();
+            messageSignature = new Message();
+            messageSignature.sender = Local.loadAccount();
+            messageSignature.type = Message.Type.Sign;
+            messageSignature.toSignList = new ArrayList<>();
+            remoteBinder.send(messageConnect);
         }
 
         @Override
@@ -1055,40 +1079,34 @@ public class Remote extends Service implements Global {
 
         @Override
         public void onClosing(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
-            Log.d("Debug", "onClosing()");
+            Log.d("Debug", "onClosing(): "+reason);
             super.onClosing(webSocket, code, reason);
         }
 
         @Override
         public void onFailure(@NotNull WebSocket webSocket, @NotNull Throwable
                 t, @org.jetbrains.annotations.Nullable okhttp3.Response response) {
-            Log.d("Debug", "onFailure()");
+            Log.d("Debug", "onFailure(): ");
             super.onFailure(webSocket, t, response);
         }
 
         @Override
         public void onMessage(@NotNull WebSocket webSocket, @NotNull String text) {
-            Log.d("Debug", "onMessage()");
+            Log.e("WebSocket", "Received: " + text);
             super.onMessage(webSocket, text);
-            System.out.println("onMessage: " + text);
-//            Message message = Message.unpack(text);
-//            for (Listener listener : listenerMap.values()) {
-//                listener.execute(ResultCode.Succeeded, message);
-//            }
-            for (Listener listener : listenerMap.values())
-                listener.execute(ResultCode.Succeeded, text);
+            final Message message = Message.unpack(text);
+            for (Listener listener : listenerMap.values()) {
+                listener.execute(ResultCode.Succeeded, message);
+            }
+            messageSignature.toSignList.clear();
+            messageSignature.toSignList.add(message);
+            remoteBinder.send(messageSignature);
         }
 
         @Override
         public void onMessage(@NotNull WebSocket webSocket, @NotNull ByteString bytes) {
             Log.d("Debug", "onMessage()");
             super.onMessage(webSocket, bytes);
-        }
-
-        Map<String, Listener> listenerMap;
-
-        public void subscribe(String id, Listener listener) {
-            listenerMap.put(id, listener);
         }
     }
 }
