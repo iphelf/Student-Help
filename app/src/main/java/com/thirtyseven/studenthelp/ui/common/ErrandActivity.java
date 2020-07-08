@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RatingBar;
@@ -45,6 +46,9 @@ public class ErrandActivity extends AppCompatActivity implements Global {
     TextView textViewMoney;
     TextView textViewContent;
 
+    EditText editTextComment;
+    RatingBar ratingBarScore;
+
     Button buttonConversation;
     Button buttonDelete;
     Button buttonDismiss;
@@ -52,6 +56,8 @@ public class ErrandActivity extends AppCompatActivity implements Global {
     Button buttonResign;
     Button buttonSubmit;
     Button buttonComment;
+    Button buttonNewComment;
+    Button buttonCancelComment;
     List<Button> buttonList;
 
     ListView listViewPulse;
@@ -60,6 +66,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
     ConstraintLayout constraintLayoutAction;
     ConstraintLayout constraintLayoutPulse;
     ConstraintLayout constraintLayoutComment;
+    ConstraintLayout constraintLayoutNewComment;
 
     enum Pulse {Application, Submission, Judge, Result}
 
@@ -229,27 +236,15 @@ public class ErrandActivity extends AppCompatActivity implements Global {
             }
         });
         buttonList.add(buttonSubmit);
-        final Comment comment=new Comment();
+
         buttonComment = findViewById(R.id.button_comment);
+
         buttonComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Toast.makeText(ErrandActivity.this, R.string.button_comment, Toast.LENGTH_SHORT).show();
-                Remote.remoteBinder.comment(Local.loadAccount(), errand, comment, new Remote.Listener() {
-                    @Override
-                    public void execute(ResultCode resultCode, Object object) {
-                        if (resultCode == ResultCode.Succeeded) {
-                            refresh();
-                        } else {
-                            switch ((CommentError) object) {
-                                case NetworkError:
-                                case CommentError:
-                                default:
-                                    break;
-                            }
-                        }
-                    }
-                });
+                constraintLayoutNewComment.setVisibility(View.VISIBLE);
+                buttonComment.setVisibility(View.GONE);
             }
         });
         buttonList.add(buttonComment);
@@ -261,8 +256,61 @@ public class ErrandActivity extends AppCompatActivity implements Global {
         constraintLayoutAction = findViewById(R.id.constraintLayout_action);
         constraintLayoutPulse = findViewById(R.id.constraintLayout_pulse);
         constraintLayoutComment = findViewById(R.id.constraintLayout_comment);
+        constraintLayoutNewComment = findViewById(R.id.constraintLayout_newComment);
 
-        push();
+        editTextComment = constraintLayoutNewComment.findViewById(R.id.editText_content);
+        ratingBarScore = constraintLayoutNewComment.findViewById(R.id.ratingBar_score);
+        buttonNewComment = constraintLayoutNewComment.findViewById(R.id.button_newComment);
+        buttonNewComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(ErrandActivity.this, "New Comment!", Toast.LENGTH_SHORT).show();
+                final Comment comment = new Comment();
+                comment.score = ratingBarScore.getRating();
+                comment.content = editTextComment.getText().toString().trim();
+                Remote.remoteBinder.newComment(Local.loadAccount(), errand, comment, new Remote.Listener() {
+                    @Override
+                    public void execute(ResultCode resultCode, Object object) {
+                        if (resultCode == ResultCode.Succeeded) {
+                            ratingBarScore.setRating(0);
+                            editTextComment.setText("");
+                            refresh();
+                        } else {
+                            switch ((NewCommentError) object) {
+                                case NetworkError:
+                                case CommentError:
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        buttonCancelComment = constraintLayoutNewComment.findViewById(R.id.button_cancel);
+        buttonCancelComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(ErrandActivity.this, "Cancel!", Toast.LENGTH_SHORT).show();
+                constraintLayoutNewComment.setVisibility(View.GONE);
+                buttonComment.setVisibility(View.VISIBLE);
+            }
+        });
+
+        Remote.remoteBinder.subscribe("Errand", new Remote.Listener() {
+            @Override
+            public void execute(ResultCode resultCode, Object object) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        refresh();
+                    }
+                });
+            }
+        });
+
+        refresh();
 
     }
 
@@ -339,6 +387,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                     buttonConversation.setVisibility(View.VISIBLE);
                     buttonDelete.setVisibility(View.VISIBLE);
                     constraintLayoutComment.setVisibility(View.VISIBLE);
+                    buttonComment.setVisibility(View.VISIBLE);
                     break;
                 default:
                     buttonDelete.setVisibility(View.VISIBLE);
@@ -373,6 +422,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                 case NotEvaluate:
                     buttonConversation.setVisibility(View.VISIBLE);
                     constraintLayoutComment.setVisibility(View.VISIBLE);
+                    buttonComment.setVisibility(View.VISIBLE);
                     break;
                 default:
                     buttonConversation.setVisibility(View.VISIBLE);
@@ -511,7 +561,7 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                             buttonNo.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    Remote.remoteBinder.supressJudge(Local.loadAccount(), errand, new Remote.Listener() {
+                                    Remote.remoteBinder.suppressJudge(Local.loadAccount(), errand, new Remote.Listener() {
                                         @Override
                                         public void execute(ResultCode resultCode, Object object) {
                                             refresh();
@@ -592,14 +642,43 @@ public class ErrandActivity extends AppCompatActivity implements Global {
             listViewComment.setAdapter(baseAdapter);
             Utility.setListViewHeightBasedOnChildren(listViewComment);
         }
+        constraintLayoutNewComment.setVisibility(View.GONE);
+        if (errand.commentList != null) {
+            boolean commented = false;
+            for (Comment c : errand.commentList)
+                if (c.commenter.equals(Local.loadAccount())) {
+                    commented = true;
+                    break;
+                }
+            if (commented) buttonComment.setVisibility(View.GONE);
+        }
     }
 
     public void refresh() {
-        Remote.remoteBinder.queryDetail(errand, new Remote.Listener() {
+        final Comment comment = new Comment();
+        comment.commenter = Local.loadAccount();
+        comment.type = Comment.Type.Self;
+        errand.commentList = new ArrayList<>();
+        Remote.remoteBinder.showComment(Local.loadAccount(), errand, comment, new Remote.Listener() {
             @Override
             public void execute(ResultCode resultCode, Object object) {
-                errand = (Errand) object;
-                push();
+                if (resultCode == ResultCode.Succeeded && object != null)
+                    errand.commentList.add((Comment) object);
+                comment.type = Comment.Type.Opponent;
+                Remote.remoteBinder.showComment(Local.loadAccount(), errand, comment, new Remote.Listener() {
+                    @Override
+                    public void execute(ResultCode resultCode, Object object) {
+                        if (resultCode == ResultCode.Succeeded && object != null)
+                            errand.commentList.add((Comment) object);
+                        Remote.remoteBinder.queryDetail(errand, new Remote.Listener() {
+                            @Override
+                            public void execute(ResultCode resultCode, Object object) {
+                                errand = (Errand) object;
+                                push();
+                            }
+                        });
+                    }
+                });
             }
         });
     }

@@ -99,5 +99,7 @@
     <string name="button_agree">Agree</string>
     <string name="button_disagree">Disagree</string>
     <string name="button_send">Send</string>
+    <string name="toast_complainError">Complain failed!</string>
+    <string name="hint_newComment">Please input comment</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

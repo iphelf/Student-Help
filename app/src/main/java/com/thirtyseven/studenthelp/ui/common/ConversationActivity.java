@@ -19,13 +19,15 @@ import com.thirtyseven.studenthelp.utility.Global;
 import com.thirtyseven.studenthelp.utility.Local;
 import com.thirtyseven.studenthelp.utility.Remote;
 
+import java.util.ArrayList;
+
 public class ConversationActivity extends AppCompatActivity {
-    private EditText editTextMsg;
-    private Button buttonSend;
-    private String msg;
     Conversation conversation;
     MessageAdapter messageAdapter;
     ListView list_conversation;
+    private EditText editTextMsg;
+    private Button buttonSend;
+    private String msg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,16 +52,8 @@ public class ConversationActivity extends AppCompatActivity {
 
         final MessageAdapter adapter = new MessageAdapter(ConversationActivity.this);
         list_conversation.setAdapter(adapter);
-        buttonSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                msg = editTextMsg.getText().toString().trim();
-                adapter.addDataToAdapter(new MsgInfo(null, msg));
-                adapter.notifyDataSetChanged();
-                list_conversation.smoothScrollToPosition(list_conversation.getCount() - 1);
-                editTextMsg.setText("");
-            }
-        });
+
+        setListener();
 
         refresh();
     }
@@ -74,12 +68,8 @@ public class ConversationActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
     public void pull() {
+        msg = editTextMsg.getText().toString().trim();
     }
 
     public void refresh() {
@@ -92,7 +82,18 @@ public class ConversationActivity extends AppCompatActivity {
         });
     }
 
+    public void add(Message message) {
+        conversation.messageList.add(message);
+        if (message.sender == conversation.sender)
+            messageAdapter.addDataToAdapter(new MsgInfo(null, message.content));
+        else
+            messageAdapter.addDataToAdapter(new MsgInfo(message.content, null));
+        list_conversation.setAdapter(messageAdapter);
+        list_conversation.smoothScrollToPosition(list_conversation.getCount() - 1);
+    }
+
     public void push() {
+        editTextMsg.setText("");
         messageAdapter = new MessageAdapter(this);
         for (Message message : conversation.messageList) {
             if (message.sender.equals(conversation.sender))
@@ -101,6 +102,49 @@ public class ConversationActivity extends AppCompatActivity {
                 messageAdapter.addDataToAdapter(new MsgInfo(message.content, null));
         }
         list_conversation.setAdapter(messageAdapter);
+        list_conversation.smoothScrollToPosition(list_conversation.getCount() - 1);
     }
 
+    Message messageNormal;
+    Message messageSign;
+
+    private void setListener() {
+        messageNormal = new Message();
+        messageNormal.sender = conversation.sender;
+        messageNormal.receiver = conversation.receiver;
+        messageNormal.type = Message.Type.Chat;
+        messageSign = new Message();
+        messageSign.sender = conversation.sender;
+        messageSign.receiver = conversation.receiver;
+        messageSign.type = Message.Type.Sign;
+        messageSign.toSignList = new ArrayList<>();
+        buttonSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pull();
+                messageNormal.content = msg;
+                Remote.remoteBinder.send(messageNormal);
+                add(messageNormal);
+            }
+        });
+        Remote.remoteBinder.subscribe(Local.loadAccount().id, new Remote.Listener() {
+            @Override
+            public void execute(Global.ResultCode resultCode, Object object) {
+                if (!(object instanceof Message)) return;
+                final Message message = (Message) object;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        add(message);
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Remote.remoteBinder.unsubscribe(Local.loadAccount().id);
+    }
 }

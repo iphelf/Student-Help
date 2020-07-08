@@ -1,6 +1,5 @@
 package com.thirtyseven.studenthelp.data;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -38,14 +37,16 @@ public class Message {
         JSONObject jsonObjectMessage = new JSONObject();
         try {
             jsonObjectWebSocket.put("action", type);
-            jsonObjectMessage.put("senderId", sender.id);
-            jsonObjectMessage.put("receiverId", receiver.id);
+            if (sender != null) jsonObjectMessage.put("senderId", sender.id);
+            if (receiver != null) jsonObjectMessage.put("receiverId", receiver.id);
             if (type == Type.Sign) {
                 jsonObjectMessage.put("msg", null);
-                JSONArray jsonArrayToSign = new JSONArray();
-                for (Message message : toSignList)
-                    jsonArrayToSign.put(message.id);
-                jsonObjectWebSocket.put("extend", jsonArrayToSign);
+                if (!toSignList.isEmpty()) {
+                    StringBuilder ids = new StringBuilder();
+                    for (Message message : toSignList)
+                        ids.append(",").append(message.id);
+                    jsonObjectWebSocket.put("extend", ids.substring(1));
+                }
             } else {
                 jsonObjectMessage.put("msg", content);
                 jsonObjectWebSocket.put("extend", null);

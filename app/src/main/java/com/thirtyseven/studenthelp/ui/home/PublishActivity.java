@@ -24,9 +24,6 @@ import com.thirtyseven.studenthelp.utility.Remote;
 
 public class PublishActivity extends AppCompatActivity implements Global {
 
-    private Remote.RemoteBinder remoteBinder;
-    private ServiceConnection serviceConnection;
-
     private Button buttonCancel;
     private Button buttonPublish;
     private EditText editTextTitle;
@@ -41,24 +38,6 @@ public class PublishActivity extends AppCompatActivity implements Global {
         if (getSupportActionBar() != null) getSupportActionBar().hide();
         setContentView(R.layout.activity_publish);
         setTitle(R.string.title_publish);
-
-        serviceConnection = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-                remoteBinder = (Remote.RemoteBinder) iBinder;
-                remoteBinder.startConversation();
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName componentName) {
-
-            }
-        };
-        bindService(
-                new Intent(this, Remote.class),
-                serviceConnection,
-                Service.BIND_AUTO_CREATE
-        );
 
         buttonPublish = findViewById(R.id.button_publish);
         buttonPublish.setOnClickListener(new View.OnClickListener() {
@@ -95,7 +74,6 @@ public class PublishActivity extends AppCompatActivity implements Global {
 
     @Override
     public void onDestroy() {
-        unbindService(serviceConnection);
         super.onDestroy();
     }
 
@@ -115,7 +93,7 @@ public class PublishActivity extends AppCompatActivity implements Global {
         errand.money = money;
         errand.content = content;
         errand.publisher = Local.loadAccount();
-        remoteBinder.publish(errand, new Remote.Listener() {
+        Remote.remoteBinder.publish(errand, new Remote.Listener() {
             @Override
             public void execute(ResultCode resultCode, Object object) {
                 if (resultCode == ResultCode.Succeeded) {

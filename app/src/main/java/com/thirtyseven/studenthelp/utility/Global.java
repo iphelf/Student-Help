@@ -86,8 +86,25 @@ public interface Global {
     enum ConversationListError {
         NetworkError, ConversationListError
     }
-    enum NewCommentError{
-        NetworkError,CommentError
+
+    enum NewCommentError {
+        NetworkError, CommentError
+    }
+
+    enum NewJudgeError {
+        NetworkError, NewJudgeError
+    }
+
+    enum SuppressError {
+        NetworkError, SuppressError
+    }
+
+    enum AgreeError {
+        NetworkError, AgreeError
+    }
+
+    enum DisagreeError {
+        NetworkError, DisagreeError
     }
     enum ApilyError{
         NetworkError,ApilyError
