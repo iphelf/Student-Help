@@ -8,6 +8,7 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.android.volley.NetworkError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -16,6 +17,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.thirtyseven.studenthelp.R;
 import com.thirtyseven.studenthelp.data.Account;
+import com.thirtyseven.studenthelp.data.Comment;
 import com.thirtyseven.studenthelp.data.Conversation;
 import com.thirtyseven.studenthelp.data.Errand;
 import com.thirtyseven.studenthelp.data.Judge;
@@ -85,6 +87,8 @@ public class Remote extends Service implements Global {
             }
             return string;
         }
+
+
 
         private void call(
                 String route, int method, String param, JSONObject body,
@@ -204,6 +208,43 @@ public class Remote extends Service implements Global {
             );
         }
 
+        public void queryHistoryList(
+                Account account,
+                final Listener listener
+        ) {
+            final List<Errand> errandList = new ArrayList<>();
+            String queryUrl = "/user/myHistoryErrand"; //根据选择的类型调用不同的url
+            String param = "?studentNumber=" + account.id;
+            call(queryUrl, Request.Method.GET,
+                    param,
+                    null,
+                    new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, SearchCompositeError.NetworkError);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+                                try {
+                                    if (jsonObject.getInt("code") == 0) {
+                                        JSONArray data = jsonObject.getJSONArray("data");
+                                        for (int i = 0; i < data.length(); i++) {
+                                            JSONObject item = data.getJSONObject(i);
+                                            final Errand errand = new Errand();
+                                            responseErrand(errand, item);
+                                            errandList.add(errand);
+                                        }
+                                        listener.execute(ResultCode.Succeeded, errandList);
+                                    } else {
+                                        listener.execute(ResultCode.Failed, SearchCompositeError.SearchFailed);
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
+        }
 
         // /user/myOffer, /user/myPublish, /errand/searchComposite
         public void queryErrandList(
@@ -487,18 +528,103 @@ public class Remote extends Service implements Global {
 
         // /errand/newComment
         public void comment(
-                Account account, Errand errand,
+                Account account, Errand errand, Comment comment,
                 final Listener listener
         ) { // ErrandActivity.java
             // TODO: 完成Remote.comment
+            call("/errand/newComment", Request.Method.POST,
+                    "?commentContent=" + comment.content + "&commentScore" + comment.score
+                            + "&errandId" + errand.id + "&userId" + account.id,
+                    null,
+                    new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, NewCommentError.NetworkError);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+                                try {
+                                    switch (jsonObject.getInt("code")) {
+                                        case 0:
+                                            listener.execute(ResultCode.Succeeded, null);
+                                            break;
+                                        default:
+                                            listener.execute(ResultCode.Failed, NewCommentError.CommentError);
+                                            break;
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
+        }
+
+        public void showComment(
+                Account account, Errand errand, Comment comment,
+                final Listener listener
+        ) {
+            call("/errand/comment", Request.Method.GET,
+                    "?viewType=" + comment.type
+                            + "&errandId" + errand.id + "&userId" + account.id,
+                    null,
+                    new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, NewCommentError.NetworkError);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+                                try {
+                                    switch (jsonObject.getInt("code")) {
+                                        case 0:
+                                            listener.execute(ResultCode.Succeeded, null);
+                                            break;
+                                        default:
+                                            listener.execute(ResultCode.Failed, NewCommentError.CommentError);
+                                            break;
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
         }
 
         // ?
         public void newJudge(
-                Account account, Judge judge,
+                Account account, Judge judge, Errand errand,
                 final Listener listener
         ) { // ErrandActivity.java
             // TODO
+            call("/judge/newJudge", Request.Method.POST,
+                    "?complainantId=" + judge.id
+                            + "&judgeErrandId" + errand.id + "&judgeImage" + judge.image
+                            + "&judgeReason" + judge.reason + "&judgeTitle" + judge.title + "&respondentId" + errand.receiver.id,
+                    null,
+                    new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, NewCommentError.NetworkError);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+                                try {
+                                    switch (jsonObject.getInt("code")) {
+                                        case 0:
+                                            listener.execute(ResultCode.Succeeded, null);
+                                            break;
+                                        default:
+                                            listener.execute(ResultCode.Failed, NewCommentError.CommentError);
+                                            break;
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
         }
 
         // ?

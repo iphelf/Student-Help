@@ -14,4 +14,5 @@ public class WalletActivity extends AppCompatActivity {
         setContentView(R.layout.activity_wallet);
         setTitle(R.string.title_wallet);
     }
+
 }

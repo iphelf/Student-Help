@@ -86,4 +86,7 @@ public interface Global {
     enum ConversationListError {
         NetworkError, ConversationListError
     }
+    enum NewCommentError{
+        NetworkError,CommentError
+    }
 }

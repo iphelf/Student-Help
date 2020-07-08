@@ -19,6 +19,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.thirtyseven.studenthelp.R;
 import com.thirtyseven.studenthelp.data.Account;
+import com.thirtyseven.studenthelp.data.Comment;
 import com.thirtyseven.studenthelp.data.Errand;
 import com.thirtyseven.studenthelp.data.Judge;
 import com.thirtyseven.studenthelp.utility.Global;
@@ -228,13 +229,13 @@ public class ErrandActivity extends AppCompatActivity implements Global {
             }
         });
         buttonList.add(buttonSubmit);
-
+        final Comment comment=new Comment();
         buttonComment = findViewById(R.id.button_comment);
         buttonComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Toast.makeText(ErrandActivity.this, R.string.button_comment, Toast.LENGTH_SHORT).show();
-                Remote.remoteBinder.comment(Local.loadAccount(), errand, new Remote.Listener() {
+                Remote.remoteBinder.comment(Local.loadAccount(), errand, comment, new Remote.Listener() {
                     @Override
                     public void execute(ResultCode resultCode, Object object) {
                         if (resultCode == ResultCode.Succeeded) {

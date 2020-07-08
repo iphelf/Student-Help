@@ -10,6 +10,8 @@ public class Comment {
     //    "userId": "20179026",
     public Account commenter;
     //    "commentScore": 40,
+    public int type;
+    //    "type为0自己发表的 为1别人发表的"
     public float score;
     //    "commentContent": "明明是我多次问了他快递送达哪里，他一直不回复。。。",
     public String content;
