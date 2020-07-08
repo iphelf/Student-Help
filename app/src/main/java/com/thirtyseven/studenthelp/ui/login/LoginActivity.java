@@ -1,15 +1,9 @@
 package com.thirtyseven.studenthelp.ui.login;
 
-import android.app.ActionBar;
-import android.app.Service;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -32,10 +26,15 @@ import java.util.List;
 import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
-    private  Account account;
+    private Account account;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //透明状态栏
+        getWindow().setFlags(
+                WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
+                WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         setContentView(R.layout.activity_login);
         setTitle(R.string.title_login);
 
@@ -51,6 +50,7 @@ public class LoginActivity extends AppCompatActivity {
                 account = new Account();
                 account.id = id;
                 account.password = password;
+                Local.saveAccount(account);
                 Remote.remoteBinder.login(account, new Remote.Listener() {
                     @Override
                     public void execute(Global.ResultCode resultCode, Object object) {
@@ -58,9 +58,9 @@ public class LoginActivity extends AppCompatActivity {
                             Remote.remoteBinder.information(account, new Remote.Listener() {
                                 public void execute(Global.ResultCode resultCode, Object object) {
                                     if (resultCode == Global.ResultCode.Succeeded) {
-                                        account=(Account) object;
+                                        account = (Account) object;
                                         Local.saveAccount(account);
-                                    }else{
+                                    } else {
                                         Toast.makeText(
                                                 LoginActivity.this,
                                                 R.string.toast_networkError,
@@ -75,11 +75,11 @@ public class LoginActivity extends AppCompatActivity {
                                 @Override
                                 public void execute(Global.ResultCode resultCode, Object object) {
                                     if (resultCode == Global.ResultCode.Succeeded) {
-                                        List<Conversation> list=new ArrayList<>();
-                                        Map<String, Conversation> map=new HashMap<>();
-                                        map=(Map<String, Conversation>)object;
+                                        List<Conversation> list = new ArrayList<>();
+                                        Map<String, Conversation> map = new HashMap<>();
+                                        map = (Map<String, Conversation>) object;
                                         Local.saveConversationMap(map);
-                                        for(String str:map.keySet()){
+                                        for (String str : map.keySet()) {
                                             list.add(map.get(str));
                                         }
                                         Collections.sort(list, new Comparator<Conversation>() {
@@ -90,8 +90,8 @@ public class LoginActivity extends AppCompatActivity {
                                         });
                                         Collections.reverse(list); //倒序 按时间从近到远
                                         Local.saveConversationList(list);
-                                    }else{
-                                        switch ((Global.ConversationListError)object){
+                                    } else {
+                                        switch ((Global.ConversationListError) object) {
                                             case NetworkError:
                                                 Toast.makeText(
                                                         LoginActivity.this,

@@ -6,6 +6,10 @@
     android:layout_height="match_parent"
     tools:context=".ui.me.AboutActivity">
 
+    <com.thirtyseven.studenthelp.ui.common.CustomTitleBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <ImageView
         android:id="@+id/imageView_logo"
         android:layout_width="128dp"
