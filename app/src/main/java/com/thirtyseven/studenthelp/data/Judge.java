@@ -5,6 +5,8 @@ import java.util.Date;
 public class Judge {
     public enum Status {Waiting, Ongoing, Handled}
 
+    public enum Progress {Both, Self, Opponent}
+
     public enum Result {FaultOnPublisher, FaultOnReceiver}
 
     //    "judgeId": 2,
@@ -31,4 +33,7 @@ public class Judge {
     public Date createTime;
     //    "updateTime": "2020-07-07T00:04:18.000+00:00"
     public Date updateTime;
+
+    public Progress progress;
+
 }

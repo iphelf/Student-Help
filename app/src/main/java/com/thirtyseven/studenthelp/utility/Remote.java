@@ -875,7 +875,10 @@ public class Remote extends Service implements Global {
                                                 //      "judgeReason": "",
                                                 judge.reason = jsonObject.getString("judgeReason");
                                                 //      "JudgeResult"
-                                                judge.result = Judge.Result.values()[jsonObject.getInt("judgeResult")];
+                                                if (jsonObject.has("judgeResult"))
+                                                    judge.result = Judge.Result.values()[jsonObject.getInt("judgeResult")];
+                                                else
+                                                    judge.result = null;
                                                 //      "judgeStatus": 0,
                                                 judge.status = Judge.Status.values()[jsonObject.getInt("judgeStatus")];
                                                 //      "createTime": "2020-07-08T14:53:32.000+00:00",
@@ -891,6 +894,36 @@ public class Remote extends Service implements Global {
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
+        }
+
+        // /judge/handleStatus
+        public void queryJudgeProgress(
+                Judge judge, Account account,
+                final Listener listener
+        ) { // ErrantActivity.java
+            call("/judge/handleStatus", Request.Method.GET,
+                    "?judgeId=" + judge.id + "&userId=" + account.id,
+                    null, new Listener() {
+                        @Override
+                        public void execute(ResultCode resultCode, Object object) {
+                            if (resultCode == ResultCode.Failed || !(object instanceof JSONObject)) {
+                                listener.execute(ResultCode.Failed, QueryJudge.NetworkError);
+                            } else {
+                                JSONObject jsonObject = (JSONObject) object;
+                                try {
+                                    switch (jsonObject.getInt("code")) {
+                                        case 0:
+                                            listener.execute(ResultCode.Succeeded,
+                                                    Judge.Progress.values()[jsonObject.getJSONObject("data").getInt("handleStatus")]);
+                                        default:
+                                            listener.execute(ResultCode.Failed, DisagreeError.DisagreeError);
+                                            break;
+                                    }
+                                } catch (JSONException e) {
                                 }
                             }
                         }
@@ -1331,15 +1364,18 @@ public class Remote extends Service implements Global {
         public void onMessage(@NotNull WebSocket webSocket, @NotNull String text) {
             Log.e("WebSocket", "Received: " + text);
             super.onMessage(webSocket, text);
-            final Message message = Message.unpack(text);
-            for (Listener listener : listenerMap.values()) {
-                listener.execute(ResultCode.Succeeded, message);
-            }
-            if (!message.id.equals("null")) {
-
+            if (text.charAt(0) == '{') {
+                final Message message = Message.unpack(text);
+                for (Listener listener : listenerMap.values()) {
+                    listener.execute(ResultCode.Succeeded, message);
+                }
                 messageSignature.toSignList.clear();
                 messageSignature.toSignList.add(message);
                 remoteBinder.send(messageSignature);
+            } else {
+                for (Listener listener : listenerMap.values()) {
+                    listener.execute(ResultCode.Succeeded, text);
+                }
             }
         }
 

@@ -151,9 +151,9 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                         if (resultCode == ResultCode.Succeeded) {
                             refresh();
                         } else {
-                            switch ((DismissError) object) {
+                            switch ((FireError) object) {
                                 case NetworkError:
-                                case DismissError:
+                                case FireError:
                                 default:
                                     break;
                             }
@@ -603,6 +603,22 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                                     });
                                 }
                             });
+                            switch (errand.judge.progress) {
+                                case Self:
+                                    buttonYes.setEnabled(false);
+                                    buttonNo.setEnabled(false);
+                                    textViewContent.setText(R.string.string_judge_waitingForOpponent);
+                                    break;
+                                case Opponent:
+                                    buttonYes.setEnabled(true);
+                                    buttonNo.setEnabled(true);
+                                    break;
+                                case Both:
+                                    buttonYes.setEnabled(false);
+                                    buttonNo.setEnabled(false);
+                                    textViewContent.setText(R.string.string_judge_waitingForJudge);
+                                    break;
+                            }
                             break;
                     }
                     return viewPulse;
@@ -682,7 +698,19 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                                     public void execute(ResultCode resultCode, Object object) {
                                         if (resultCode == ResultCode.Succeeded)
                                             errand.judge = (Judge) object;
-                                        push();
+                                        if (errand.judge != null)
+                                            Remote.remoteBinder.queryJudgeProgress(
+                                                    errand.judge, Local.loadAccount(), new Remote.Listener() {
+                                                        @Override
+                                                        public void execute(ResultCode resultCode, Object object) {
+                                                            if (resultCode == ResultCode.Succeeded)
+                                                                errand.judge.progress = (Judge.Progress) object;
+                                                            push();
+                                                        }
+                                                    }
+                                            );
+                                        else
+                                            push();
                                     }
                                 });
                             }

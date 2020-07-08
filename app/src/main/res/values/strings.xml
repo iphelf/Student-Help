@@ -105,5 +105,7 @@
     <string name="toast_recharge_failed">Recharge Failed!</string>
     <string name="toast_withdraw_success">Withdraw Success!</string>
     <string name="toast_withdraw_failed">Withdraw Failed!</string>
+    <string name="string_judge_waitingForOpponent">Please wait for you opponent to finish</string>
+    <string name="string_judge_waitingForJudge">Please wait for judge</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>
