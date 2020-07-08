@@ -1,11 +1,7 @@
 package com.thirtyseven.studenthelp.ui.notice;
 
-import android.app.Service;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,13 +18,11 @@ import com.thirtyseven.studenthelp.utility.Global;
 import com.thirtyseven.studenthelp.utility.Local;
 import com.thirtyseven.studenthelp.utility.Remote;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class NoticeConversationFragment extends Fragment {
-
-    private Remote.RemoteBinder remoteBinder;
-    private ServiceConnection serviceConnection;
 
     private ListView listViewConversationList;
     private List<Conversation> conversationList;
@@ -44,23 +38,6 @@ public class NoticeConversationFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        serviceConnection = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-                remoteBinder = (Remote.RemoteBinder) iBinder;
-                remoteBinder.startConversation();
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName componentName) {
-
-            }
-        };
-        requireActivity().bindService(
-                new Intent(requireContext(), Remote.class),
-                serviceConnection,
-                Service.BIND_AUTO_CREATE
-        );
     }
 
     @Override
@@ -77,7 +54,14 @@ public class NoticeConversationFragment extends Fragment {
         Remote.remoteBinder.queryConversationList(Local.loadAccount(), new Remote.Listener() {
                     @Override
                     public void execute(Global.ResultCode resultCode, Object object) {
-                        Local.saveConversationMap((Map<String, Conversation>) object);
+                        Map<String, Conversation> conversationMap = (Map<String, Conversation>) object;
+                        Local.saveConversationMap(conversationMap);
+                        conversationList = new ArrayList<>();
+                        for (Conversation conversation : conversationMap.values()) {
+                            if (conversation.receiver.id.equals("server")) continue;
+                            conversationList.add(conversation);
+                        }
+                        Local.saveConversationList(conversationList);
                         push();
                     }
                 }
@@ -85,13 +69,13 @@ public class NoticeConversationFragment extends Fragment {
     }
 
     public void push() {
-        conversationList = Local.loadConversationList();
         ConversationListAdapter conversationListAdapter = new ConversationListAdapter(getContext(), conversationList);
         listViewConversationList.setAdapter(conversationListAdapter);
         listViewConversationList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(getActivity(), ConversationActivity.class);
+                Local.pushAccount(conversationList.get(i).receiver);
                 startActivity(intent);
             }
         });
@@ -99,8 +83,6 @@ public class NoticeConversationFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        if (serviceConnection != null)
-            requireActivity().unbindService(serviceConnection);
         super.onDestroy();
     }
 }

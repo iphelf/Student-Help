@@ -98,5 +98,6 @@
     <string name="title_complain">Complain</string>
     <string name="button_agree">Agree</string>
     <string name="button_disagree">Disagree</string>
+    <string name="button_send">Send</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

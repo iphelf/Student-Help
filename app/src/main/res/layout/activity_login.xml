@@ -34,7 +34,7 @@
             android:ems="10"
             android:hint="@string/hint_studentId"
             android:inputType="textPersonName"
-            android:text="20163933" />
+            android:text="20176151" />
 
         <EditText
             android:id="@+id/editText_password"
@@ -43,7 +43,7 @@
             android:ems="10"
             android:hint="@string/hint_password"
             android:inputType="textPassword"
-            android:text="dasd" />
+            android:text="flf10101" />
 
     </LinearLayout>
 

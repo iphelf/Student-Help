@@ -42,9 +42,9 @@ import okhttp3.WebSocketListener;
 import okio.ByteString;
 
 public class Remote extends Service implements Global {
-    static private RequestQueue requestQueue;
-    static private OkHttpClient okHttpClient;
-    static private String urlHost;
+    private static RequestQueue requestQueue;
+    private static OkHttpClient okHttpClient;
+    private static String urlHost;
     static public RemoteBinder remoteBinder = new RemoteBinder();
     private boolean success;
 
@@ -556,8 +556,8 @@ public class Remote extends Service implements Global {
                                         if (map.size() == 0) { //c初始化
                                             map.put(msg.sender.id, map.size());
                                             Conversation conversation = new Conversation();
-                                            conversation.sender = new Account();
-                                            conversation.sender.id = msg.sender.id;
+                                            conversation.receiver = new Account();
+                                            conversation.receiver.id = msg.sender.id;
                                             if (conversation.messageList == null)
                                                 conversation.messageList = new ArrayList<>();
                                             conversation.messageList.add(msg);
@@ -574,8 +574,8 @@ public class Remote extends Service implements Global {
                                             } else {  //不存在该接收者
                                                 map.put(msg.sender.id, map.size());
                                                 Conversation conversation = new Conversation();
-                                                conversation.sender = new Account();
-                                                conversation.sender.id = msg.sender.id;
+                                                conversation.receiver = new Account();
+                                                conversation.receiver.id = msg.sender.id;
                                                 if (conversation.messageList == null)
                                                     conversation.messageList = new ArrayList<>();
                                                 conversation.messageList.add(msg);
@@ -597,7 +597,7 @@ public class Remote extends Service implements Global {
                                         conversationList.get(i).time = conversationList.get(i).messageList.get(0).date;
                                     }
                                     for (int i = 0; i < conversationList.size(); i++) {
-                                        responseMap.put(conversationList.get(i).sender.id, conversationList.get(i));
+                                        responseMap.put(conversationList.get(i).receiver.id, conversationList.get(i));
                                     }
 
                                     listener.execute(ResultCode.Succeeded, responseMap);
@@ -617,7 +617,7 @@ public class Remote extends Service implements Global {
         ) { // ConversationActivity.java
             // TODO: 完成Remote.queryConversation
             //  返回值object中存放Conversation
-            String param = "?myId=" + conversation.sender.id + "&otherId=" + conversation.receiverPrimary.id;
+            String param = "?myId=" + conversation.sender.id + "&otherId=" + conversation.receiver.id;
             call("/chat/queryHistoricRecords", Request.Method.GET,
                     param,
                     null,
@@ -631,12 +631,14 @@ public class Remote extends Service implements Global {
                                 try {
                                     switch (jsonObject.getInt("code")) {
                                         case 0:
-                                            JSONArray jsonMessage = new JSONArray();
-                                            ((JSONObject) object).toJSONArray(jsonMessage);
+                                            JSONArray jsonMessage = jsonObject.getJSONArray("data");
+                                            conversation.messageList = new ArrayList<>();
                                             for (int i = 0; i < jsonMessage.length(); i++) {
                                                 final Message msg = new Message();
                                                 JSONObject Msg = jsonMessage.getJSONObject(i);
+                                                msg.sender = new Account();
                                                 msg.sender.id = Msg.getString("senderId");
+                                                msg.receiver = new Account();
                                                 msg.receiver.id = Msg.getString("receiverId");
                                                 msg.content = Msg.getString("msg");
                                                 conversation.messageList.add(msg);
@@ -908,7 +910,6 @@ public class Remote extends Service implements Global {
         ) { // ErrandActivity.java
             // TO-DO: 完成Remote.rejectApplication
         }
-
     }
 
     public static final class RemoteWebSocketListener extends WebSocketListener {
@@ -918,8 +919,6 @@ public class Remote extends Service implements Global {
         public void onOpen(@NotNull WebSocket webSocket, @NotNull okhttp3.Response response) {
             Log.d("Debug", "onOpen()");
             super.onOpen(webSocket, response);
-            webSocket.send("{\"action\":1,\"chatMsg\":{\"senderId\":\"20176151\",\"receiverId\":\"20171745\",\"msg\":\"Hello, this is iphelf\",\"msgId\":null},\"extend\":null}");
-            webSocket.send("{\"action\":1,\"chatMsg\":{\"senderId\":\"20176151\",\"receiverId\":\"20171722\",\"msg\":\"Hello, this is iphelf\",\"msgId\":null},\"extend\":null}");
         }
 
         @Override
@@ -946,6 +945,12 @@ public class Remote extends Service implements Global {
             Log.d("Debug", "onMessage()");
             super.onMessage(webSocket, text);
             System.out.println("onMessage: " + text);
+//            Message message = Message.unpack(text);
+//            for (Listener listener : listenerMap.values()) {
+//                listener.execute(ResultCode.Succeeded, message);
+//            }
+            for (Listener listener : listenerMap.values())
+                listener.execute(ResultCode.Succeeded, text);
         }
 
         @Override
@@ -954,5 +959,10 @@ public class Remote extends Service implements Global {
             super.onMessage(webSocket, bytes);
         }
 
+        Map<String, Listener> listenerMap;
+
+        public void subscribe(String id, Listener listener) {
+            listenerMap.put(id, listener);
+        }
     }
 }

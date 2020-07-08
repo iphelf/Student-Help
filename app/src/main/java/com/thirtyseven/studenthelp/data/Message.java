@@ -1,6 +1,11 @@
 package com.thirtyseven.studenthelp.data;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Date;
+import java.util.List;
 
 public class Message {
     public String id;
@@ -10,14 +15,13 @@ public class Message {
     public Date date;
     public int type;
     public boolean read;
+    public List<Message> toSignList;
 
-    //public enum Type {Normal, Complaint}
     public interface Type {
         int Connect = 1;
         int Chat = 2;
-        int Signed = 3;
+        int Sign = 3;
         int KeepAlive = 4;
-
         // Receiver
         int Apply = 5;
         int Resign = 61;
@@ -30,7 +34,42 @@ public class Message {
     }
 
     public String pack() {
-//        webSocket.send("{\"action\":1,\"chatMsg\":{\"senderId\":\"20176151\",\"receiverId\":\"20171745\",\"msg\":\"Hello, this is iphelf\",\"msgId\":null},\"extend\":null}");
-        return "";
+        JSONObject jsonObjectWebSocket = new JSONObject();
+        JSONObject jsonObjectMessage = new JSONObject();
+        try {
+            jsonObjectWebSocket.put("action", type);
+            jsonObjectMessage.put("senderId", sender.id);
+            jsonObjectMessage.put("receiverId", receiver.id);
+            if (type == Type.Sign) {
+                jsonObjectMessage.put("msg", null);
+                JSONArray jsonArrayToSign = new JSONArray();
+                for (Message message : toSignList)
+                    jsonArrayToSign.put(message.id);
+                jsonObjectWebSocket.put("extend", jsonArrayToSign);
+            } else {
+                jsonObjectMessage.put("msg", content);
+                jsonObjectWebSocket.put("extend", null);
+            }
+            jsonObjectMessage.put("msgId", null);
+            jsonObjectWebSocket.put("chatMsg", jsonObjectMessage);
+        } catch (JSONException e) {
+        }
+        return jsonObjectWebSocket.toString();
+    }
+
+    public static Message unpack(String string) {
+        // {"msg":"Content","senderId":"20171745","receiverId":"20171745","msgId":"1594176531109-20171745-20171745-1209"}
+        Message message = new Message();
+        try {
+            JSONObject jsonObjectWebSocket = new JSONObject(string);
+            message.id = jsonObjectWebSocket.getString("msgId");
+            message.content = jsonObjectWebSocket.getString("msg");
+            message.sender = new Account();
+            message.sender.id = jsonObjectWebSocket.getString("senderId");
+            message.receiver = new Account();
+            message.receiver.id = jsonObjectWebSocket.getString("receiverId");
+        } catch (JSONException e) {
+        }
+        return message;
     }
 }

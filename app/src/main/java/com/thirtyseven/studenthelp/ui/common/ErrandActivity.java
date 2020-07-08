@@ -97,6 +97,11 @@ public class ErrandActivity extends AppCompatActivity implements Global {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(ErrandActivity.this, ConversationActivity.class);
+                if (errand.publisher.id.equals(Local.loadAccount().id)) { // As publisher
+                    Local.pushAccount(errand.receiver);
+                } else { // As receiver
+                    Local.pushAccount(errand.publisher);
+                }
                 startActivity(intent);
             }
         });

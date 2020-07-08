@@ -45,7 +45,7 @@ public class ConversationListAdapter extends BaseAdapter {
         TextView textView_title=view.findViewById(R.id.textView_title);
         TextView textView_preview=view.findViewById(R.id.textView_preview);
         TextView textView_time=view.findViewById(R.id.textView_time);
-        textView_title.setText(list.get(i).sender.id);
+        textView_title.setText(list.get(i).receiver.id);
         textView_preview.setText(list.get(i).messageLatest.content);
         SimpleDateFormat formatter = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss");
         textView_time.setText(formatter.format(list.get(i).messageLatest.date));

@@ -42,15 +42,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0">
 
-        <Button
-            android:id="@+id/btn_left"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_margin="5dp"
-            android:background="@color/colorPrimary"
-            android:text="左边"
-            android:textColor="#ffffff" />
-
         <EditText
             android:id="@+id/editText_message"
             android:layout_width="wrap_content"
@@ -58,12 +49,12 @@
             android:layout_weight="1" />
 
         <Button
-            android:id="@+id/btn_right"
+            android:id="@+id/button_send"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:layout_margin="5dp"
             android:background="@color/colorPrimary"
-            android:text="右边"
+            android:text="@string/button_send"
             android:textColor="#ffffff" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
