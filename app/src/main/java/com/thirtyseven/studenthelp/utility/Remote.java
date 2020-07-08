@@ -962,8 +962,10 @@ public class Remote extends Service implements Global {
                                 try {
                                     switch (jsonObject.getInt("code")) {
                                         case 0:
+                                            int type = jsonObject.getJSONObject("data").getInt("handleStatus");
+                                            if (type > 2) type = 0;
                                             listener.execute(ResultCode.Succeeded,
-                                                    Judge.Progress.values()[jsonObject.getJSONObject("data").getInt("handleStatus")]);
+                                                    Judge.Progress.values()[type]);
                                         default:
                                             listener.execute(ResultCode.Failed, DisagreeError.DisagreeError);
                                             break;
