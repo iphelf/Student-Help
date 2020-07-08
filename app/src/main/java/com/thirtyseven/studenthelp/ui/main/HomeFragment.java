@@ -172,7 +172,7 @@ public class HomeFragment extends Fragment implements Global {
     }
 
     String[] fields = {
-            "Thumbnail", "Title", "State", "Author", "Preview", "Money"
+            "Thumbnail", "Title", "State", "Author", "Preview", "Money","Image"
     };
     int[] fieldIds = {
             R.id.imageView_thumbnail,
@@ -180,8 +180,12 @@ public class HomeFragment extends Fragment implements Global {
             R.id.textView_state,
             R.id.textView_author,
             R.id.textView_preview,
-            R.id.textView_money
+            R.id.textView_money,
+            R.id.imageView_thumbnail
     };
+    int[] imageIds=new int[]{R.drawable.ic_type1_,};
+//            R.drawable.img2,
+//            R.drawable.img3};
 
     public void push() {
         List<Map<String, Object>> mapList = new ArrayList<>();
@@ -194,6 +198,7 @@ public class HomeFragment extends Fragment implements Global {
             map.put("Author", errand.publisher.getName());
             map.put("Preview", errand.getContentPreview());
             map.put("Money", "悬赏: " + errand.money);
+            map.put("Image",imageIds[0]);
             mapList.add(map);
         }
         simpleAdapter = new SimpleAdapter(
