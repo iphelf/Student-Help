@@ -1,12 +1,14 @@
 package com.thirtyseven.studenthelp.ui.me;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.thirtyseven.studenthelp.R;
+import com.thirtyseven.studenthelp.ui.common.CustomTitleBar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +21,15 @@ public class AccountActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account);
-        setTitle(R.string.title_account);
+
+        CustomTitleBar customTitleBar = findViewById(R.id.customTitleBar);
+        customTitleBar.setLeftIconOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+        customTitleBar.setTitle(R.string.title_account);
 
         String[] values = {
                 "家乡", "生日", "性别", "姓名", "学号"

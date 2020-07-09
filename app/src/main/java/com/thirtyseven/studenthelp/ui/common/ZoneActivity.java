@@ -32,6 +32,14 @@ public class ZoneActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        CustomTitleBar customTitleBar = findViewById(R.id.customTitleBar);
+        customTitleBar.setLeftIconOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
         String[] fields = {
                 "Thumbnail", "Title", "State", "Author", "Preview", "Money"
         };

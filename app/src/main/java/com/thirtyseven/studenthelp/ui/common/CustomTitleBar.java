@@ -9,6 +9,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.StringRes;
+
 import com.thirtyseven.studenthelp.R;
 
 public class CustomTitleBar extends RelativeLayout {
@@ -16,6 +18,7 @@ public class CustomTitleBar extends RelativeLayout {
     private ImageView imageViewBack;
     private TextView textViewTitle;
     private ImageView imageViewRefresh;
+    private TextView textViewOperation;
 
     public CustomTitleBar(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -29,6 +32,7 @@ public class CustomTitleBar extends RelativeLayout {
         imageViewBack = inflate.findViewById(R.id.imageView_back);
         textViewTitle = inflate.findViewById(R.id.textView_title);
         imageViewRefresh = inflate.findViewById(R.id.imageView_refresh);
+        textViewOperation = inflate.findViewById(R.id.textView_operation);
 
         init(context, attributeSet);
     }
@@ -39,18 +43,32 @@ public class CustomTitleBar extends RelativeLayout {
         String title = typedArray.getString(R.styleable.CustomTitleBar_title);//标题
         int leftIcon = typedArray.getResourceId(R.styleable.CustomTitleBar_left_icon, R.drawable.ic_arrow_back_ios_24px);//左边图片
         int rightIcon = typedArray.getResourceId(R.styleable.CustomTitleBar_right_icon, R.drawable.ic_refresh_24px);//右边图片
-        int titleBarType = typedArray.getInt(R.styleable.CustomTitleBar_titlebar_type, 1);//标题栏类型,默认为0
+        String rightText = typedArray.getString(R.styleable.CustomTitleBar_right_text);
+        int titleBarType = typedArray.getInt(R.styleable.CustomTitleBar_titlebar_type, 1);//标题栏类型,默认为1
 
         //赋值进去我们的标题栏
         textViewTitle.setText(title);
         imageViewBack.setImageResource(leftIcon);
         imageViewRefresh.setImageResource(rightIcon);
+        textViewOperation.setText(rightText);
 
         //可以传入type值,可自定义判断值
-        if (titleBarType == 0) {
+        if (titleBarType == 0) { // No back No refresh
             imageViewBack.setVisibility(GONE);
-        } else {
+            imageViewRefresh.setVisibility(GONE);
+            textViewOperation.setVisibility(GONE);
+        } else if (titleBarType == 1) { // Has back No refresh
             imageViewBack.setVisibility(VISIBLE);
+            imageViewRefresh.setVisibility(GONE);
+            textViewOperation.setVisibility(GONE);
+        } else if (titleBarType == 2) { // Has back and refresh
+            imageViewBack.setVisibility(VISIBLE);
+            imageViewRefresh.setVisibility(VISIBLE);
+            textViewOperation.setVisibility(GONE);
+        } else if (titleBarType == 3) { // Has back and text refresh
+            imageViewBack.setVisibility(VISIBLE);
+            imageViewRefresh.setVisibility(GONE);
+            textViewOperation.setVisibility(VISIBLE);
         }
     }
 
@@ -66,6 +84,14 @@ public class CustomTitleBar extends RelativeLayout {
 
     //右边文字点击事件
     public void setRightTextOnClickListener(OnClickListener l) {
-        textViewTitle.setOnClickListener(l);
+        textViewOperation.setOnClickListener(l);
+    }
+
+    public void setTitle(String title) {
+        textViewTitle.setText(title);
+    }
+
+    public void setTitle(@StringRes int title) {
+        textViewTitle.setText(title);
     }
 }

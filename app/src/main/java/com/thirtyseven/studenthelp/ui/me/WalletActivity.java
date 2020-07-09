@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,12 +16,11 @@ import com.alipay.sdk.app.EnvUtils;
 import com.alipay.sdk.app.PayTask;
 import com.thirtyseven.studenthelp.R;
 import com.thirtyseven.studenthelp.data.Account;
-import com.thirtyseven.studenthelp.ui.login.LoginActivity;
+import com.thirtyseven.studenthelp.ui.common.CustomTitleBar;
 import com.thirtyseven.studenthelp.utility.Global;
 import com.thirtyseven.studenthelp.utility.Local;
 import com.thirtyseven.studenthelp.utility.Remote;
 
-import java.util.List;
 import java.util.Map;
 
 public class WalletActivity extends AppCompatActivity {
@@ -36,9 +34,11 @@ public class WalletActivity extends AppCompatActivity {
     private EditText editRecharge;
     private EditText editWithdraw;
     private TextView myCoin;
-    private int myCoinNumber=0;
+    private CustomTitleBar customTitleBar;
+    private int myCoinNumber = 0;
     private Account account;
     private String ordNo;
+
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
         @Override
@@ -52,9 +52,9 @@ public class WalletActivity extends AppCompatActivity {
                 ).show();
                 Remote.remoteBinder.alipaySuccess(amount, studentNumber, ordNo, new Remote.Listener() {
                     public void execute(Global.ResultCode resultCode, Object object) {
-                        myCoinNumber=Integer.parseInt(editRecharge.getText().toString());
-                        myCoinNumber=myCoinNumber+Integer.parseInt(account.capital);
-                        account.capital=Integer.toString(myCoinNumber);
+                        myCoinNumber = Integer.parseInt(editRecharge.getText().toString());
+                        myCoinNumber = myCoinNumber + Integer.parseInt(account.capital);
+                        account.capital = Integer.toString(myCoinNumber);
                         myCoin.setText(account.capital);
                     }
                 });
@@ -74,7 +74,14 @@ public class WalletActivity extends AppCompatActivity {
         EnvUtils.setEnv(EnvUtils.EnvEnum.SANDBOX);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wallet);
-        setTitle(R.string.title_wallet);
+        customTitleBar = findViewById(R.id.customTitleBar);
+        customTitleBar.setLeftIconOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+        customTitleBar.setTitle(R.string.title_wallet);
         account = Local.loadAccount();
         studentNumber = account.id;
         editRecharge = (EditText) findViewById(R.id.editText_recharge);
@@ -88,17 +95,17 @@ public class WalletActivity extends AppCompatActivity {
         rechargeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                amount=editRecharge.getText().toString();
-                Remote.remoteBinder.recharge(amount,studentNumber,new Remote.Listener(){
+                amount = editRecharge.getText().toString();
+                Remote.remoteBinder.recharge(amount, studentNumber, new Remote.Listener() {
                     public void execute(Global.ResultCode resultCode, Object object) {
                         if (resultCode == Global.ResultCode.Succeeded) {
-                            final String orderInfo =(String)object;
+                            final String orderInfo = (String) object;
                             Runnable payRunnable = new Runnable() {
 
                                 @Override
                                 public void run() {
                                     PayTask alipay = new PayTask(WalletActivity.this);
-                                    Map<String,String> result = alipay.payV2(orderInfo,true);
+                                    Map<String, String> result = alipay.payV2(orderInfo, true);
                                     Message msg = new Message();
                                     msg.what = SDK_PAY_FLAG;
                                     msg.obj = result;
@@ -124,7 +131,7 @@ public class WalletActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 amount = editWithdraw.getText().toString();
-                Remote.remoteBinder.withdraw(amount, studentNumber,apilyAccount, new Remote.Listener() {
+                Remote.remoteBinder.withdraw(amount, studentNumber, apilyAccount, new Remote.Listener() {
                     public void execute(Global.ResultCode resultCode, Object object) {
                         if (resultCode == Global.ResultCode.Succeeded) {
                             if (resultCode == Global.ResultCode.Succeeded) {

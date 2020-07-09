@@ -25,14 +25,15 @@ public class ComplainActivity extends AppCompatActivity implements Global {
     EditText editTextTitle;
     EditText editTextContent;
     ImageButton imageButtonAppend;
+    CustomTitleBar customTitleBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_complain);
-        setTitle(getString(R.string.title_complain));
 
-        buttonComplain = findViewById(R.id.button_complain);
+        customTitleBar = findViewById(R.id.customTitleBar);
+        customTitleBar.setTitle(getString(R.string.title_complain));
         buttonComplain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

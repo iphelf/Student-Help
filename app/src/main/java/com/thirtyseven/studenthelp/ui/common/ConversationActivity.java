@@ -28,12 +28,12 @@ public class ConversationActivity extends AppCompatActivity {
     private EditText editTextMsg;
     private Button buttonSend;
     private String msg;
+    CustomTitleBar customTitleBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_conversation);
-        setTitle(R.string.title_conversation);
 
         conversation = new Conversation();
         conversation.sender = Local.loadAccount();
@@ -52,6 +52,16 @@ public class ConversationActivity extends AppCompatActivity {
 
         final MessageAdapter adapter = new MessageAdapter(ConversationActivity.this);
         list_conversation.setAdapter(adapter);
+
+        customTitleBar = findViewById(R.id.customTitleBar);
+        customTitleBar.setTitle(R.string.title_conversation);
+
+        customTitleBar.setLeftIconOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
         setListener();
 

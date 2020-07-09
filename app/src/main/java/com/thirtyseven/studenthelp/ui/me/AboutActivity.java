@@ -2,11 +2,12 @@ package com.thirtyseven.studenthelp.ui.me;
 
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.thirtyseven.studenthelp.R;
+import com.thirtyseven.studenthelp.ui.common.CustomTitleBar;
 
 public class AboutActivity extends AppCompatActivity {
 
@@ -14,12 +15,19 @@ public class AboutActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
-        setTitle(R.string.title_about);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setHomeButtonEnabled(true);
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
+//        ActionBar actionBar = getSupportActionBar();
+//        if (actionBar != null) {
+//            actionBar.setHomeButtonEnabled(true);
+//            actionBar.setDisplayHomeAsUpEnabled(true);
+//        }
+        CustomTitleBar customTitleBar = findViewById(R.id.customTitleBar);
+        customTitleBar.setTitle(R.string.title_about);
+        customTitleBar.setLeftIconOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
     }
 

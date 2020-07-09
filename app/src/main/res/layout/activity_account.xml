@@ -6,6 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".ui.me.AccountActivity">
 
+    <com.thirtyseven.studenthelp.ui.common.CustomTitleBar
+        android:id="@+id/customTitleBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/textView_accountPhoto"
         style="@style/AccountStyle"
@@ -18,8 +27,7 @@
         app:layout_constraintEnd_toStartOf="@+id/imageView_accountPhoto"
         app:layout_constraintHorizontal_bias="0.1"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.452" />
+        app:layout_constraintTop_toBottomOf="@+id/customTitleBar" />
 
     <Button
         android:id="@+id/button_saveAccount"
@@ -41,29 +49,27 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.9"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/customTitleBar"
         app:srcCompat="@drawable/ic_logo" />
 
     <LinearLayout
         android:id="@+id/linearLayout5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="133dp"
-        android:layout_marginBottom="272dp"
-        android:orientation="vertical"
         android:divider="@drawable/divider_shape"
+        android:orientation="vertical"
         android:showDividers="beginning"
-        app:layout_constraintBottom_toTopOf="@+id/divider7"
+        app:layout_constraintBottom_toTopOf="@+id/button_saveAccount"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.26">
+        app:layout_constraintTop_toBottomOf="@+id/customTitleBar"
+        app:layout_constraintVertical_bias="0.27">
 
         <LinearLayout
             android:id="@+id/linearLayout6"
             android:layout_width="match_parent"
-            android:layout_height="69dp"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:weightSum="1">
 
@@ -94,7 +100,7 @@
         <LinearLayout
             android:id="@+id/linearLayout7"
             android:layout_width="match_parent"
-            android:layout_height="144dp"
+            android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <TextView

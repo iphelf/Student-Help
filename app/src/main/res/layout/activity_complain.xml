@@ -6,28 +6,12 @@
     android:layout_height="match_parent"
     tools:context=".ui.common.ComplainActivity">
 
-    <Button
-        android:id="@+id/button_complain"
-        android:layout_width="wrap_content"
+    <com.thirtyseven.studenthelp.ui.common.CustomTitleBar
+        android:id="@+id/customTitleBar"
+        android:layout_width="0dp"
+        app:titlebar_type="1"
+        app:right_text="@string/button_publish"
         android:layout_height="wrap_content"
-        android:text="@string/button_publish"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/button_cancel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/button_cancel"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/textView_complain"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/title_complain"
-        app:layout_constraintBottom_toBottomOf="@+id/button_cancel"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -39,7 +23,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_cancel">
+        app:layout_constraintTop_toBottomOf="@+id/customTitleBar">
 
         <LinearLayout
             android:layout_width="match_parent"

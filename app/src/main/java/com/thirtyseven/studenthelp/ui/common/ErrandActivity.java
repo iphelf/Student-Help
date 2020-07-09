@@ -63,10 +63,13 @@ public class ErrandActivity extends AppCompatActivity implements Global {
     ListView listViewPulse;
     ListView listViewComment;
 
+    ConstraintLayout constraintLayoutErrand;
     ConstraintLayout constraintLayoutAction;
     ConstraintLayout constraintLayoutPulse;
     ConstraintLayout constraintLayoutComment;
     ConstraintLayout constraintLayoutNewComment;
+
+    CustomTitleBar customTitleBar;
 
     enum Pulse {Application, Submission, Judge, Result}
 
@@ -74,7 +77,6 @@ public class ErrandActivity extends AppCompatActivity implements Global {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_errand);
-        setTitle(R.string.title_errand);
 
         errand = Local.popErrand();
         if (errand == null)
@@ -89,10 +91,16 @@ public class ErrandActivity extends AppCompatActivity implements Global {
             }
         });
 
+        constraintLayoutErrand = findViewById(R.id.constraintLayout_errand);
+        constraintLayoutAction = findViewById(R.id.constraintLayout_action);
+        constraintLayoutPulse = findViewById(R.id.constraintLayout_pulse);
+        constraintLayoutComment = findViewById(R.id.constraintLayout_comment);
+        constraintLayoutNewComment = findViewById(R.id.constraintLayout_newComment);
+
         textViewPublisher = findViewById(R.id.textView_author);
         textViewCredit = findViewById(R.id.textView_credit);
         textViewDate = findViewById(R.id.textView_date);
-        textViewTitle = findViewById(R.id.textView_title);
+        textViewTitle = constraintLayoutErrand.findViewById(R.id.textView_title);
         textViewState = findViewById(R.id.textView_state);
         textViewTag = findViewById(R.id.textView_tag);
         textViewMoney = findViewById(R.id.textView_money);
@@ -253,11 +261,6 @@ public class ErrandActivity extends AppCompatActivity implements Global {
 
         listViewComment = findViewById(R.id.listView_commentList);
 
-        constraintLayoutAction = findViewById(R.id.constraintLayout_action);
-        constraintLayoutPulse = findViewById(R.id.constraintLayout_pulse);
-        constraintLayoutComment = findViewById(R.id.constraintLayout_comment);
-        constraintLayoutNewComment = findViewById(R.id.constraintLayout_newComment);
-
         editTextComment = constraintLayoutNewComment.findViewById(R.id.editText_content);
         ratingBarScore = constraintLayoutNewComment.findViewById(R.id.ratingBar_score);
         buttonNewComment = constraintLayoutNewComment.findViewById(R.id.button_newComment);
@@ -295,6 +298,16 @@ public class ErrandActivity extends AppCompatActivity implements Global {
                 Toast.makeText(ErrandActivity.this, "Cancel!", Toast.LENGTH_SHORT).show();
                 constraintLayoutNewComment.setVisibility(View.GONE);
                 buttonComment.setVisibility(View.VISIBLE);
+            }
+        });
+
+        customTitleBar = findViewById(R.id.customTitleBar);
+        customTitleBar.setTitle(R.string.title_errand);
+
+        customTitleBar.setLeftIconOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
             }
         });
 

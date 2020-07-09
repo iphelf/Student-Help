@@ -1,11 +1,6 @@
 package com.thirtyseven.studenthelp.ui.home;
 
-import android.app.Service;
-import android.content.ComponentName;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -18,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.thirtyseven.studenthelp.R;
 import com.thirtyseven.studenthelp.data.Errand;
+import com.thirtyseven.studenthelp.ui.common.CustomTitleBar;
 import com.thirtyseven.studenthelp.utility.Global;
 import com.thirtyseven.studenthelp.utility.Local;
 import com.thirtyseven.studenthelp.utility.Remote;
@@ -31,24 +27,23 @@ public class PublishActivity extends AppCompatActivity implements Global {
     private EditText editTextMoney;
     private EditText editTextContent;
     private ImageButton imageButtonAppend;
+    private CustomTitleBar customTitleBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getSupportActionBar() != null) getSupportActionBar().hide();
         setContentView(R.layout.activity_publish);
-        setTitle(R.string.title_publish);
 
-        buttonPublish = findViewById(R.id.button_publish);
-        buttonPublish.setOnClickListener(new View.OnClickListener() {
+        customTitleBar = findViewById(R.id.customTitleBar);
+        customTitleBar.setTitle(R.string.title_publish);
+        customTitleBar.setRightTextOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 pull();
             }
         });
-
-        buttonCancel = findViewById(R.id.button_cancel);
-        buttonCancel.setOnClickListener(new View.OnClickListener() {
+        customTitleBar.setLeftIconOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();

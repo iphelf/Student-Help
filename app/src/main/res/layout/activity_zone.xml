@@ -6,6 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".ui.common.ZoneActivity">
 
+    <com.thirtyseven.studenthelp.ui.common.CustomTitleBar
+        android:id="@+id/customTitleBar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <LinearLayout
         android:id="@+id/linearLayout4"
         android:layout_width="64dp"
