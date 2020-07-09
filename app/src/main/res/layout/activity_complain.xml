@@ -9,13 +9,13 @@
     <com.thirtyseven.studenthelp.ui.common.CustomTitleBar
         android:id="@+id/customTitleBar"
         android:layout_width="0dp"
-        app:titlebar_type="1"
-        app:right_text="@string/button_publish"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:right_text="@string/button_publish"
+        app:titlebar_type="3" />
 
     <ScrollView
         android:layout_width="0dp"

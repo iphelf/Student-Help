@@ -303,6 +303,12 @@ public class ErrandActivity extends AppCompatActivity implements Global {
 
         customTitleBar = findViewById(R.id.customTitleBar);
         customTitleBar.setTitle(R.string.title_errand);
+        customTitleBar.setRightIconOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                refresh();
+            }
+        });
 
         customTitleBar.setLeftIconOnClickListener(new View.OnClickListener() {
             @Override

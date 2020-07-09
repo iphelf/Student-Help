@@ -183,7 +183,6 @@ public class HomeFragment extends Fragment implements Global {
             R.id.textView_money,
             R.id.imageView_thumbnail
     };
-    int[] imageIds=new int[]{R.drawable.ic_type1_,};
 //            R.drawable.img2,
 //            R.drawable.img3};
 
@@ -198,7 +197,6 @@ public class HomeFragment extends Fragment implements Global {
             map.put("Author", errand.publisher.getName());
             map.put("Preview", errand.getContentPreview());
             map.put("Money", "悬赏: " + errand.money);
-            map.put("Image",imageIds[0]);
             mapList.add(map);
         }
         simpleAdapter = new SimpleAdapter(

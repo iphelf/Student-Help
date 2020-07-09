@@ -65,7 +65,7 @@ public class CustomTitleBar extends RelativeLayout {
             imageViewBack.setVisibility(VISIBLE);
             imageViewRefresh.setVisibility(VISIBLE);
             textViewOperation.setVisibility(GONE);
-        } else if (titleBarType == 3) { // Has back and text refresh
+        } else if (titleBarType == 3) { // Has back and text
             imageViewBack.setVisibility(VISIBLE);
             imageViewRefresh.setVisibility(GONE);
             textViewOperation.setVisibility(VISIBLE);

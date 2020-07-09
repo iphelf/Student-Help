@@ -2,7 +2,6 @@ package com.thirtyseven.studenthelp.ui.common;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -20,8 +19,6 @@ public class ComplainActivity extends AppCompatActivity implements Global {
 
     Errand errand;
 
-    Button buttonComplain;
-    Button buttonCancel;
     EditText editTextTitle;
     EditText editTextContent;
     ImageButton imageButtonAppend;
@@ -34,19 +31,19 @@ public class ComplainActivity extends AppCompatActivity implements Global {
 
         customTitleBar = findViewById(R.id.customTitleBar);
         customTitleBar.setTitle(getString(R.string.title_complain));
-        buttonComplain.setOnClickListener(new View.OnClickListener() {
+        customTitleBar.setRightTextOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 pull();
             }
         });
-        buttonCancel = findViewById(R.id.button_cancel);
-        buttonCancel.setOnClickListener(new View.OnClickListener() {
+        customTitleBar.setLeftIconOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
             }
         });
+
         editTextTitle = findViewById(R.id.editText_title);
         editTextContent = findViewById(R.id.editText_content);
 
