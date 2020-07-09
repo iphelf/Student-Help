@@ -176,6 +176,7 @@ public class Remote extends Service implements Global {
                 message.id = item.getString("msgId");
                 message.sender = new Account();
                 message.sender.id = item.getString("senderId");
+                message.receiver = Local.loadAccount();
                 message.date = new Date(item.getLong("createTime"));
                 message.read = item.getInt("signFlag") == 1;
                 message.content = item.getString("msg");
@@ -202,20 +203,20 @@ public class Remote extends Service implements Global {
                             } else {
                                 JSONObject jsonObject = (JSONObject) object;
                                 try {
-                                    if (jsonObject.getInt("code")==0) {
+                                    if (jsonObject.getInt("code") == 0) {
                                         String info;
                                         String outTradeNo;
-                                        List<String> list=new ArrayList<>();
-                                        JSONObject data=jsonObject.getJSONObject("data");
-                                        info=data.getString("form:");
-                                        outTradeNo=data.getString("outTradeNo:");
+                                        List<String> list = new ArrayList<>();
+                                        JSONObject data = jsonObject.getJSONObject("data");
+                                        info = data.getString("form:");
+                                        outTradeNo = data.getString("outTradeNo:");
                                         list.add(info);
                                         list.add(outTradeNo);
                                         listener.execute(ResultCode.Succeeded, list);
                                     } else {
                                         listener.execute(ResultCode.Failed, ApilyError.ApilyError);
                                     }
-                                }catch (JSONException e){
+                                } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
                             }
@@ -232,7 +233,7 @@ public class Remote extends Service implements Global {
             call(
                     "/alipay/success", Request.Method.GET,
                     "?studentNumber=" + studentNumber + "&amount=" + money
-                    +"&outTradeNo="+ordNo,
+                            + "&outTradeNo=" + ordNo,
                     null,
                     new Listener() {
                         @Override
@@ -275,7 +276,7 @@ public class Remote extends Service implements Global {
                                 try {
                                     if (jsonObject.getInt("code") == 0) {
                                         listener.execute(ResultCode.Succeeded, null);
-                                    }else if(jsonObject.getInt("code")==4011){
+                                    } else if (jsonObject.getInt("code") == 4011) {
                                         listener.execute(ResultCode.Succeeded, ApilyError.MoneyNotInEnough);
                                     } else {
                                         listener.execute(ResultCode.Failed, ApilyError.ApilyError);
@@ -289,10 +290,11 @@ public class Remote extends Service implements Global {
                     }
             );
         }
+
         public void information(
                 Account account,
                 final Listener listener
-        ){
+        ) {
             call(
                     "/user/findUser", Request.Method.GET,
                     "?studentNumber=" + account.id,
@@ -305,20 +307,20 @@ public class Remote extends Service implements Global {
                             } else {
                                 JSONObject jsonObject = (JSONObject) object;
                                 try {
-                                    Account account=new Account();
-                                    JSONObject data=jsonObject.getJSONObject("data");
-                                    if(jsonObject.getInt("code")==0){
-                                        account.id=data.getString("userStudentNumber");
-                                        account.realName=data.getString("userRealName");
-                                        account.nickname=data.getString("userNickname");
-                                        account.credit=data.getString("userCredit");
-                                        account.capital=data.getString("userMoney");
-                                        account.userImage=data.getString("userAvatar");
-                                        listener.execute(ResultCode.Succeeded,account);
-                                    }else{
+                                    Account account = new Account();
+                                    JSONObject data = jsonObject.getJSONObject("data");
+                                    if (jsonObject.getInt("code") == 0) {
+                                        account.id = data.getString("userStudentNumber");
+                                        account.realName = data.getString("userRealName");
+                                        account.nickname = data.getString("userNickname");
+                                        account.credit = data.getString("userCredit");
+                                        account.capital = data.getString("userMoney");
+                                        account.userImage = data.getString("userAvatar");
+                                        listener.execute(ResultCode.Succeeded, account);
+                                    } else {
                                         listener.execute(ResultCode.Failed, LoginError.LoginError);
                                     }
-                                }catch (JSONException e){
+                                } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
                             }
@@ -982,7 +984,6 @@ public class Remote extends Service implements Global {
                 Account account,
                 final Listener listener
         ) { // NoticeConversationActivity.java
-
             call("/chat/queryNewestMsg", Request.Method.GET,
                     "?studentNumber=" + account.id,
                     null,
@@ -1008,6 +1009,7 @@ public class Remote extends Service implements Global {
                                             Conversation conversation = new Conversation();
                                             conversation.receiver = new Account();
                                             conversation.receiver.id = msg.sender.id;
+                                            conversation.sender = Local.loadAccount();
                                             if (conversation.messageList == null)
                                                 conversation.messageList = new Vector<>();
                                             conversation.messageList.add(msg);
@@ -1080,7 +1082,10 @@ public class Remote extends Service implements Global {
                                     switch (jsonObject.getInt("code")) {
                                         case 0:
                                             JSONArray jsonMessage = jsonObject.getJSONArray("data");
-                                            conversation.messageList = new Vector<>();
+                                            Conversation queriedConversation = new Conversation();
+                                            queriedConversation.sender=conversation.sender;
+                                            queriedConversation.receiver=conversation.receiver;
+                                            queriedConversation.messageList = new Vector<>();
                                             for (int i = 0; i < jsonMessage.length(); i++) {
                                                 final Message msg = new Message();
                                                 JSONObject Msg = jsonMessage.getJSONObject(i);
@@ -1089,9 +1094,16 @@ public class Remote extends Service implements Global {
                                                 msg.receiver = new Account();
                                                 msg.receiver.id = Msg.getString("receiverId");
                                                 msg.content = Msg.getString("msg");
-                                                conversation.messageList.add(msg);
+                                                queriedConversation.messageList.add(msg);
                                             }
-                                            listener.execute(ResultCode.Succeeded, conversation);
+                                            if (!queriedConversation.messageList.isEmpty()) {
+                                                queriedConversation.sender = Local.loadAccount();
+                                                if (queriedConversation.sender.equals(queriedConversation.messageList.get(0).sender))
+                                                    queriedConversation.receiver = queriedConversation.messageList.get(0).receiver;
+                                                else
+                                                    queriedConversation.receiver = queriedConversation.messageList.get(0).sender;
+                                            }
+                                            listener.execute(ResultCode.Succeeded, queriedConversation);
                                             break;
                                         default:
                                             listener.execute(ResultCode.Failed, QueryRecordsError.QueryFailed);

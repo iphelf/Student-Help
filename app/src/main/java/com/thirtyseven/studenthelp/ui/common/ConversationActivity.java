@@ -90,24 +90,24 @@ public class ConversationActivity extends AppCompatActivity {
                 push();
             }
         });
-        Remote.remoteBinder.queryConversationList(
-                Local.loadAccount(), new Remote.Listener() {
-                    @Override
-                    public void execute(Global.ResultCode resultCode, Object object) {
-                        conversation = Local.loadConversationMap().get(conversation.receiver.id);
-                    }
-                }
-        );
+//        Remote.remoteBinder.queryConversationList(
+//                Local.loadAccount(), new Remote.Listener() {
+//                    @Override
+//                    public void execute(Global.ResultCode resultCode, Object object) {
+//                        conversation = Local.loadConversationMap().get(conversation.receiver.id);
+//                    }
+//                }
+//        );
     }
 
     public void add(Message message) {
         conversation.messageList.add(message);
-        if (message.sender == conversation.sender)
+        if (message.sender.equals(conversation.sender))
             messageAdapter.addDataToAdapter(new MsgInfo(null, message.content));
         else
             messageAdapter.addDataToAdapter(new MsgInfo(message.content, null));
         list_conversation.setAdapter(messageAdapter);
-        list_conversation.smoothScrollToPosition(list_conversation.getCount() - 1);
+        list_conversation.setSelection(list_conversation.getBottom());
     }
 
     public void push() {
@@ -120,7 +120,7 @@ public class ConversationActivity extends AppCompatActivity {
                 messageAdapter.addDataToAdapter(new MsgInfo(message.content, null));
         }
         list_conversation.setAdapter(messageAdapter);
-        list_conversation.smoothScrollToPosition(list_conversation.getCount() - 1);
+        list_conversation.setSelection(list_conversation.getBottom());
     }
 
     Message messageNormal;
@@ -143,6 +143,7 @@ public class ConversationActivity extends AppCompatActivity {
                 messageNormal.content = msg;
                 Remote.remoteBinder.send(messageNormal);
                 add(messageNormal);
+                editTextMsg.setText("");
             }
         });
         Remote.remoteBinder.subscribe(Local.loadAccount().id, new Remote.Listener() {
